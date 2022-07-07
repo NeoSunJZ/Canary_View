@@ -1,14 +1,17 @@
 <template>
-  <HelloWorld msg="Welcome to Your Vue.js App" />
+  <div>
+    <AntNavigation></AntNavigation>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import AntNavigation from "./components/Head-Navigation.vue";
 
 export default {
   name: "App",
   components: {
-    HelloWorld,
+    AntNavigation,
   },
 };
 </script>
