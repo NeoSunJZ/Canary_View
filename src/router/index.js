@@ -1,10 +1,10 @@
-import { createRouter,createWebHashHistory} from "vue-router";
+import { createRouter,createWebHistory} from "vue-router";
 
 const MainPage = () => import("@/views/MainPage.vue")
 const LoginPage = () => import("@/views/LoginPage.vue")
 
 const routes = [
-  { path: "/", redirect: "/MainPage" },
+  { path: "/", redirect: "/Login" },
   {
     path: "/Mainpage",
     name: "MainPage",
@@ -18,7 +18,7 @@ const routes = [
 ]
 
 export const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes: routes
   })
 

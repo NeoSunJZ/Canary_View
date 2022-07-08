@@ -1,5 +1,17 @@
+<style scoped>
+.TopNavigationStyle {
+  display: flex;
+  flex-direction: row-reverse;
+}
+</style>
+
+<!-- 这个是头部导航栏，直接用的Ant的组件，后续可改成个人信息 -->
 <template>
-  <a-menu v-model:selectedKeys="current" mode="horizontal">
+  <a-menu
+    v-model:selectedKeys="current"
+    mode="horizontal"
+    class="TopNavigationStyle"
+  >
     <a-menu-item key="mail">
       <template #icon>
         <mail-outlined />
