@@ -1,12 +1,15 @@
 <template>
-  <div>This is Main Page</div>
+  <div><LeftNavigation></LeftNavigation></div>
 </template>
 
 <script>
+import LeftNavigation from "@/components/LeftNavigation.vue";
+
 export default {
   name: "MainPage",
   data: () => ({
     //
   }),
+  components: { LeftNavigation },
 };
 </script>

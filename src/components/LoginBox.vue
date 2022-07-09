@@ -41,13 +41,16 @@
       </a-form-item>
 
       <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
-        <a-button type="primary" html-type="submit">Submit</a-button>
+        <a-button type="primary" html-type="submit" @click="login"
+          >Submit</a-button
+        >
       </a-form-item>
     </a-form>
   </a-card>
 </template>
 <script>
 import { defineComponent, reactive } from "vue";
+// import * as axios from "axios";
 export default defineComponent({
   setup() {
     const formState = reactive({
@@ -63,12 +66,16 @@ export default defineComponent({
     const onFinishFailed = (errorInfo) => {
       console.log("Failed:", errorInfo);
     };
-
     return {
       formState,
       onFinish,
       onFinishFailed,
     };
+  },
+  methods: {
+    login() {
+      this.$router.push({ path: "/MainPage" });
+    },
   },
 });
 </script>
