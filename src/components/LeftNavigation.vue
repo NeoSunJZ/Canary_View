@@ -1,13 +1,13 @@
 <template>
   <div style="width: 256px">
-    <a-button
+    <!-- <a-button
       type="primary"
       style="margin-bottom: 16px"
       @click="toggleCollapsed"
     >
       <MenuUnfoldOutlined v-if="collapsed" />
       <MenuFoldOutlined v-else />
-    </a-button>
+    </a-button> -->
     <a-menu
       v-model:openKeys="openKeys"
       v-model:selectedKeys="selectedKeys"
@@ -67,9 +67,9 @@
 </template>
 <script>
 import { defineComponent, reactive, toRefs, watch } from "vue";
+// import mitt from "mitt";
+
 import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
   PieChartOutlined,
   MailOutlined,
   InboxOutlined,
@@ -77,8 +77,6 @@ import {
 } from "@ant-design/icons-vue";
 export default defineComponent({
   components: {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
     PieChartOutlined,
     MailOutlined,
     InboxOutlined,
@@ -103,8 +101,12 @@ export default defineComponent({
       state.collapsed = !state.collapsed;
       state.openKeys = state.collapsed ? [] : state.preOpenKeys;
     };
-
     return { ...toRefs(state), toggleCollapsed };
   },
+  // onMounted() {
+  //   mitt().on("State", (type, e) => console.log(type, e));
+  //   collapsed = !collapsed;
+  //   state.openKeys = state.collapsed ? [] : state.preOpenKeys;
+  // },
 });
 </script>

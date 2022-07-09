@@ -1,17 +1,16 @@
 <template>
   <div>
-    <AntNavigation style="margin-top: -50px"></AntNavigation>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import AntNavigation from "./components/TopNavigation.vue";
+// import AntNavigation from "./components/TopNavigation.vue";
 
 export default {
   name: "App",
   components: {
-    AntNavigation,
+    // AntNavigation,
   },
 };
 </script>
