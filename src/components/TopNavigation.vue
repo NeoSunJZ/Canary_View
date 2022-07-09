@@ -1,7 +1,7 @@
 <style scoped>
 .TopNavigationStyle {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
 }
 </style>
 
@@ -12,6 +12,16 @@
     mode="horizontal"
     class="TopNavigationStyle"
   >
+    <a-menu-item>
+      <a-button
+        type="primary"
+        style="margin-bottom: 16px"
+        @click="toggleCollapsed"
+      >
+        <MenuUnfoldOutlined v-if="collapsed" />
+        <MenuFoldOutlined v-else />
+      </a-button>
+    </a-menu-item>
     <a-menu-item key="mail">
       <template #icon>
         <mail-outlined />
