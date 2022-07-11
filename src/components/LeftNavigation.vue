@@ -1,19 +1,11 @@
 <template>
   <div style="width: 256px">
-    <!-- <a-button
-      type="primary"
-      style="margin-bottom: 16px"
-      @click="toggleCollapsed"
-    >
-      <MenuUnfoldOutlined v-if="collapsed" />
-      <MenuFoldOutlined v-else />
-    </a-button> -->
     <a-menu
       v-model:openKeys="openKeys"
       v-model:selectedKeys="selectedKeys"
       mode="inline"
       theme="light"
-      :inline-collapsed="collapsed"
+      :inline-collapsed="changestate"
     >
       <a-sub-menu key="sub1">
         <template #icon>
@@ -67,7 +59,6 @@
 </template>
 <script>
 import { defineComponent, reactive, toRefs, watch } from "vue";
-// import mitt from "mitt";
 
 import {
   PieChartOutlined,
@@ -82,7 +73,9 @@ export default defineComponent({
     InboxOutlined,
     AppstoreOutlined,
   },
-
+  props: {
+    changestate: Boolean,
+  },
   setup() {
     const state = reactive({
       collapsed: false,
@@ -96,17 +89,11 @@ export default defineComponent({
         state.preOpenKeys = oldVal;
       }
     );
-
     const toggleCollapsed = () => {
       state.collapsed = !state.collapsed;
       state.openKeys = state.collapsed ? [] : state.preOpenKeys;
     };
     return { ...toRefs(state), toggleCollapsed };
   },
-  // onMounted() {
-  //   mitt().on("State", (type, e) => console.log(type, e));
-  //   collapsed = !collapsed;
-  //   state.openKeys = state.collapsed ? [] : state.preOpenKeys;
-  // },
 });
 </script>

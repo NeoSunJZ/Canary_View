@@ -6,9 +6,14 @@
   height: 60px;
   z-index: 1;
 }
+.CanaryIcon {
+  margin-left: 10px;
+  margin-right: 20px;
+}
 </style>
 
 <!-- 这个是头部导航栏，直接用的Ant的组件，后续可改成个人信息 -->
+<!-- 采用一个固定的卡片包裹着图片、按钮、导航栏的结构，卡片修改了budyStyle使 padding = 0 -->
 <template>
   <a-card class="TopNavigationStyle" :bodyStyle="{ padding: '0' }">
     <div style="display: flex; align-items: center">
@@ -16,7 +21,7 @@
         src="@/assets/CanaryTest.png"
         width="80"
         height="30"
-        style="margin-left: 10px; margin-right: 20px"
+        class="CanaryIcon"
       />
       <a-button type="text" size="large" @click="sendState">
         <MenuUnfoldOutlined v-if="collapsed" />
@@ -60,8 +65,7 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
-import mitt from "mitt";
+import { defineComponent, ref, toRefs, reactive } from "vue";
 
 import {
   MenuFoldOutlined,
@@ -79,16 +83,18 @@ export default defineComponent({
     MenuFoldOutlined,
     MenuUnfoldOutlined,
   },
-
-  setup() {
+  setup(props, context) {
     const current = ref(["mail"]);
-    const State = false;
+    const state = reactive({
+      collapsed: false,
+    });
     const sendState = () => {
-      mitt().emit("State", State);
+      state.collapsed = !state.collapsed;
+      context.emit("onClickButton", state.collapsed);
     };
     return {
       current,
-      State,
+      ...toRefs(state),
       sendState,
     };
   },
