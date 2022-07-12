@@ -10,6 +10,8 @@
   "dependencies": {
     "ant-design-vue": "^3.2.9",
     "core-js": "^3.8.3",
+    "less": "^4.1.3",
+    "less-loader": "^11.0.0",
     "view-ui-plus": "^1.3.1",
     "vue": "^3.2.13",
     "vue-router": "^4.1.1"
@@ -35,7 +37,9 @@
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
-    "rules": {}
+    "rules": {
+      "vue/no-unused-components": "off"
+    }
   },
   "browserslist": [
     "> 1%",
