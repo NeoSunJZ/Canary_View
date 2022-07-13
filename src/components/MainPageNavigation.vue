@@ -31,7 +31,12 @@
     <a-layout-header class="layout__header">
       <div>
         <img src="@/assets/image/logo/logo.png" height="50" />
-        <a-button type="text" size="large" @click="toggleCollapsed" class="layout__collapse_button">
+        <a-button
+          type="text"
+          size="large"
+          @click="toggleCollapsed"
+          class="layout__collapse_button"
+        >
           <MenuUnfoldOutlined v-if="collapsed" />
           <MenuFoldOutlined v-else />
         </a-button>
@@ -42,36 +47,75 @@
         <a-menu-item key="2">nav 2</a-menu-item>
         <a-menu-item key="3">nav 3</a-menu-item>
       </a-menu>
-
     </a-layout-header>
     <a-layout>
       <!-- 侧边栏，主要包括一个导航栏 -->
-      <a-layout-sider width="200" v-model:collapsed="collapsed" class="layout__menu">
-        <a-menu :openKeys="openKeys" :selectedKeys="selectedKeys" mode="inline" theme="light">
+      <a-layout-sider
+        width="200"
+        v-model:collapsed="collapsed"
+        class="layout__menu"
+      >
+        <a-menu
+          :openKeys="openKeys"
+          :selectedKeys="selectedKeys"
+          mode="inline"
+          theme="light"
+        >
           <a-sub-menu key="sub1">
             <template #icon>
-              <MailOutlined />
+              <ClusterOutlined />
             </template>
             <template #title>节点管理</template>
-            <a-menu-item key="1">我的节点</a-menu-item>
-            <a-menu-item key="2">数据集绑定</a-menu-item>
-            <a-menu-item key="3">模型绑定</a-menu-item>
-            <a-menu-item key="4">攻击方法绑定</a-menu-item>
-            <a-menu-item key="5">防御方法绑定</a-menu-item>
+            <a-menu-item key="1">
+              <template #icon><DesktopOutlined /></template>
+              我的节点</a-menu-item
+            >
+            <a-menu-item key="2">
+              <template #icon><DatabaseOutlined /></template>
+
+              数据集绑定</a-menu-item
+            >
+            <a-menu-item key="3">
+              <template #icon> <DeploymentUnitOutlined /></template>
+
+              模型绑定</a-menu-item
+            >
+            <a-menu-item key="4">
+              <template #icon><AimOutlined /></template>
+              攻击方法绑定</a-menu-item
+            >
+            <a-menu-item key="5">
+              <template #icon><SecurityScanOutlined /></template>
+
+              防御方法绑定</a-menu-item
+            >
           </a-sub-menu>
           <a-sub-menu key="sub2">
             <template #icon>
-              <PieChartOutlined />
+              <ExperimentOutlined />
             </template>
             <template #title>测试任务管理</template>
-            <a-menu-item key="6">测试任务构建</a-menu-item>
-            <a-menu-item key="7">任务实时看板</a-menu-item>
-            <a-menu-item key="8">结果分析</a-menu-item>
-            <a-menu-item key="9">天梯榜</a-menu-item>
+            <a-menu-item key="6">
+              <template #icon><AppstoreAddOutlined /></template>
+              测试任务构建
+            </a-menu-item>
+            <a-menu-item key="7">
+              <template #icon><CalendarOutlined /></template>
+              任务实时看板</a-menu-item
+            >
+            <a-menu-item key="8">
+              <template #icon><FundOutlined /></template>
+              结果分析</a-menu-item
+            >
+            <a-menu-item key="9">
+              <template #icon><RocketOutlined /></template>
+
+              天梯榜</a-menu-item
+            >
           </a-sub-menu>
           <a-menu-item key="10">
             <template #icon>
-              <InboxOutlined />
+              <QuestionCircleOutlined />
             </template>
             <span>关于我们</span>
           </a-menu-item>
@@ -92,17 +136,40 @@
   </a-layout>
 </template>
 <script>
-import { MenuFoldOutlined, MenuUnfoldOutlined, PieChartOutlined, MailOutlined, InboxOutlined, AppstoreOutlined } from '@ant-design/icons-vue';
-import { defineComponent, ref, toRefs, reactive } from 'vue';
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  ClusterOutlined,
+  DesktopOutlined,
+  DatabaseOutlined,
+  DeploymentUnitOutlined,
+  AimOutlined,
+  SecurityScanOutlined,
+  ExperimentOutlined,
+  AppstoreAddOutlined,
+  CalendarOutlined,
+  FundOutlined,
+  RocketOutlined,
+  QuestionCircleOutlined,
+} from "@ant-design/icons-vue";
+import { defineComponent, ref, toRefs, reactive } from "vue";
 
 export default defineComponent({
   components: {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
-    PieChartOutlined,
-    MailOutlined,
-    InboxOutlined,
-    AppstoreOutlined,
+    ClusterOutlined,
+    DesktopOutlined,
+    DatabaseOutlined,
+    DeploymentUnitOutlined,
+    AimOutlined,
+    SecurityScanOutlined,
+    ExperimentOutlined,
+    AppstoreAddOutlined,
+    CalendarOutlined,
+    FundOutlined,
+    RocketOutlined,
+    QuestionCircleOutlined,
   },
   props: {
     openKeys: Array,
@@ -112,25 +179,25 @@ export default defineComponent({
     return {
       links: [
         {
-          key: '帮助',
-          title: '帮助',
-          href: 'https://www.iviewui.com',
+          key: "帮助",
+          title: "帮助",
+          href: "",
           blankTarget: true,
         },
         {
-          key: 'github',
-          icon: 'logo-github',
-          href: 'https://github.com/view-design/ViewUIPlus',
+          key: "github",
+          icon: "logo-github",
+          href: "",
           blankTarget: true,
         },
         {
-          key: '条款',
-          title: '条款',
-          href: '',
+          key: "条款",
+          title: "条款",
+          href: "",
           blankTarget: true,
         },
       ],
-      copyright: 'Copyright © 2022 BIT All Rights Reserved',
+      copyright: "Copyright © 2022 BIT All Rights Reserved",
     };
   },
   setup() {
@@ -149,9 +216,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style>
-.site-layout-background {
-  background: #fff;
-}
-</style>

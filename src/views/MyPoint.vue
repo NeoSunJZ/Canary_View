@@ -1,18 +1,20 @@
+<style scoped lang="less">
+.submenu {
+  height: 50px;
+}
+</style>
+
 <template>
   <MainPageNavigation :selectedKeys="['1']" :openKeys="['sub1']">
     <template v-slot:submenu>
-      <a-menu v-model:selectedKeys="current" mode="horizontal">
-        <a-menu-item key="mail">
+      <a-menu v-model:selectedKeys="current" mode="horizontal" class="submenu">
+        <a-menu-item key="defenseTest">
           <template #icon>
             <mail-outlined />
           </template>
           防御测试
         </a-menu-item>
-        <a-menu-item key="alipay">
-          <a href="https://antdv.com" target="_blank" rel="noopener noreferrer">
-            攻击测试
-          </a>
-        </a-menu-item>
+        <a-menu-item key="attackTest"> 攻击测试 </a-menu-item>
       </a-menu>
     </template>
     <template v-slot:breadcrumb>
@@ -22,16 +24,15 @@
     </template>
     <template v-slot:content>
       <p>hello world!</p>
-
     </template>
   </MainPageNavigation>
 </template>
 
 <script>
-import MainPageNavigation from '@/components/MainPageNavigation.vue';
+import MainPageNavigation from "@/components/MainPageNavigation.vue";
 
 export default {
-  name: 'MainPage',
+  name: "MainPage",
   data() {
     return {
       //

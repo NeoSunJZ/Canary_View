@@ -74,7 +74,7 @@ export default defineComponent({
   },
   methods: {
     login() {
-      this.$router.push({ path: "/MainPage" });
+      this.$router.push({ path: "/MyPoint" });
     },
   },
 });
