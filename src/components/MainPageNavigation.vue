@@ -66,25 +66,25 @@
               <ClusterOutlined />
             </template>
             <template #title>节点管理</template>
-            <a-menu-item key="1">
+            <a-menu-item key="1" @click="toPage('MyPoint')">
               <template #icon><DesktopOutlined /></template>
               我的节点</a-menu-item
             >
-            <a-menu-item key="2">
+            <a-menu-item key="2" @click="toPage('DataSetBinding')">
               <template #icon><DatabaseOutlined /></template>
 
               数据集绑定</a-menu-item
             >
-            <a-menu-item key="3">
+            <a-menu-item key="3" @click="toPage('ModelBinding')">
               <template #icon> <DeploymentUnitOutlined /></template>
 
               模型绑定</a-menu-item
             >
-            <a-menu-item key="4">
+            <a-menu-item key="4" @click="toPage('AttackMethodBinding')">
               <template #icon><AimOutlined /></template>
               攻击方法绑定</a-menu-item
             >
-            <a-menu-item key="5">
+            <a-menu-item key="5" @click="toPage('DefenseMethodBinding')">
               <template #icon><SecurityScanOutlined /></template>
 
               防御方法绑定</a-menu-item
@@ -199,6 +199,11 @@ export default defineComponent({
       ],
       copyright: "Copyright © 2022 BIT All Rights Reserved",
     };
+  },
+  methods: {
+    toPage(page) {
+      this.$router.push({ path: "/" + page });
+    },
   },
   setup() {
     const state = reactive({
