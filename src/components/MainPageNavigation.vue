@@ -95,19 +95,19 @@
               <ExperimentOutlined />
             </template>
             <template #title>测试任务管理</template>
-            <a-menu-item key="6">
+            <a-menu-item key="6" @click="toPage('TestTaskConstruction')">
               <template #icon><AppstoreAddOutlined /></template>
               测试任务构建
             </a-menu-item>
-            <a-menu-item key="7">
+            <a-menu-item key="7" @click="toPage('TaskRealtimeBoard')">
               <template #icon><CalendarOutlined /></template>
               任务实时看板</a-menu-item
             >
-            <a-menu-item key="8">
+            <a-menu-item key="8" @click="toPage('ResultAnalysis')">
               <template #icon><FundOutlined /></template>
               结果分析</a-menu-item
             >
-            <a-menu-item key="9">
+            <a-menu-item key="9" @click="toPage('RankingList')">
               <template #icon><RocketOutlined /></template>
 
               天梯榜</a-menu-item

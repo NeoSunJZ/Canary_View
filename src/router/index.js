@@ -1,12 +1,11 @@
 import { createRouter,createWebHistory} from "vue-router";
 
 const MyPoint = () => import("@/views/point-manage/MyPoint.vue")
-const LoginPage = () => import("@/views/login/LoginPage.vue")
+
 const DataSetBinding = () => import("@/views/point-manage/DataSetBinding.vue")
 const ModelBinding = () => import("@/views/point-manage/ModelBinding.vue")
 const AttackMethodBinding = () => import("@/views/point-manage/AttackMethodBinding.vue")
 const DefenseMethodBinding = () => import("@/views/point-manage/DefenseMethodBinding.vue")
-const TestTaskConstruction=()=>import("@/views/test-manage/TestTaskConstruction.vue")
 const TaskRealtimeBoard=()=>import("@/views/test-manage/TaskRealtimeBoard.vue")
 const ResultAnalysis=()=>import("@/views/test-manage/ResultAnalysis.vue")
 const RankingList=()=>import("@/views/test-manage/RankingList.vue")
@@ -16,7 +15,7 @@ const routes = [
   {
     path: "/Login",
     name: "Login",
-    component: LoginPage
+    component: () => import("@/views/login/LoginPage.vue") // 而不是 const LoginPage = () => import("@/views/login/LoginPage.vue")
   },
   {
     path: "/MyPoint",
@@ -46,7 +45,12 @@ const routes = [
   {
     path: "/TestTaskConstruction",
     name: "TestTaskConstruction",
-    component:TestTaskConstruction
+    component: ()=>import("@/views/test-manage/TestTaskConstruction/MainPage.vue")
+  },
+  {
+    path: "/TestTaskConstruction/AttackTest",
+    name: "AttackTestTaskConstruction",
+    component: ()=>import("@/views/test-manage/TestTaskConstruction/AttackTest.vue")
   },
   {
     path: "/TaskRealtimeBoard",

@@ -29,12 +29,13 @@
       </a-menu>
     </template>
     <template v-slot:breadcrumb>
-      <a-breadcrumb-item>Home</a-breadcrumb-item>
-      <a-breadcrumb-item>List</a-breadcrumb-item>
+      <a-breadcrumb-item>测试任务管理</a-breadcrumb-item>
+      <a-breadcrumb-item>测试任务构建</a-breadcrumb-item>
       <a-breadcrumb-item>App</a-breadcrumb-item>
     </template>
     <template v-slot:content>
       <p>测试任务构建页面</p>
+
     </template>
   </MainPageNavigation>
 </template>
@@ -43,7 +44,7 @@
 import MainPageNavigation from "@/components/MainPageNavigation.vue";
 
 export default {
-  name: "TestTaskConstruction",
+  name: "MainPage",
   data() {
     return {
       //
