@@ -14,13 +14,16 @@
           </template>
           防御测试
         </a-menu-item>
-        <a-menu-item key="attackTest">
+        <a-menu-item
+          key="attackTest"
+          @click="toPage('TestTaskConstruction/AttackTest')"
+        >
           <template #icon>
             <mail-outlined />
           </template>
           攻击测试
         </a-menu-item>
-        <a-menu-item key="attackTest">
+        <a-menu-item key="modelTest">
           <template #icon>
             <mail-outlined />
           </template>
@@ -35,7 +38,6 @@
     </template>
     <template v-slot:content>
       <p>测试任务构建页面</p>
-
     </template>
   </MainPageNavigation>
 </template>
@@ -51,7 +53,9 @@ export default {
     };
   },
   methods: {
-    //
+    toPage(page) {
+      this.$router.push({ path: "/" + page });
+    },
   },
   components: { MainPageNavigation },
 };

@@ -1,15 +1,5 @@
 import { createRouter,createWebHistory} from "vue-router";
 
-const MyPoint = () => import("@/views/point-manage/MyPoint.vue")
-
-const DataSetBinding = () => import("@/views/point-manage/DataSetBinding.vue")
-const ModelBinding = () => import("@/views/point-manage/ModelBinding.vue")
-const AttackMethodBinding = () => import("@/views/point-manage/AttackMethodBinding.vue")
-const DefenseMethodBinding = () => import("@/views/point-manage/DefenseMethodBinding.vue")
-const TaskRealtimeBoard=()=>import("@/views/test-manage/TaskRealtimeBoard.vue")
-const ResultAnalysis=()=>import("@/views/test-manage/ResultAnalysis.vue")
-const RankingList=()=>import("@/views/test-manage/RankingList.vue")
-
 const routes = [
   { path: "/", redirect: "/Login" },
   {
@@ -20,27 +10,27 @@ const routes = [
   {
     path: "/MyPoint",
     name: "MyPoint",
-    component: MyPoint
+    component: () => import("@/views/point-manage/MyPoint.vue")
   },
   {
     path: "/DataSetBinding",
     name: "DataSetBinding",
-    component: DataSetBinding
+    component: () => import("@/views/point-manage/DataSetBinding.vue")
   },
   {
     path: "/ModelBinding",
     name: "ModelBinding",
-    component: ModelBinding
+    component: () => import("@/views/point-manage/ModelBinding.vue")
   },
   {
     path: "/AttackMethodBinding",
     name: "AttackMethodBinding",
-    component: AttackMethodBinding
+    component:  () => import("@/views/point-manage/AttackMethodBinding.vue")
   },
   {
     path: "/DefenseMethodBinding",
     name: "DefenseMethodBinding",
-    component: DefenseMethodBinding
+    component: () => import("@/views/point-manage/DefenseMethodBinding.vue")
   },
   {
     path: "/TestTaskConstruction",
@@ -55,17 +45,17 @@ const routes = [
   {
     path: "/TaskRealtimeBoard",
     name: "TaskRealtimeBoard",
-    component: TaskRealtimeBoard
+    component: ()=>import("@/views/test-manage/TaskRealtimeBoard.vue")
   },
   {
     path: "/ResultAnalysis",
     name: "ResultAnalysis",
-    component: ResultAnalysis
+    component: ()=>import("@/views/test-manage/ResultAnalysis.vue")
   },
   {
     path: "/RankingList",
     name: "RankingList",
-    component: RankingList
+    component: ()=>import("@/views/test-manage/RankingList.vue")
   }
 
 ]

@@ -152,7 +152,7 @@ import {
   RocketOutlined,
   QuestionCircleOutlined,
 } from "@ant-design/icons-vue";
-import { defineComponent, ref, toRefs, reactive } from "vue";
+import { defineComponent, ref, toRefs, reactive, onBeforeMount } from "vue";
 
 export default defineComponent({
   components: {
@@ -211,7 +211,13 @@ export default defineComponent({
     });
     const toggleCollapsed = () => {
       state.collapsed = !state.collapsed;
+      sessionStorage.setItem("collapsed", state.collapsed);
     };
+    onBeforeMount(() => {
+      if (sessionStorage.getItem("collapsed") == "true") {
+        state.collapsed = true;
+      } else state.collapsed = false;
+    });
     return {
       selectedKeys1: ref([]),
       collapsed: ref(false),
