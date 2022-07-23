@@ -134,13 +134,14 @@
               <a-col :span="16" class="attack-task__attack-selector">
                 <a-transfer v-model:target-keys="targetKeys" :data-source="attackInfo" show-search :rowKey="record => record.attackMethodID"
                   :list-style="{'min-width': '250px','min-height': '300px',flex:1}" :titles="[' 可选方法', ' 已选定方法']" :operations="['to right', 'to left']"
-                  @change="handleChange" style="width: 100%">
+                  @change="handleMoveItemChange" style="width: 100%">
 
                   <template #children="{ direction,filteredItems,selectedKeys,disabled: listDisabled,onItemSelectAll,onItemSelect }">
 
                     <a-table :row-selection="getRowSelection({disabled: listDisabled,selectedKeys,onItemSelectAll,onItemSelect,})"
                       :columns="direction === 'left' ? leftTableColumns : rightTableColumns" :data-source="filteredItems" size="small"
-                      :style="{ pointerEvents: listDisabled ? 'none' : null }" :pagination="{ pageSize: 5 }"
+                      :style="{ pointerEvents: listDisabled ? 'none' : null }" :pagination="direction === 'left' ? pagination : {'pageSize':5}"
+                      @change="(...args) => {(direction === 'left' ? handleTableChange(...args) : ()=>{})}"
                       :custom-row="({ key, disabled: itemDisabled }) => ({onClick: () => {if (itemDisabled || listDisabled) return;onItemSelect(key, !selectedKeys.includes(key))},})"
                       :scroll="direction === 'left' ? { x: 800 }:null">
 
@@ -211,7 +212,7 @@
 
 <script>
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import { message, Empty } from 'ant-design-vue';
 import { DeploymentUnitOutlined, ClusterOutlined } from '@ant-design/icons-vue';
 
@@ -258,15 +259,58 @@ export default defineComponent({
       },
     ];
 
+    const pageSize = ref(5);
+    const totalAtkInfo = ref(0);
+    const totalLoad = ref(0);
+
+    const currentPage = ref(1);
+
+    const attackInfo = ref([]);
+    const targetKeys = ref([]);
+
+    let loadPage = 1;
+    let loadFinished = false;
+
+    const pagination = computed(() => {
+      return {
+        total: totalAtkInfo.value - targetKeys.value.length,
+        current: currentPage.value,
+        pageSize: pageSize.value,
+      };
+    });
+
     // 拉取攻击方法信息
     onMounted(async () => {
       await getAttackInfo();
     });
-    const attackInfo = ref([]);
-    const targetKeys = ref([]);
+
     const getAttackInfo = async () => {
-      const atkInfo = await getAtkInfo(1, 10);
-      attackInfo.value = atkInfo.list;
+      const atkInfo = await getAtkInfo(loadPage, pageSize.value);
+
+      attackInfo.value = attackInfo.value.concat(atkInfo.list);
+      totalAtkInfo.value = atkInfo.total;
+      totalLoad.value = totalLoad.value + atkInfo.size;
+
+      loadFinished = atkInfo.isLastPage;
+    };
+
+    const handleMoveItemChange = () => {
+      loadMoreAttackMethodInfo();
+    };
+
+    const loadMoreAttackMethodInfo = async () => {
+      // 左侧待选已加载的项目数 totalLoad - targetKeys.value.length
+      // 左侧需显示的项目数 pageSize*currentPage
+      // 若已加载小于需显示，则继续向后加载
+      while (totalLoad.value - targetKeys.value.length < pageSize.value * currentPage.value && !loadFinished) {
+        loadPage++;
+        await getAttackInfo();
+      }
+    };
+    
+    const handleTableChange = (newPagination, filters, sorter) => {
+      currentPage.value = newPagination.current;
+      loadMoreAttackMethodInfo();
     };
 
     const selectedAttackMethodInfo = ref();
@@ -276,10 +320,6 @@ export default defineComponent({
           selectedAttackMethodInfo.value = element;
         }
       });
-    };
-
-    const handleChange = (keys, direction, moveKeys) => {
-      console.log(keys, direction, moveKeys);
     };
 
     const getRowSelection = ({ disabled, selectedKeys, onItemSelectAll, onItemSelect }) => {
@@ -320,11 +360,13 @@ export default defineComponent({
       leftTableColumns,
       rightTableColumns,
 
-      attackInfo,
+      pagination,
 
+      attackInfo,
+      handleTableChange,
       targetKeys,
       getRowSelection,
-      handleChange,
+      handleMoveItemChange,
 
       getAttackInfo,
       showMethodDetails,
