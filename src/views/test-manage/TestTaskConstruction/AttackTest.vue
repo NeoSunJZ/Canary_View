@@ -32,26 +32,6 @@
     padding: 10px;
   }
 }
-// .server {
-//   height: 100%;
-//   margin-left: 10px;
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-//   &__icon {
-//     font-size: 32px;
-//     color: @primary-color;
-//   }
-//   &__title {
-//     margin-left: 10px;
-//   }
-//   &__detail {
-//     margin-top: 5px;
-//   }
-// }
-// .ant-ribbon-wrapper {
-//   height: 100%;
-// }
 </style>
 
 <template>
@@ -170,7 +150,7 @@
                   }"
                   :titles="[' 可选方法', ' 已选定方法']"
                   :operations="['to right', 'to left']"
-                  @change="handleChange"
+                  @change="handleMoveItemChange"
                   style="width: 100%"
                 >
                   <template
@@ -200,7 +180,16 @@
                       :data-source="filteredItems"
                       size="small"
                       :style="{ pointerEvents: listDisabled ? 'none' : null }"
-                      :pagination="{ pageSize: 5 }"
+                      :pagination="
+                        direction === 'left' ? pagination : { pageSize: 5 }
+                      "
+                      @change="
+                        (...args) => {
+                          direction === 'left'
+                            ? handleTableChange(...args)
+                            : () => {};
+                        }
+                      "
                       :custom-row="
                         ({ key, disabled: itemDisabled }) => ({
                           onClick: () => {
@@ -313,11 +302,10 @@
 <script>
 import MainPageNavigation from "@/components/MainPageNavigation.vue";
 import ServerPointCard from "@/components/ServerPointCard.vue";
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref, onMounted, computed } from "vue";
 import { message, Empty } from "ant-design-vue";
 import { DeploymentUnitOutlined, ClusterOutlined } from "@ant-design/icons-vue";
-
-// import { getModelInfo } from '@/api/model-api/modelInfo.js'
+// import { getModelInfo } from "@/api/model-api/modelInfo.js";
 import { getAtkInfo } from "@/api/atk-api/atkInfo.js";
 
 export default defineComponent({
@@ -362,15 +350,63 @@ export default defineComponent({
     const handleServerChange = (currentServerInfo) => {
       console.log(currentServerInfo);
     };
+
+    const pageSize = ref(5);
+    const totalAtkInfo = ref(0);
+    const totalLoad = ref(0);
+
+    const currentPage = ref(1);
+
+    const attackInfo = ref([]);
+    const targetKeys = ref([]);
+
+    let loadPage = 1;
+    let loadFinished = false;
+
+    const pagination = computed(() => {
+      return {
+        total: totalAtkInfo.value - targetKeys.value.length,
+        current: currentPage.value,
+        pageSize: pageSize.value,
+      };
+    });
+
     // 拉取攻击方法信息
     onMounted(async () => {
       await getAttackInfo();
     });
-    const attackInfo = ref([]);
-    const targetKeys = ref([]);
+
     const getAttackInfo = async () => {
-      const atkInfo = await getAtkInfo(1, 10);
-      attackInfo.value = atkInfo.list;
+      const atkInfo = await getAtkInfo(loadPage, pageSize.value);
+
+      attackInfo.value = attackInfo.value.concat(atkInfo.list);
+      totalAtkInfo.value = atkInfo.total;
+      totalLoad.value = totalLoad.value + atkInfo.size;
+
+      loadFinished = atkInfo.isLastPage;
+    };
+
+    const handleMoveItemChange = () => {
+      loadMoreAttackMethodInfo();
+    };
+
+    const loadMoreAttackMethodInfo = async () => {
+      // 左侧待选已加载的项目数 totalLoad - targetKeys.value.length
+      // 左侧需显示的项目数 pageSize*currentPage
+      // 若已加载小于需显示，则继续向后加载
+      while (
+        totalLoad.value - targetKeys.value.length <
+          pageSize.value * currentPage.value &&
+        !loadFinished
+      ) {
+        loadPage++;
+        await getAttackInfo();
+      }
+    };
+
+    const handleTableChange = (newPagination, filters, sorter) => {
+      currentPage.value = newPagination.current;
+      loadMoreAttackMethodInfo();
     };
 
     const selectedAttackMethodInfo = ref();
@@ -392,26 +428,32 @@ export default defineComponent({
       onItemSelectAll,
       onItemSelect,
     }) => {
-      return {
-        getCheckboxProps: (item) => ({
-          disabled: disabled || item.disabled,
-        }),
+      const getRowSelection = ({
+        disabled,
+        selectedKeys,
+        onItemSelectAll,
+        onItemSelect,
+      }) => {
+        return {
+          getCheckboxProps: (item) => ({
+            disabled: disabled || item.disabled,
+          }),
 
-        onSelectAll(selected, selectedRows) {
-          const treeSelectedKeys = selectedRows
-            .filter((item) => !item.disabled)
-            .map(({ key }) => key);
-          onItemSelectAll(treeSelectedKeys, selected);
-        },
+          onSelectAll(selected, selectedRows) {
+            const treeSelectedKeys = selectedRows
+              .filter((item) => !item.disabled)
+              .map(({ key }) => key);
+            onItemSelectAll(treeSelectedKeys, selected);
+          },
 
-        onSelect({ key }, selected) {
-          onItemSelect(key, selected);
-        },
+          onSelect({ key }, selected) {
+            onItemSelect(key, selected);
+          },
 
-        selectedRowKeys: selectedKeys,
+          selectedRowKeys: selectedKeys,
+        };
       };
     };
-
     const next = () => {
       current.value++;
     };
@@ -428,11 +470,17 @@ export default defineComponent({
       selectedAttackMethodInfo,
       leftTableColumns,
       rightTableColumns,
-      attackInfo,
       targetKeys,
       getRowSelection,
       handleServerChange,
       handleChange,
+
+      pagination,
+
+      attackInfo,
+      handleTableChange,
+      handleMoveItemChange,
+
       getAttackInfo,
       showMethodDetails,
       simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
