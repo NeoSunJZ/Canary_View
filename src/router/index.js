@@ -1,7 +1,12 @@
-import { createRouter,createWebHistory} from "vue-router";
+import {
+  createRouter,
+  createWebHistory
+} from "vue-router";
 
-const routes = [
-  { path: "/", redirect: "/Login" },
+const routes = [{
+    path: "/",
+    redirect: "/Login"
+  },
   {
     path: "/Login",
     name: "Login",
@@ -25,7 +30,7 @@ const routes = [
   {
     path: "/AttackMethodBinding",
     name: "AttackMethodBinding",
-    component:  () => import("@/views/point-manage/AttackMethodBinding.vue")
+    component: () => import("@/views/point-manage/AttackMethodBinding.vue")
   },
   {
     path: "/DefenseMethodBinding",
@@ -35,34 +40,39 @@ const routes = [
   {
     path: "/TestTaskConstruction",
     name: "TestTaskConstruction",
-    component: ()=>import("@/views/test-manage/TestTaskConstruction/MainPage.vue")
+    component: () => import("@/views/test-manage/TestTaskConstruction/DefenseTest.vue")
+  },
+  {
+    path: "/TestTaskConstruction/DefenseTest",
+    name: "DefenseTestTaskConstruction",
+    component: () => import("@/views/test-manage/TestTaskConstruction/DefenseTest.vue")
   },
   {
     path: "/TestTaskConstruction/AttackTest",
     name: "AttackTestTaskConstruction",
-    component: ()=>import("@/views/test-manage/TestTaskConstruction/AttackTest.vue")
+    component: () => import("@/views/test-manage/TestTaskConstruction/AttackTest.vue")
   },
   {
     path: "/TaskRealtimeBoard",
     name: "TaskRealtimeBoard",
-    component: ()=>import("@/views/test-manage/TaskRealtimeBoard.vue")
+    component: () => import("@/views/test-manage/TaskRealtimeBoard.vue")
   },
   {
     path: "/ResultAnalysis",
     name: "ResultAnalysis",
-    component: ()=>import("@/views/test-manage/ResultAnalysis.vue")
+    component: () => import("@/views/test-manage/ResultAnalysis.vue")
   },
   {
     path: "/RankingList",
     name: "RankingList",
-    component: ()=>import("@/views/test-manage/RankingList.vue")
+    component: () => import("@/views/test-manage/RankingList.vue")
   }
 
 ]
 
 export const router = createRouter({
-    history: createWebHistory(),
-    routes: routes
-  })
+  history: createWebHistory(),
+  routes: routes
+})
 
 export default router
