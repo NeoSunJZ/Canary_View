@@ -140,6 +140,7 @@
   </a-layout>
 </template>
 <script>
+import router from '@/router';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -204,11 +205,6 @@ export default defineComponent({
       copyright: 'Copyright © 2022 BIT All Rights Reserved',
     };
   },
-  methods: {
-    toPage(page) {
-      this.$router.push({ path: '/' + page });
-    },
-  },
   setup(props, context) {
     const state = reactive({
       collapsed: false,
@@ -216,6 +212,9 @@ export default defineComponent({
     const toggleCollapsed = () => {
       state.collapsed = !state.collapsed;
       sessionStorage.setItem('collapsed', state.collapsed);
+    };
+    const toPage = (page) => {
+      router.push({ path: '/' + page });
     };
     onBeforeMount(() => {
       if (sessionStorage.getItem('collapsed') == 'true') {
@@ -226,7 +225,7 @@ export default defineComponent({
       selectedKeys1: ref([]),
       collapsed: ref(false),
       toggleCollapsed,
-      // toPage,
+      toPage,
       ...toRefs(state),
     };
   },

@@ -274,7 +274,6 @@ export default defineComponent({
 
       loadFinished = atkInfo.isLastPage;
     };
-
     const handleMoveItemChange = () => {
       loadMoreAttackMethodInfo();
     };
