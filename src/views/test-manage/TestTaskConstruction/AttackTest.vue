@@ -189,16 +189,13 @@ import ServerPointCard from '@/components/ServerPointCard.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import { message, Empty } from 'ant-design-vue';
 import { DeploymentUnitOutlined, ClusterOutlined } from '@ant-design/icons-vue';
+import router from '@/router';
 // import { getModelInfo } from "@/api/model-api/modelInfo.js";
 import { getAtkInfo } from '@/api/atk-api/atkInfo.js';
 
 export default defineComponent({
   name: 'MainPage',
-  methods: {
-    toPage(page) {
-      this.$router.push({ path: '/' + page });
-    },
-  },
+
   setup() {
     const current = ref(0);
     const attackType = ref(0);
@@ -239,7 +236,9 @@ export default defineComponent({
     const handleServerChange = (currentServerInfo) => {
       console.log(currentServerInfo);
     };
-
+    const toPage = (page) => {
+      router.push({ path: '/' + page });
+    };
     const pageSize = ref(5);
     const totalAtkInfo = ref(0);
     const totalLoad = ref(0);
@@ -348,7 +347,7 @@ export default defineComponent({
       handleChange,
 
       pagination,
-
+      toPage,
       attackInfo,
       handleTableChange,
       handleMoveItemChange,

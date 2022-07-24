@@ -38,11 +38,6 @@ const routes = [{
     component: () => import("@/views/point-manage/DefenseMethodBinding.vue")
   },
   {
-    path: "/TestTaskConstruction",
-    name: "TestTaskConstruction",
-    component: () => import("@/views/test-manage/TestTaskConstruction/DefenseTest.vue")
-  },
-  {
     path: "/TestTaskConstruction/DefenseTest",
     name: "DefenseTestTaskConstruction",
     component: () => import("@/views/test-manage/TestTaskConstruction/DefenseTest.vue")

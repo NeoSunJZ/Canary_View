@@ -60,7 +60,8 @@
 </template>
 
 <script>
-import { defineComponent, ref, onMounted, watch, computed } from 'vue';
+import { defineComponent, ref, computed, onBeforeMount } from 'vue';
+import { getDeclaration } from '@/api/framework-api/declaration';
 import { DeploymentUnitOutlined, ClusterOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({
@@ -119,10 +120,25 @@ export default defineComponent({
       visible.value = !visible.value;
       // todo 请求所有我的服务器节点信息,放到了data里
     };
-    const handleOk = () => {
+    const handleOk = async () => {
       visible.value = !visible.value;
-      context.emit('serverSelected', data[selectedServerIndex]);
+      let declarationInfo = await getDeclaration(data[selectedServerIndex.value].ip, data[selectedServerIndex.value].port);
+      if (declarationInfo == null) {
+        serverStatusFlag.value = false;
+      } else {
+        serverStatusFlag.value = true;
+      }
+      context.emit('serverSelected', { serverInfo: data[selectedServerIndex.value], declarationInfo: declarationInfo });
     };
+    onBeforeMount(async () => {
+      let declarationInfo = await getDeclaration(data[0].ip, data[0].port);
+      if (declarationInfo == null) {
+        serverStatusFlag.value = false;
+      } else {
+        serverStatusFlag.value = true;
+      }
+      context.emit('serverSelected', { serverInfo: data[0], declarationInfo: declarationInfo });
+    });
 
     return {
       visible,
