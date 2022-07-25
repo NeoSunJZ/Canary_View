@@ -1,3 +1,7 @@
+<!--
+ * @FileDescription: 主页的导航栏组件，包含一个头部导航和一个侧边栏
+ -->
+
 <style scoped lang="less">
 .layout {
   height: 100vh;
@@ -25,6 +29,7 @@
   }
 }
 </style>
+
 <template>
   <a-layout class="layout">
     <!-- 头部，包含一个logo，一个按钮和一个导航菜单 -->
@@ -43,6 +48,7 @@
         <a-menu-item key="3">nav 3</a-menu-item>
       </a-menu>
     </a-layout-header>
+
     <a-layout>
       <!-- 侧边栏，主要包括一个导航栏 -->
       <a-layout-sider width="200" v-model:collapsed="collapsed" class="layout__menu">
@@ -62,14 +68,12 @@
               <template #icon>
                 <DatabaseOutlined />
               </template>
-
               数据集绑定
             </a-menu-item>
             <a-menu-item key="3" @click="toPage('ModelBinding')">
               <template #icon>
                 <DeploymentUnitOutlined />
               </template>
-
               模型绑定
             </a-menu-item>
             <a-menu-item key="4" @click="toPage('AttackMethodBinding')">
@@ -82,10 +86,10 @@
               <template #icon>
                 <SecurityScanOutlined />
               </template>
-
               防御方法绑定
             </a-menu-item>
           </a-sub-menu>
+
           <a-sub-menu key="sub2">
             <template #icon>
               <ExperimentOutlined />
@@ -113,7 +117,6 @@
               <template #icon>
                 <RocketOutlined />
               </template>
-
               天梯榜
             </a-menu-item>
           </a-sub-menu>
@@ -125,7 +128,7 @@
           </a-menu-item>
         </a-menu>
       </a-layout-sider>
-      <!-- 中间的面包屑和内容板块 -->
+      <!-- 中间的面包屑和内容板块使用slot插槽 -->
       <a-layout class="layout__content">
         <slot name="submenu"></slot>
         <a-breadcrumb class="layout__content__breadcrumb">
@@ -134,11 +137,13 @@
         <a-card class="layout__content__card">
           <slot name="content"></slot>
         </a-card>
+        <!-- 版权等脚标 -->
         <GlobalFooter :links="links" :copyright="copyright" />
       </a-layout>
     </a-layout>
   </a-layout>
 </template>
+
 <script>
 import router from '@/router';
 import {
@@ -177,37 +182,12 @@ export default defineComponent({
     QuestionCircleOutlined,
   },
   props: {
-    openKeys: Array,
-    selectedKeys: Array,
-  },
-  data() {
-    return {
-      links: [
-        {
-          key: '帮助',
-          title: '帮助',
-          href: '',
-          blankTarget: true,
-        },
-        {
-          key: 'github',
-          icon: 'logo-github',
-          href: '',
-          blankTarget: true,
-        },
-        {
-          key: '条款',
-          title: '条款',
-          href: '',
-          blankTarget: true,
-        },
-      ],
-      copyright: 'Copyright © 2022 BIT All Rights Reserved',
-    };
+    openKeys: Array, //控制侧边栏中哪些父菜单打开
+    selectedKeys: Array, //控制选中哪个子菜单
   },
   setup(props, context) {
     const state = reactive({
-      collapsed: false,
+      collapsed: false, //侧边栏是否折叠
     });
     const toggleCollapsed = () => {
       state.collapsed = !state.collapsed;
@@ -216,12 +196,36 @@ export default defineComponent({
     const toPage = (page) => {
       router.push({ path: '/' + page });
     };
+    const links = ref([
+      {
+        key: '帮助',
+        title: '帮助',
+        href: '',
+        blankTarget: true,
+      },
+      {
+        key: 'github',
+        icon: 'logo-github',
+        href: '',
+        blankTarget: true,
+      },
+      {
+        key: '条款',
+        title: '条款',
+        href: '',
+        blankTarget: true,
+      },
+    ]);
+    const copyright = ref('Copyright © 2022 BIT All Rights Reserved');
     onBeforeMount(() => {
+      // 用于管理侧边栏折叠状态
       if (sessionStorage.getItem('collapsed') == 'true') {
         state.collapsed = true;
       } else state.collapsed = false;
     });
     return {
+      links,
+      copyright,
       selectedKeys1: ref([]),
       collapsed: ref(false),
       toggleCollapsed,

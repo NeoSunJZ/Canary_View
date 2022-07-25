@@ -195,7 +195,12 @@ import { getAtkInfo } from '@/api/atk-api/atkInfo.js';
 
 export default defineComponent({
   name: 'MainPage',
-
+  components: {
+    MainPageNavigation,
+    ServerPointCard,
+    DeploymentUnitOutlined,
+    ClusterOutlined,
+  },
   setup() {
     const current = ref(0);
     const attackType = ref(0);
@@ -358,12 +363,6 @@ export default defineComponent({
       next,
       prev,
     };
-  },
-  components: {
-    MainPageNavigation,
-    ServerPointCard,
-    DeploymentUnitOutlined,
-    ClusterOutlined,
   },
 });
 </script>

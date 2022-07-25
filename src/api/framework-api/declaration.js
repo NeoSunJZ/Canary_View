@@ -3,6 +3,12 @@ import {
     notification
 } from 'ant-design-vue';
 
+/**
+ * @description: 用于请求对应服务器返回声明，确认服务器是否链接
+ * @param {String} ip
+ * @param {String} port
+ * @return 返回正确响应的声明或是null
+ */
 export async function getDeclaration(ip, port) {
     let data = null;
     await axios({
