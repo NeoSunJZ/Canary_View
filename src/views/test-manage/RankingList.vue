@@ -40,18 +40,13 @@
 </template>
 
 <script>
-import MainPageNavigation from "@/components/MainPageNavigation.vue";
+import MainPageNavigation from '@/components/MainPageNavigation.vue';
 
 export default {
-  name: "RankingList",
-  data() {
-    return {
-      //
-    };
-  },
-  methods: {
+  name: 'RankingList',
+  components: { MainPageNavigation },
+  setup() {
     //
   },
-  components: { MainPageNavigation },
 };
 </script>

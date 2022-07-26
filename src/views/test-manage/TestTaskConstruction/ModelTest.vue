@@ -46,12 +46,12 @@
     <template v-slot:breadcrumb>
       <a-breadcrumb-item>测试任务管理</a-breadcrumb-item>
       <a-breadcrumb-item>测试任务构建</a-breadcrumb-item>
-      <a-breadcrumb-item>防御测试</a-breadcrumb-item>
+      <a-breadcrumb-item>模型测试</a-breadcrumb-item>
     </template>
     <template v-slot:content>
       <a-row type="flex" class="attack-task">
         <a-col flex="1 1">
-          <h2 class="attack-task__title">防御测试构建</h2>
+          <h2 class="attack-task__title">模型测试构建</h2>
           <div>
             <p class="attack-task__type-select__title">
               <deployment-unit-outlined /> 构建向导类型
@@ -74,7 +74,7 @@ import { DeploymentUnitOutlined, ClusterOutlined } from '@ant-design/icons-vue';
 import router from '@/router';
 
 export default defineComponent({
-  name: 'DefenseTest',
+  name: 'ModelTest',
   setup() {
     const toPage = (page) => {
       router.push({ path: '/' + page });

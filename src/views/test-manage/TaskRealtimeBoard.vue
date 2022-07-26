@@ -40,18 +40,13 @@
 </template>
 
 <script>
-import MainPageNavigation from "@/components/MainPageNavigation.vue";
+import MainPageNavigation from '@/components/MainPageNavigation.vue';
 
 export default {
-  name: "TestRealtimeBoard",
-  data() {
-    return {
-      //
-    };
-  },
-  methods: {
+  name: 'TestRealtimeBoard',
+  components: { MainPageNavigation },
+  setup() {
     //
   },
-  components: { MainPageNavigation },
 };
 </script>

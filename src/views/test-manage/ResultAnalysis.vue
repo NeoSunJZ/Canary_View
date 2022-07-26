@@ -40,18 +40,13 @@
 </template>
 
 <script>
-import MainPageNavigation from "@/components/MainPageNavigation.vue";
+import MainPageNavigation from '@/components/MainPageNavigation.vue';
 
 export default {
-  name: "ResultAnalysis",
-  data() {
-    return {
-      //
-    };
-  },
-  methods: {
+  name: 'ResultAnalysis',
+  components: { MainPageNavigation },
+  setup() {
     //
   },
-  components: { MainPageNavigation },
 };
 </script>

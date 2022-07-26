@@ -40,7 +40,7 @@
       <a-menu :selectedKeys="['attackTest']" mode="horizontal" class="submenu">
         <a-menu-item key="defenseTest" @click="toPage('TestTaskConstruction/DefenseTest')"> 防御测试 </a-menu-item>
         <a-menu-item key="attackTest" @click="toPage('TestTaskConstruction/AttackTest')"> 攻击测试 </a-menu-item>
-        <a-menu-item key="modelTest"> 模型测试 </a-menu-item>
+        <a-menu-item key="modelTest" @click="toPage('TestTaskConstruction/ModelTest')"> 模型测试 </a-menu-item>
       </a-menu>
     </template>
     <template v-slot:breadcrumb>
@@ -194,7 +194,7 @@ import router from '@/router';
 import { getAtkInfo } from '@/api/atk-api/atkInfo.js';
 
 export default defineComponent({
-  name: 'MainPage',
+  name: 'AttackTest',
   components: {
     MainPageNavigation,
     ServerPointCard,
