@@ -11,17 +11,17 @@
       <a-breadcrumb-item>我的节点</a-breadcrumb-item>
     </template>
     <template v-slot:content>
-      <p>我的节点页面</p>
+      <ServerInfoCard></ServerInfoCard>
     </template>
   </MainPageNavigation>
 </template>
 
 <script>
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
-
+import ServerInfoCard from '@/components/ServerInfoCard.vue';
 export default {
   name: 'MyPoint',
-  components: { MainPageNavigation },
+  components: { MainPageNavigation, ServerInfoCard },
   setup() {
     //
   },
