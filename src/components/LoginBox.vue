@@ -49,7 +49,7 @@ export default defineComponent({
   },
   methods: {
     login() {
-      this.$router.push({ path: '/MyPoint' });
+      this.$router.push({ path: '/MyNode' });
     },
   },
 });

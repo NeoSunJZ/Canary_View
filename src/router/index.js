@@ -13,29 +13,29 @@ const routes = [{
     component: () => import("@/views/login/LoginPage.vue") // 而不是 const LoginPage = () => import("@/views/login/LoginPage.vue")
   },
   {
-    path: "/MyPoint",
-    name: "MyPoint",
-    component: () => import("@/views/point-manage/MyPoint.vue")
+    path: "/MyNode",
+    name: "MyNode",
+    component: () => import("@/views/node-manage/MyNode.vue")
   },
   {
     path: "/DataSetBinding",
     name: "DataSetBinding",
-    component: () => import("@/views/point-manage/DataSetBinding.vue")
+    component: () => import("@/views/node-manage/DataSetBinding.vue")
   },
   {
     path: "/ModelBinding",
     name: "ModelBinding",
-    component: () => import("@/views/point-manage/ModelBinding.vue")
+    component: () => import("@/views/node-manage/ModelBinding.vue")
   },
   {
     path: "/AttackMethodBinding",
     name: "AttackMethodBinding",
-    component: () => import("@/views/point-manage/AttackMethodBinding.vue")
+    component: () => import("@/views/node-manage/AttackMethodBinding.vue")
   },
   {
     path: "/DefenseMethodBinding",
     name: "DefenseMethodBinding",
-    component: () => import("@/views/point-manage/DefenseMethodBinding.vue")
+    component: () => import("@/views/node-manage/DefenseMethodBinding.vue")
   },
   {
     path: "/TestTaskConstruction/DefenseTest",

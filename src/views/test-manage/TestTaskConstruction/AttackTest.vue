@@ -59,7 +59,7 @@
             <a-select ref="select" v-model:value="attackType" style="width: 100%" :options="attackTypes" @focus="focus" @change="handleChange"></a-select>
           </div>
         </a-col>
-        <ServerPointCard @serverSelected="handleServerChange"></ServerPointCard>
+        <ServerNodeCard @serverSelected="handleServerChange"></ServerNodeCard>
       </a-row>
 
       <a-alert class="attack-task__type-select__notice" message="构建向导指南" type="info" show-icon closable close-text="我已了解">
@@ -185,7 +185,7 @@
 
 <script>
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
-import ServerPointCard from '@/components/ServerPointCard.vue';
+import ServerNodeCard from '@/components/ServerNodeCard.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import { message, Empty } from 'ant-design-vue';
 import { DeploymentUnitOutlined, ClusterOutlined } from '@ant-design/icons-vue';
@@ -197,7 +197,7 @@ export default defineComponent({
   name: 'AttackTest',
   components: {
     MainPageNavigation,
-    ServerPointCard,
+    ServerNodeCard,
     DeploymentUnitOutlined,
     ClusterOutlined,
   },

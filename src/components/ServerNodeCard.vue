@@ -70,7 +70,7 @@ import { getDeclaration } from '@/api/framework-api/declaration';
 import { DeploymentUnitOutlined, ClusterOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({
-  name: 'ServerPointCard',
+  name: 'ServerNodeCard',
   props: {
     //
   },

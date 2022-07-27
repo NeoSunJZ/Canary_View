@@ -11,7 +11,7 @@
       <a-breadcrumb-item>我的节点</a-breadcrumb-item>
     </template>
     <template v-slot:content>
-      <ServerInfoTable :serverInfo="server1"></ServerInfoTable>
+      <ServerInfoTable></ServerInfoTable>
     </template>
   </MainPageNavigation>
 </template>
@@ -21,7 +21,7 @@ import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import ServerInfoTable from '@/components/ServerInfoTable.vue';
 import { ref } from 'vue';
 export default {
-  name: 'MyPoint',
+  name: 'MyNode',
   components: { MainPageNavigation, ServerInfoTable },
   setup() {
     const server1 = ref({ name: 'Server1', ip: '10.0.0.55', port: '8888' });

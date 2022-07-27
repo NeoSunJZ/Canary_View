@@ -47,7 +47,7 @@
 
 <template>
   <h2 class="title">服务资源列表</h2>
-  <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">Add</a-button>
+  <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">新增节点</a-button>
   <a-table bordered :data-source="dataSource" :columns="columns">
     <template #bodyCell="{ column, text, record }">
       <template v-if="column.dataIndex === 'name'">
@@ -63,8 +63,11 @@
         </div>
       </template>
       <template v-else-if="column.dataIndex === 'operation'">
+
+        <a @click="getStatus(record.ip,record.port)">查询状态</a>
+
         <a-popconfirm v-if="dataSource.length" title="Sure to delete?" @confirm="onDelete(record.key)">
-          <a>Delete</a>
+          <a> 删除节点</a>
         </a-popconfirm>
       </template>
     </template>
@@ -76,7 +79,9 @@
 <script>
 import { defineComponent, ref, computed, reactive, onBeforeMount } from 'vue';
 import { DeploymentUnitOutlined, ClusterOutlined, CheckOutlined, EditOutlined } from '@ant-design/icons-vue';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, forEach } from 'lodash-es';
+import { getNodeInfo } from '@/api/node-api/nodeinfo';
+import { message } from 'ant-design-vue';
 
 export default defineComponent({
   name: 'ServerInfoCard',
@@ -92,35 +97,51 @@ export default defineComponent({
   setup() {
     const columns = [
       {
-        title: 'name',
+        title: '服务器',
         dataIndex: 'name',
-        width: '30%',
+        width: '15%',
       },
       {
-        title: 'age',
-        dataIndex: 'age',
+        title: 'IP地址',
+        dataIndex: 'ip',
+        width: '15%',
       },
       {
-        title: 'address',
-        dataIndex: 'address',
+        title: '端口',
+        dataIndex: 'port',
+        width: '10%',
       },
       {
-        title: 'operation',
+        title: '描述',
+        dataIndex: 'description',
+        width: '35%',
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        width: '10%',
+      },
+      {
+        title: '操作',
         dataIndex: 'operation',
       },
     ];
     const dataSource = ref([
       {
         key: '0',
-        name: 'Edward King 0',
-        age: 32,
-        address: 'London, Park Lane no. 0',
+        name: 'Server 0',
+        ip: '10.0.0.55',
+        port: '8888',
+        description: '测试节点1',
+        status: '运行中',
       },
       {
         key: '1',
-        name: 'Edward King 1',
-        age: 32,
-        address: 'London, Park Lane no. 1',
+        name: 'Server 1',
+        ip: '127.0.0.1',
+        port: '8080',
+        description: '测试节点2',
+        status: '已断开',
       },
     ]);
     const count = computed(() => dataSource.value.length + 1);
@@ -138,20 +159,30 @@ export default defineComponent({
     const onDelete = (key) => {
       dataSource.value = dataSource.value.filter((item) => item.key !== key);
     };
-
+    const getStatus = (ip, port) => {
+      console.log(ip, port);
+    };
     const handleAdd = () => {
       const newData = {
         key: `${count.value}`,
         name: `Edward King ${count.value}`,
-        age: 32,
-        address: `London, Park Lane no. ${count.value}`,
+        ip: 32,
+        port: `London, Park Lane no. ${count.value}`,
+        description: `测试节点 ${count.value}`,
       };
       dataSource.value.push(newData);
     };
+    onBeforeMount(async () => {
+      const data = await getNodeInfo(1, 2);
 
+      data.list.forEach((element) => {
+        console.log(element);
+      });
+    });
     return {
       columns,
       onDelete,
+      getStatus,
       handleAdd,
       dataSource,
       editableData,

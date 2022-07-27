@@ -58,7 +58,7 @@
               <ClusterOutlined />
             </template>
             <template #title>节点管理</template>
-            <a-menu-item key="1" @click="toPage('MyPoint')">
+            <a-menu-item key="1" @click="toPage('MyNode')">
               <template #icon>
                 <DesktopOutlined />
               </template>

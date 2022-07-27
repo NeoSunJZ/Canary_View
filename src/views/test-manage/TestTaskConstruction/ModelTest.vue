@@ -59,7 +59,7 @@
             <a-select ref="select" v-model:value="attackType" style="width: 100%" :options="attackTypes" @focus="focus" @change="handleChange"></a-select>
           </div>
         </a-col>
-        <ServerPointCard @serverSelected="handleServerChange"></ServerPointCard>
+        <ServerNodeCard @serverSelected="handleServerChange"></ServerNodeCard>
       </a-row>
     </template>
   </MainPageNavigation>
@@ -67,7 +67,7 @@
 
 <script>
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
-import ServerPointCard from '@/components/ServerPointCard.vue';
+import ServerNodeCard from '@/components/ServerNodeCard.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import { message, Empty } from 'ant-design-vue';
 import { DeploymentUnitOutlined, ClusterOutlined } from '@ant-design/icons-vue';
@@ -87,7 +87,7 @@ export default defineComponent({
   },
   components: {
     MainPageNavigation,
-    ServerPointCard,
+    ServerNodeCard,
     DeploymentUnitOutlined,
     ClusterOutlined,
   },
