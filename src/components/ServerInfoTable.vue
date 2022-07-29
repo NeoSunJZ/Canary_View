@@ -47,13 +47,27 @@
 
 <template>
   <h2 class="title">服务资源列表</h2>
+
   <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">新增节点</a-button>
+
   <a-table bordered :data-source="dataSource" :columns="columns">
     <template #bodyCell="{ column, text, record }">
       <template v-if="column.dataIndex === 'name'">
         <div class="editable-cell">
           <div v-if="editableData[record.key]" class="editable-cell-input-wrapper">
             <a-input v-model:value="editableData[record.key].name" @pressEnter="save(record.key)" />
+            <check-outlined class="editable-cell-icon-check" @click="save(record.key)" />
+          </div>
+          <div v-else class="editable-cell-text-wrapper">
+            {{ text || ' ' }}
+            <edit-outlined class="editable-cell-icon" @click="edit(record.key)" />
+          </div>
+        </div>
+      </template>
+      <template v-else-if="column.dataIndex === 'ip'">
+        <div class="editable-cell">
+          <div v-if="editableData[record.key]" class="editable-cell-input-wrapper">
+            <a-input v-model:value="editableData[record.key].ip" @pressEnter="save(record.key)" />
             <check-outlined class="editable-cell-icon-check" @click="save(record.key)" />
           </div>
           <div v-else class="editable-cell-text-wrapper">
@@ -97,9 +111,14 @@ export default defineComponent({
   setup() {
     const columns = [
       {
+        title: '序号',
+        dataIndex: 'index',
+        width: '5%',
+      },
+      {
         title: '服务器',
         dataIndex: 'name',
-        width: '15%',
+        width: '20%',
       },
       {
         title: 'IP地址',
@@ -109,17 +128,17 @@ export default defineComponent({
       {
         title: '端口',
         dataIndex: 'port',
-        width: '10%',
+        width: '7%',
       },
       {
         title: '描述',
         dataIndex: 'description',
-        width: '35%',
+        width: '30%',
       },
       {
         title: '状态',
         dataIndex: 'status',
-        width: '10%',
+        width: '9%',
       },
       {
         title: '操作',
@@ -129,6 +148,7 @@ export default defineComponent({
     const dataSource = ref([
       {
         key: '0',
+        index: '1',
         name: 'Server 0',
         ip: '10.0.0.55',
         port: '8888',
@@ -137,13 +157,18 @@ export default defineComponent({
       },
       {
         key: '1',
+        index: '2',
         name: 'Server 1',
-        ip: '127.0.0.1',
+        ip: '1127.1110.1110.1111',
         port: '8080',
         description: '测试节点2',
         status: '已断开',
       },
     ]);
+    const print = (record) => {
+      console.log(editableData);
+      console.log(record);
+    };
     const count = computed(() => dataSource.value.length + 1);
     const editableData = reactive({});
 
@@ -180,6 +205,7 @@ export default defineComponent({
       });
     });
     return {
+      print,
       columns,
       onDelete,
       getStatus,
