@@ -1,4 +1,5 @@
 import axiosPlugin from '@/axiosPlugin.js'
+import Qs from 'qs'
 
 /**
  * @description: 用于请求返回服务器节点信息
@@ -38,12 +39,12 @@ export async function addNodeInfo(ip, port, name, desc) {
     await axiosPlugin({
         method: "post",
         url: "v2/resource/NodeInfo/addNodeInfo",
-        params: {
+        data: Qs.stringify({
             ip: ip,
             port: port,
             nodeName: name,
             nodeDesc: desc
-        },
+        }),
     }).then((response) => {
         if (response.data.state === "SUCCESS") {
             success = true
@@ -77,26 +78,25 @@ export async function deleteNodeInfo(nodeID) {
 /**
  * @description: 用于请求更新一个服务器节点
  * @param {String?} userToken 用户身份令牌，还没用上
- * @param {Number} nodeID
+ * @param {Number} nodeID 删除的节点ID
  * @param {String} ip 
  * @param {String} port
  * @param {String} name 服务器名
  * @param {String} desc 服务器描述
- * @param {Number} nodeID 删除的节点ID
  * @return 返回是否成功
  */
 export async function updateNodeInfo(nodeID, ip, port, name, desc) {
     let success = false;
     await axiosPlugin({
-        method: "get",
+        method: "post",
         url: "v2/resource/NodeInfo/updateNodeInfo",
-        params: {
+        data: Qs.stringify({
             nodeID: nodeID,
             ip: ip,
             port: port,
             nodeName: name,
             nodeDesc: desc
-        },
+        }),
     }).then((response) => {
         if (response.data.state === "SUCCESS") {
             success = true

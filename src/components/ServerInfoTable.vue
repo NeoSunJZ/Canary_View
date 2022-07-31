@@ -147,7 +147,9 @@ export default defineComponent({
   setup() {
     // 新增节点弹出框是否可见
     const visible = ref(false);
-
+    const handleOk = () => {
+      // Todo:
+    };
     // 表格显示的每一列的标题等属性
     const columns = [
       {
@@ -246,6 +248,7 @@ export default defineComponent({
     });
     return {
       visible,
+      handleOk,
       columns,
       onDelete,
       getStatus,

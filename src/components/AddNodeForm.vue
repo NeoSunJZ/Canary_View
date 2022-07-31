@@ -6,23 +6,22 @@
 
 <template>
   <h2 class='title'>新增节点</h2>
+
   <a-form :model="formState" v-bind="layout" name="nest-messages" :validate-messages="validateMessages" @finish="onFinish">
-    <a-form-item :name="['user', 'name']" label="Name" :rules="[{ required: true }]">
-      <a-input v-model:value="formState.user.name" />
+    <a-form-item :name="['node', 'name']" label="名称" :rules="[{ required: true }]">
+      <a-input v-model:value="formState.node.name" />
     </a-form-item>
-    <a-form-item :name="['user', 'email']" label="IP" :rules="[{ required: true }]">
-      <a-input v-model:value="formState.user.email" />
+    <a-form-item :name="['node', 'ip']" label="IP" :rules="[{ required: true }]">
+      <a-input v-model:value="formState.node.ip" />
     </a-form-item>
-    <a-form-item :name="['user', 'age']" label="Port" :rules="[{ type: 'number',required:true}]">
-      <a-input-number v-model:value="formState.user.age" />
+    <a-form-item :name="['node', 'port']" label="端口" :rules="[{ type: 'number',required:true}]">
+      <a-input-number v-model:value="formState.node.port" />
     </a-form-item>
-    <a-form-item :name="['user', 'introduction']" label="Description">
-      <a-textarea v-model:value="formState.user.introduction" />
-    </a-form-item>
-    <a-form-item :wrapper-col="{ ...layout.wrapperCol, offset: 8 }">
-      <a-button type="primary" html-type="submit">Submit</a-button>
+    <a-form-item :name="['node', 'introduction']" label="简介">
+      <a-textarea v-model:value="formState.node.introduction" />
     </a-form-item>
   </a-form>
+
 </template>
 <script>
 import { defineComponent, reactive } from 'vue';
@@ -57,21 +56,16 @@ export default defineComponent({
       },
     };
     const formState = reactive({
-      user: {
+      node: {
         name: '',
-        age: undefined,
-        email: '',
+        ip: '',
+        port: '',
         introduction: '',
       },
     });
 
-    const onFinish = (values) => {
-      console.log('Success:', values);
-    };
-
     return {
       formState,
-      onFinish,
       layout,
       validateMessages,
     };
