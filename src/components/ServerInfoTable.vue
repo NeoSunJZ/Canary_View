@@ -49,11 +49,12 @@
   <h2 class="title">服务资源列表</h2>
 
   <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">新增节点</a-button>
-
+  <!-- 新增节点的弹出框，还在构建中 -->
   <a-modal v-model:visible="visible" okText="确定" cancelText="取消" width="500px" @ok="handleOk" :closable='false'>
     <AddNodeForm></AddNodeForm>
   </a-modal>
 
+  <!-- 节点表 -->
   <a-table bordered :data-source="dataSource" :columns="columns">
     <template #bodyCell="{ column, text, record }">
 
@@ -144,8 +145,10 @@ export default defineComponent({
     //
   },
   setup() {
+    // 新增节点弹出框是否可见
     const visible = ref(false);
-    // 表格显示的每一列的标题以及宽度
+
+    // 表格显示的每一列的标题等属性
     const columns = [
       {
         title: '序号',
@@ -182,10 +185,14 @@ export default defineComponent({
         dataIndex: 'operation',
       },
     ];
+    // 显示的数据源
     const dataSource = ref([]);
-    const count = computed(() => dataSource.value.length + 1);
+    // const count = computed(() => dataSource.value.length + 1);
+    // 正在编辑的行数据proxy
     const editableData = reactive({});
+    // 正在编辑的属性
     const editableElement = ref({});
+
     const edit = (key, element) => {
       editableData[key] = cloneDeep(dataSource.value.filter((item) => key === item.key)[0]);
       editableElement.value[key] = element;
@@ -203,9 +210,11 @@ export default defineComponent({
       dataSource.value = dataSource.value.filter((item) => item.key !== key);
       deleteNodeInfo(key);
     };
+
     const getStatus = (ip, port) => {
       console.log(ip, port);
     };
+
     const handleAdd = () => {
       visible.value = true;
       // const newData = {
@@ -244,7 +253,6 @@ export default defineComponent({
       dataSource,
       editableData,
       editableElement,
-      count,
       edit,
       save,
     };
