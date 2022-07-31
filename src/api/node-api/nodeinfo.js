@@ -96,7 +96,6 @@ export async function updateNodeInfo(nodeID, ip, port, name, desc) {
             port: port,
             nodeName: name,
             nodeDesc: desc
-
         },
     }).then((response) => {
         if (response.data.state === "SUCCESS") {

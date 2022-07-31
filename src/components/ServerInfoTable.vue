@@ -50,8 +50,8 @@
 
   <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">新增节点</a-button>
 
-  <a-modal v-model:visible="visible" okText="确定" cancelText="取消" width="1000px" @ok="handleOk" :closable='false'>
-    123
+  <a-modal v-model:visible="visible" okText="确定" cancelText="取消" width="500px" @ok="handleOk" :closable='false'>
+    <AddNodeForm></AddNodeForm>
   </a-modal>
 
   <a-table bordered :data-source="dataSource" :columns="columns">
@@ -123,10 +123,12 @@
 
 
 <script>
+import AddNodeForm from '@/components/AddNodeForm';
 import { defineComponent, ref, computed, reactive, onBeforeMount } from 'vue';
 import { DeploymentUnitOutlined, ClusterOutlined, CheckOutlined, EditOutlined } from '@ant-design/icons-vue';
-import { cloneDeep, forEach } from 'lodash-es';
+import { cloneDeep } from 'lodash-es';
 import { getNodeInfo, addNodeInfo, deleteNodeInfo, updateNodeInfo } from '@/api/node-api/nodeinfo';
+import { getDeclaration } from '@/api/framework-api/declaration';
 import { message } from 'ant-design-vue';
 
 export default defineComponent({
@@ -136,6 +138,7 @@ export default defineComponent({
     ClusterOutlined,
     CheckOutlined,
     EditOutlined,
+    AddNodeForm,
   },
   props: {
     //
@@ -179,26 +182,7 @@ export default defineComponent({
         dataIndex: 'operation',
       },
     ];
-    const dataSource = ref([
-      {
-        key: '0',
-        index: '1',
-        name: 'Server 0',
-        ip: '10.0.0.55',
-        port: '8888',
-        description: '测试节点1',
-        status: '运行中',
-      },
-      {
-        key: '1',
-        index: '2',
-        name: 'Server 1',
-        ip: '1127.1110.1110.1111',
-        port: '8080',
-        description: '测试节点2',
-        status: '已断开',
-      },
-    ]);
+    const dataSource = ref([]);
     const count = computed(() => dataSource.value.length + 1);
     const editableData = reactive({});
     const editableElement = ref({});
@@ -209,12 +193,15 @@ export default defineComponent({
 
     const save = (key) => {
       Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData[key]);
+      updateNodeInfo(editableData[key].key, editableData[key].ip, editableData[key].port, editableData[key].name, editableData[key].description);
+      // Todo:刷新
       delete editableData[key];
       editableElement.value[key] = '';
     };
 
     const onDelete = (key) => {
       dataSource.value = dataSource.value.filter((item) => item.key !== key);
+      deleteNodeInfo(key);
     };
     const getStatus = (ip, port) => {
       console.log(ip, port);
@@ -231,10 +218,22 @@ export default defineComponent({
       // dataSource.value.push(newData);
     };
     onBeforeMount(async () => {
-      // const data = await getNodeInfo(1, 2);
-      // data.list.forEach((element) => {
-      //   console.log(element);
-      // });
+      const data = await getNodeInfo(1, 10);
+
+      data.list.forEach((element, index) => {
+        dataSource.value[index] = {
+          key: element.nodeID,
+          index: index + 1,
+          name: element.nodeName,
+          ip: element.host,
+          port: element.port,
+          description: element.nodeDesc,
+          createTime: element.createTime,
+          status: '未知',
+        };
+        // let status = getDeclaration(dataSource.value[index].ip, dataSource.value[index].port);
+        // Todo:根据状态赋予status值
+      });
     });
     return {
       visible,
