@@ -43,6 +43,36 @@
 .editable-cell:hover .editable-cell-icon {
   display: inline-block;
 }
+
+.state {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  &__greenpoint {
+    display: inline-block;
+    height: 5px;
+    width: 5px;
+    border-radius: 16px;
+    color: #fff;
+    background: rgb(119, 228, 119);
+    margin-right: 3px;
+  }
+  &__redpoint {
+    display: inline-block;
+    height: 5px;
+    width: 5px;
+    border-radius: 16px;
+    color: #fff;
+    background: rgb(175, 2, 2);
+    margin-right: 3px;
+  }
+  &__running {
+    color: rgb(8, 179, 8);
+  }
+  &__stopping {
+    color: rgb(237, 6, 6);
+  }
+}
 </style>
 
 <template>
@@ -51,7 +81,7 @@
   <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">新增节点</a-button>
   <!-- 新增节点的弹出框，还在构建中 -->
   <a-modal v-model:visible="visible" okText="确定" cancelText="取消" width="500px" @ok="handleOk" :closable='false'>
-    <AddNodeForm></AddNodeForm>
+    <AddNodeForm @nodeInfo="getInfo"></AddNodeForm>
   </a-modal>
 
   <!-- 节点表 -->
@@ -110,6 +140,21 @@
         </div>
       </template>
 
+      <template v-else-if="column.dataIndex === 'status'">
+        <div v-if="record.status==='running'">
+          <div class="state">
+            <div class='state__greenpoint'></div>
+            <p class="state__running">运行中</p>
+          </div>
+        </div>
+        <div v-else>
+          <div class="state">
+            <div class='state__redpoint'></div>
+            <p class="state__stopping">已断开</p>
+          </div>
+        </div>
+      </template>
+
       <template v-else-if="column.dataIndex === 'operation'">
         <a @click="getStatus(record.ip,record.port)">刷新</a>
         <a-popconfirm v-if="dataSource.length" title="Sure to delete?" @confirm="onDelete(record.key)">
@@ -147,8 +192,21 @@ export default defineComponent({
   setup() {
     // 新增节点弹出框是否可见
     const visible = ref(false);
+    const addInfo = ref();
     const handleOk = () => {
       // Todo:
+      // const newData = {
+      //   key: `${count.value}`,
+      //   name: `Edward King ${count.value}`,
+      //   ip: 32,
+      //   port: `London, Park Lane no. ${count.value}`,
+      //   description: `测试节点 ${count.value}`,
+      // };
+      // dataSource.value.push(newData);
+      // addNodeInfo()
+    };
+    const getInfo = (nodeInfo) => {
+      addInfo.value = nodeInfo;
     };
     // 表格显示的每一列的标题等属性
     const columns = [
@@ -170,7 +228,7 @@ export default defineComponent({
       {
         title: '端口',
         dataIndex: 'port',
-        width: '7%',
+        width: '10%',
       },
       {
         title: '描述',
@@ -219,14 +277,6 @@ export default defineComponent({
 
     const handleAdd = () => {
       visible.value = true;
-      // const newData = {
-      //   key: `${count.value}`,
-      //   name: `Edward King ${count.value}`,
-      //   ip: 32,
-      //   port: `London, Park Lane no. ${count.value}`,
-      //   description: `测试节点 ${count.value}`,
-      // };
-      // dataSource.value.push(newData);
     };
     onBeforeMount(async () => {
       const data = await getNodeInfo(1, 10);
@@ -240,7 +290,7 @@ export default defineComponent({
           port: element.port,
           description: element.nodeDesc,
           createTime: element.createTime,
-          status: '未知',
+          status: 'unknown',
         };
         // let status = getDeclaration(dataSource.value[index].ip, dataSource.value[index].port);
         // Todo:根据状态赋予status值
@@ -248,6 +298,8 @@ export default defineComponent({
     });
     return {
       visible,
+      addInfo,
+      getInfo,
       handleOk,
       columns,
       onDelete,
