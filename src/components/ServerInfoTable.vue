@@ -78,11 +78,8 @@
 <template>
   <h2 class="title">服务资源列表</h2>
 
-  <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">新增节点</a-button>
-  <!-- 新增节点的弹出框，还在构建中 -->
-  <a-modal v-model:visible="visible" okText="确定" cancelText="取消" width="500px" @ok="handleOk" :closable='false'>
-    <AddNodeForm @nodeInfo="getInfo"></AddNodeForm>
-  </a-modal>
+  <!-- 新增节点，还在构建中 -->
+  <AddNodeForm @nodeInfo="getInfo"></AddNodeForm>
 
   <!-- 节点表 -->
   <a-table bordered :data-source="dataSource" :columns="columns">
@@ -175,7 +172,6 @@ import { DeploymentUnitOutlined, ClusterOutlined, CheckOutlined, EditOutlined } 
 import { cloneDeep } from 'lodash-es';
 import { getNodeInfo, addNodeInfo, deleteNodeInfo, updateNodeInfo } from '@/api/node-api/nodeinfo';
 import { getDeclaration } from '@/api/framework-api/declaration';
-import { message } from 'ant-design-vue';
 
 export default defineComponent({
   name: 'ServerInfoCard',
@@ -191,7 +187,6 @@ export default defineComponent({
   },
   setup() {
     // 新增节点弹出框是否可见
-    const visible = ref(false);
     const addInfo = ref();
     const handleOk = () => {
       // Todo:
@@ -204,6 +199,7 @@ export default defineComponent({
       // };
       // dataSource.value.push(newData);
       // addNodeInfo()
+      addInfo.value;
     };
     const getInfo = (nodeInfo) => {
       addInfo.value = nodeInfo;
@@ -275,9 +271,6 @@ export default defineComponent({
       console.log(ip, port);
     };
 
-    const handleAdd = () => {
-      visible.value = true;
-    };
     onBeforeMount(async () => {
       const data = await getNodeInfo(1, 10);
 
@@ -297,14 +290,12 @@ export default defineComponent({
       });
     });
     return {
-      visible,
       addInfo,
       getInfo,
       handleOk,
       columns,
       onDelete,
       getStatus,
-      handleAdd,
       dataSource,
       editableData,
       editableElement,
