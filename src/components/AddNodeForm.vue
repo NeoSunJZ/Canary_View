@@ -5,7 +5,7 @@
 
 <style lang="less" scoped>
 .title {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 </style>
 
