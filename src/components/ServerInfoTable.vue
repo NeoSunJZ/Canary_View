@@ -82,7 +82,7 @@
   <AddNodeForm @nodeInfo="getInfo"></AddNodeForm>
 
   <!-- 节点表 -->
-  <a-table bordered :data-source="dataSource" :columns="columns">
+  <a-table bordered :data-source="dataSource" :columns="columns" size="small">
     <template #bodyCell="{ column, text, record }">
 
       <template v-if="column.dataIndex === 'name'">
