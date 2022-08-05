@@ -41,6 +41,15 @@
         <div>
           <a-card class="attack-binding__card">
             <h3>详情</h3>
+            <tinyEditor :height="300" :width="500" :initialValue="string" @updateValue="updateValue">
+
+            </tinyEditor>
+
+            <a-divider></a-divider>
+            <a-button>新增节点</a-button>
+
+
+
           </a-card>
         </div>
       </div>
@@ -53,6 +62,7 @@
 import { getAtkInfo } from '@/api/atk-api/atkInfo';
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
+import tinyEditor from '@/components/TinyEditor.vue';
 
 const columns = [
   {
@@ -71,7 +81,7 @@ const columns = [
 
 export default defineComponent({
   name: 'AttackMethodBinding',
-  components: { MainPageNavigation },
+  components: { MainPageNavigation, tinyEditor },
   setup() {
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
@@ -119,6 +129,10 @@ export default defineComponent({
       console.log(pagination);
     };
 
+    const updateValue = (value) => {
+      console.log(value);
+    }
+
     return {
       columns,
       rowSelection,
@@ -128,6 +142,8 @@ export default defineComponent({
       currentPage,
       pagination,
       handleTableChange,
+      updateValue,
+
     };
   },
 });
