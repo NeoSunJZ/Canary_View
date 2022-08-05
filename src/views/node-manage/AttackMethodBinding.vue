@@ -13,6 +13,7 @@
     height: 700px;
   }
 }
+
 </style>
 
 <template>
@@ -48,8 +49,32 @@
             <a-divider></a-divider>
             <a-button>新增节点</a-button>
 
-
-
+            <a-card >
+            <div style="display:flex; flex-direction:row; flex:1; overflow-x:scroll;">
+              <a-card v-for="(item,index) in dataSource" class="server" size="small" :key="index" style="min-width: 300px;">
+                <div v-if="dataSource.length == 0">
+                  <p>请您新增服务节点</p>
+                </div>
+                <div v-else>
+                  <div>
+                    <cluster-outlined class="server__icon" /><span class="server__title">服务节点 -
+                      {{item.appName }}</span>
+                  </div>
+                  <div>
+                    IP地址 - {{ item.ip }}
+                    <a-divider type="vertical" />
+                    端口 - {{ item.port }}
+                  </div>
+                  <div class="server__detail">
+                    <a>详情</a>
+                    <a-divider type="vertical" /><a @click="showSelector">修改节点</a>
+                    <!-- 对话框用于更换节点 -->
+                  </div>
+                </div>
+              </a-card>
+              </div>
+            </a-card>
+            
           </a-card>
         </div>
       </div>
@@ -79,6 +104,8 @@ const columns = [
   },
 ];
 
+
+
 export default defineComponent({
   name: 'AttackMethodBinding',
   components: { MainPageNavigation, tinyEditor },
@@ -95,9 +122,72 @@ export default defineComponent({
     };
 
     const attackInfo = ref([]);
-    const pageSize = ref(5);
+    const pageSize = ref(10);
     const totalAtkInfo = ref(0);
     const currentPage = ref(1);
+
+    const dataSource = ref([{
+          key: '1',
+          name: 'John Brown',
+          age: 32,
+          address: 'New York No. 1 Lake Park',
+          ip: '127.0.0.1',
+          port: '8888',
+          appID: '1',
+          appName: 'Server 1',
+          appDesc: '默认服务描述',
+          appStatus: 'Running',
+          createTime: '2022-01-02 13:40:20',
+          createUser: 'admin',
+          isDisabled: 'false',
+        },
+        {
+          key: '2',
+          name: 'Jim Green',
+          age: 42,
+          address: 'London No. 1 Lake Park',
+          ip: '127.0.0.2',
+          port: '8888',
+          appID: '2',
+          appName: 'Server 2',
+          appDesc: 'Alpha测试',
+          appStatus: 'Stop',
+          createTime: '2022-01-01 10:41:20',
+          createUser: 'admin',
+          isDisabled: 'false',
+        },
+        {
+          key: '3',
+          name: 'Joe Black',
+          age: 32,
+          address: 'Sidney No. 1 Lake Park',
+          ip: '127.0.0.3',
+          port: '8888',
+          appID: '3',
+          appName: 'Server 3',
+          appDesc: 'Beta测试',
+          appStatus: 'Running',
+          createTime: '2021-01-01 10:41:20',
+          createUser: 'admin',
+          isDisabled: 'false',
+
+        },
+        {
+          key: '4',
+          name: 'Disabled User',
+          age: 99,
+          address: 'Sidney No. 1 Lake Park',
+          ip: '127.0.0.4',
+          port: '8888',
+          appID: '3',
+          appName: 'Server 4',
+          appDesc: 'Beta测试',
+          appStatus: 'Running',
+          createTime: '2021-01-01 10:41:20',
+          createUser: 'admin',
+          isDisabled: 'false',
+        },
+      ]);
 
     const pagination = computed(() => {
       return {
@@ -141,6 +231,7 @@ export default defineComponent({
       totalAtkInfo,
       currentPage,
       pagination,
+      dataSource,
       handleTableChange,
       updateValue,
 
