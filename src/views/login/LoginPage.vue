@@ -1,22 +1,24 @@
 <style scoped lang='less'>
 </style>
 <template>
-
   <LoginBox></LoginBox>
 </template>
 
 <script>
+import { defineComponent, ref } from 'vue';
 import LoginBox from '@/components/LoginBox.vue';
-import TEditor from '@/components/TinyEditor.vue';
-import { ref } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'LoginPage',
-  components: { LoginBox, TEditor },
-  setup() {
+  components: { LoginBox },
+  props: {
+    //
+  },
+  setup(props) {
     return {
+      print,
       //
     };
   },
-};
+});
 </script>
