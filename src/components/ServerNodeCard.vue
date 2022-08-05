@@ -51,7 +51,7 @@
             <a-divider type="vertical" /><a @click="showSelector">切换节点</a>
             <!-- 对话框用于更换节点 -->
             <a-modal v-model:visible="visible" @ok="handleOk" :closable='false'>
-              <a-select ref="select" v-model:value="selectedServerIndex" class="server__detail__modal__select" @focus="focus">
+              <a-select ref="select" v-model:value="newServerIndex" class="server__detail__modal__select" @focus="focus">
                 <a-select-option v-for="(item,index) in data" :value="index" :key="index">
                   {{item.nodeName+' '+item.host+ ' '+item.port}}
                 </a-select-option>
@@ -79,6 +79,9 @@ export default defineComponent({
     const visible = ref(false); //控制对话框是否可见
     const data = ref([]); // 用于接受后端返回的服务器信息
     const selectedServerIndex = ref(0); //选中的服务器的索引
+
+    const newServerIndex = ref(0);
+
     const serverStatusFlag = ref(true); //选中的服务器是否运行的标志
 
     const serverStatus = computed(() => {
@@ -90,31 +93,26 @@ export default defineComponent({
     });
 
     const showSelector = () => {
-      /*
-       * 点击更换节点后的操作
-       * 1.显示对话框
-       * 2.向后端请求节点信息
-       * 3.放入data
-       */
       visible.value = !visible.value;
-      // todo 请求所有我的服务器节点信息,放到了data里
     };
 
-    const handleOk = async () => {
-      /*
-       * 确认更换节点后的操作
-       * 1.关闭对话框
-       * 2.向对应节点请求声明
-       * 3.根据返回值确认状态
-       */
-      visible.value = !visible.value;
-      let declarationInfo = await getDeclaration(data.value[selectedServerIndex.value].host, data.value[selectedServerIndex.value].port);
+    const serverSelected = async (host, port) => {
+      let declarationInfo = await getDeclaration(host, port);
       if (declarationInfo == null) {
         serverStatusFlag.value = false;
       } else {
+        context.emit('serverSelected', { serverInfo: data.value[selectedServerIndex.value], declarationInfo: declarationInfo });
         serverStatusFlag.value = true;
       }
-      context.emit('serverSelected', { serverInfo: data.value[selectedServerIndex.value], declarationInfo: declarationInfo });
+    };
+
+    const handleOk = async () => {
+      visible.value = !visible.value;
+      selectedServerIndex.value = newServerIndex.value
+
+      console.log(newServerIndex.value)
+      
+      await serverSelected(data.value[selectedServerIndex.value].host, data.value[selectedServerIndex.value].port);
     };
 
     onBeforeMount(async () => {
@@ -134,14 +132,8 @@ export default defineComponent({
           status: 'unknown',
         };
       });
-
-      let declarationInfo = await getDeclaration(data.value[0].host, data.value[0].port);
-      if (declarationInfo == null) {
-        serverStatusFlag.value = false;
-      } else {
-        serverStatusFlag.value = true;
-      }
-      context.emit('serverSelected', { serverInfo: data.value[0], declarationInfo: declarationInfo });
+      await serverSelected(data.value[0].host, data.value[0].port);
+      
     });
 
     return {
@@ -150,6 +142,7 @@ export default defineComponent({
       serverStatus,
       serverStatusFlag,
       selectedServerIndex,
+      newServerIndex,
       handleOk,
       showSelector,
     };
