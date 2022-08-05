@@ -1,19 +1,24 @@
-<style scoped>
-.LoginBoxStyle {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-}
+<style scoped lang='less'>
 </style>
-<template><LoginBox></LoginBox></template>
+<template>
+  <LoginBox></LoginBox>
+</template>
 
 <script>
-import LoginBox from "@/components/LoginBox.vue";
-export default {
-  name: "LoginPage",
-  data: () => ({
-    //
-  }),
+import { defineComponent, ref } from 'vue';
+import LoginBox from '@/components/LoginBox.vue';
+
+export default defineComponent({
+  name: 'LoginPage',
   components: { LoginBox },
-};
+  props: {
+    //
+  },
+  setup(props) {
+    return {
+      print,
+      //
+    };
+  },
+});
 </script>

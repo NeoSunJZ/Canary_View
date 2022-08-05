@@ -1,8 +1,7 @@
 <style scoped lang="less">
 .title {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
-
 .editable-cell {
   position: relative;
   .editable-cell-input-wrapper,
@@ -48,6 +47,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  // justify-content: space-around;
   &__greenpoint {
     display: inline-block;
     height: 5px;
@@ -67,9 +67,11 @@
     margin-right: 3px;
   }
   &__running {
+    margin-right: 10px;
     color: rgb(8, 179, 8);
   }
   &__stopping {
+    margin-right: 10px;
     color: rgb(237, 6, 6);
   }
 }
@@ -82,7 +84,7 @@
   <AddNodeForm @nodeInfo="getInfo"></AddNodeForm>
 
   <!-- 节点表 -->
-  <a-table bordered :data-source="dataSource" :columns="columns">
+  <a-table bordered :data-source="dataSource" :columns="columns" size="small">
     <template #bodyCell="{ column, text, record }">
 
       <template v-if="column.dataIndex === 'name'">
@@ -142,20 +144,26 @@
           <div class="state">
             <div class='state__greenpoint'></div>
             <p class="state__running">运行中</p>
+            <a-button type="link" size="small" shape="circle">
+              <SyncOutlined @click="refresh(record.index)" />
+            </a-button>
           </div>
         </div>
         <div v-else>
           <div class="state">
             <div class='state__redpoint'></div>
             <p class="state__stopping">已断开</p>
+            <a-button type="link" size="small" shape="circle">
+              <SyncOutlined @click="refresh(record.index)" />
+            </a-button>
+
           </div>
         </div>
       </template>
 
       <template v-else-if="column.dataIndex === 'operation'">
-        <a @click="getStatus(record.ip,record.port)">刷新</a>
         <a-popconfirm v-if="dataSource.length" title="Sure to delete?" @confirm="onDelete(record.key)">
-          <a> 删除</a>
+          <a>删除</a>
         </a-popconfirm>
       </template>
 
@@ -168,10 +176,9 @@
 <script>
 import AddNodeForm from '@/components/AddNodeForm';
 import { defineComponent, ref, computed, reactive, onBeforeMount } from 'vue';
-import { DeploymentUnitOutlined, ClusterOutlined, CheckOutlined, EditOutlined } from '@ant-design/icons-vue';
+import { DeploymentUnitOutlined, ClusterOutlined, CheckOutlined, EditOutlined, SyncOutlined } from '@ant-design/icons-vue';
 import { cloneDeep } from 'lodash-es';
 import { getNodeInfo, addNodeInfo, deleteNodeInfo, updateNodeInfo } from '@/api/node-api/nodeinfo';
-import { getDeclaration } from '@/api/framework-api/declaration';
 
 export default defineComponent({
   name: 'ServerInfoCard',
@@ -180,29 +187,31 @@ export default defineComponent({
     ClusterOutlined,
     CheckOutlined,
     EditOutlined,
+    SyncOutlined,
     AddNodeForm,
   },
   props: {
     //
   },
   setup() {
-    // 新增节点弹出框是否可见
-    const addInfo = ref();
-    const handleOk = () => {
-      // Todo:
-      // const newData = {
-      //   key: `${count.value}`,
-      //   name: `Edward King ${count.value}`,
-      //   ip: 32,
-      //   port: `London, Park Lane no. ${count.value}`,
-      //   description: `测试节点 ${count.value}`,
-      // };
-      // dataSource.value.push(newData);
-      // addNodeInfo()
-      addInfo.value;
+    const refresh = async (index) => {
+      //
     };
-    const getInfo = (nodeInfo) => {
-      addInfo.value = nodeInfo;
+    const getInfo = async (nodeInfo) => {
+      const data = await getNodeInfo(1, 10);
+      data.list.forEach((element, index) => {
+        dataSource.value[index] = {
+          key: element.nodeID,
+          index: index + 1,
+          name: element.nodeName,
+          ip: element.host,
+          port: element.port,
+          description: element.nodeDesc,
+          createTime: element.createTime,
+          status: 'unknown',
+        };
+        // Todo:根据状态赋予status值
+      });
     };
     // 表格显示的每一列的标题等属性
     const columns = [
@@ -234,7 +243,7 @@ export default defineComponent({
       {
         title: '状态',
         dataIndex: 'status',
-        width: '9%',
+        width: '10%',
       },
       {
         title: '操作',
@@ -243,9 +252,10 @@ export default defineComponent({
     ];
     // 显示的数据源
     const dataSource = ref([]);
-    // const count = computed(() => dataSource.value.length + 1);
+
     // 正在编辑的行数据proxy
     const editableData = reactive({});
+
     // 正在编辑的属性
     const editableElement = ref({});
 
@@ -254,26 +264,28 @@ export default defineComponent({
       editableElement.value[key] = element;
     };
 
-    const save = (key) => {
+    const save = async (key) => {
       Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData[key]);
-      updateNodeInfo(editableData[key].key, editableData[key].ip, editableData[key].port, editableData[key].name, editableData[key].description);
-      // Todo:刷新
+      let success = await updateNodeInfo(
+        editableData[key].key,
+        editableData[key].ip,
+        editableData[key].port,
+        editableData[key].name,
+        editableData[key].description
+      );
+      console.log(success);
       delete editableData[key];
       editableElement.value[key] = '';
     };
 
-    const onDelete = (key) => {
+    const onDelete = async (key) => {
       dataSource.value = dataSource.value.filter((item) => item.key !== key);
-      deleteNodeInfo(key);
-    };
-
-    const getStatus = (ip, port) => {
-      console.log(ip, port);
+      let success = await deleteNodeInfo(key);
+      console.log(success);
     };
 
     onBeforeMount(async () => {
       const data = await getNodeInfo(1, 10);
-
       data.list.forEach((element, index) => {
         dataSource.value[index] = {
           key: element.nodeID,
@@ -285,17 +297,13 @@ export default defineComponent({
           createTime: element.createTime,
           status: 'unknown',
         };
-        // let status = getDeclaration(dataSource.value[index].ip, dataSource.value[index].port);
-        // Todo:根据状态赋予status值
       });
     });
     return {
-      addInfo,
       getInfo,
-      handleOk,
+      refresh,
       columns,
       onDelete,
-      getStatus,
       dataSource,
       editableData,
       editableElement,

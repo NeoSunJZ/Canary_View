@@ -39,10 +39,10 @@
         </div>
         <div v-else>
           <div>
-            <cluster-outlined class="server__icon" /><span class="server__title">服务节点 - {{ data[selectedServerIndex].appName }}</span>
+            <cluster-outlined class="server__icon" /><span class="server__title">服务节点 - {{ data[selectedServerIndex].nodeName }}</span>
           </div>
           <div>
-            IP地址 - {{ data[selectedServerIndex].ip }}
+            IP地址 - {{ data[selectedServerIndex].host }}
             <a-divider type="vertical" />
             端口 - {{ data[selectedServerIndex].port }}
           </div>
@@ -53,7 +53,7 @@
             <a-modal v-model:visible="visible" @ok="handleOk" :closable='false'>
               <a-select ref="select" v-model:value="selectedServerIndex" class="server__detail__modal__select" @focus="focus">
                 <a-select-option v-for="(item,index) in data" :value="index" :key="index">
-                  {{item.appName+' '+item.ip+ ' '+item.port}}
+                  {{item.nodeName+' '+item.host+ ' '+item.port}}
                 </a-select-option>
               </a-select>
             </a-modal>
@@ -67,6 +67,7 @@
 <script>
 import { defineComponent, ref, computed, onBeforeMount } from 'vue';
 import { getDeclaration } from '@/api/framework-api/declaration';
+import { getNodeInfo } from '@/api/node-api/nodeinfo';
 import { DeploymentUnitOutlined, ClusterOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({
@@ -76,43 +77,7 @@ export default defineComponent({
   },
   setup(props, context) {
     const visible = ref(false); //控制对话框是否可见
-
-    // 用于接受后端返回的服务器信息
-    const data = [
-      {
-        appID: '1',
-        appName: 'Server 1',
-        port: '8888',
-        ip: '127.0.0.1',
-        appDesc: '默认服务描述',
-        appStatus: 'Running',
-        createTime: '2022-01-02 13:40:20',
-        createUser: 'admin',
-        isDisabled: 'false',
-      },
-      {
-        appID: '2',
-        appName: 'Server 2',
-        port: '8888',
-        ip: '127.0.0.2',
-        appDesc: 'Alpha测试',
-        appStatus: 'Stop',
-        createTime: '2022-01-01 10:41:20',
-        createUser: 'admin',
-        isDisabled: 'false',
-      },
-      {
-        appID: '3',
-        appName: 'Server 3',
-        port: '8888',
-        ip: '128.0.0.2',
-        appDesc: 'Beta测试',
-        appStatus: 'Running',
-        createTime: '2021-01-01 10:41:20',
-        createUser: 'admin',
-        isDisabled: 'false',
-      },
-    ];
+    const data = ref([]); // 用于接受后端返回的服务器信息
     const selectedServerIndex = ref(0); //选中的服务器的索引
     const serverStatusFlag = ref(true); //选中的服务器是否运行的标志
 
@@ -143,26 +108,40 @@ export default defineComponent({
        * 3.根据返回值确认状态
        */
       visible.value = !visible.value;
-      let declarationInfo = await getDeclaration(data[selectedServerIndex.value].ip, data[selectedServerIndex.value].port);
+      let declarationInfo = await getDeclaration(data.value[selectedServerIndex.value].host, data.value[selectedServerIndex.value].port);
       if (declarationInfo == null) {
         serverStatusFlag.value = false;
       } else {
         serverStatusFlag.value = true;
       }
-      context.emit('serverSelected', { serverInfo: data[selectedServerIndex.value], declarationInfo: declarationInfo });
+      context.emit('serverSelected', { serverInfo: data.value[selectedServerIndex.value], declarationInfo: declarationInfo });
     };
 
     onBeforeMount(async () => {
       /*
        * 每次渲染前对默认节点做请求声明
        */
-      let declarationInfo = await getDeclaration(data[0].ip, data[0].port);
+      const newData = await getNodeInfo(1, 10);
+      newData.list.forEach((element, index) => {
+        data.value[index] = {
+          nodeID: element.nodeID,
+          index: index + 1,
+          nodeName: element.nodeName,
+          host: element.host,
+          port: element.port,
+          nodeDesc: element.nodeDesc,
+          createTime: element.createTime,
+          status: 'unknown',
+        };
+      });
+
+      let declarationInfo = await getDeclaration(data.value[0].host, data.value[0].port);
       if (declarationInfo == null) {
         serverStatusFlag.value = false;
       } else {
         serverStatusFlag.value = true;
       }
-      context.emit('serverSelected', { serverInfo: data[0], declarationInfo: declarationInfo });
+      context.emit('serverSelected', { serverInfo: data.value[0], declarationInfo: declarationInfo });
     });
 
     return {
