@@ -56,7 +56,7 @@
             <p class="attack-task__type-select__title">
               <deployment-unit-outlined /> 构建向导类型
             </p>
-            <a-select ref="select" v-model:value="attackType" style="width: 100%" :options="attackTypes" @focus="focus" @change="handleChange"></a-select>
+            <a-select ref="select" v-model:value="attackType" style="width: 100%" :options="attackTypes"></a-select>
           </div>
         </a-col>
         <ServerNodeCard @serverSelected="handleServerChange"></ServerNodeCard>
@@ -98,17 +98,22 @@
             <a-row>
               <a-col :span="16" class="attack-task__attack-selector">
                 <a-transfer v-model:target-keys="targetKeys" :data-source="attackInfo" show-search :rowKey="(record) => record.attackMethodID"
-                  :list-style="{'min-width': '250px', 'min-height': '300px', flex: 1,}" :titles="[' 可选方法', ' 已选定方法']" :operations="['to right', 'to left']"
-                  @change="handleMoveItemChange" style="width: 100%">
+                  :showSelectAll="false" :list-style="{'min-width': '250px', 'min-height': '300px', flex: 1,}" :titles="[' 可选方法', ' 已选定方法']"
+                  :operations="['加入队列', '移除队列']" @change="handleMoveItemChange" style="width: 100%">
                   <template #children="{direction, filteredItems, selectedKeys, disabled: listDisabled, onItemSelectAll, onItemSelect}">
                     <a-table :row-selection="getRowSelection({disabled: listDisabled, selectedKeys, onItemSelectAll, onItemSelect,})"
                       :columns="direction === 'left' ? leftTableColumns : rightTableColumns" :data-source="filteredItems" size="small"
                       :style="{ pointerEvents: listDisabled ? 'none' : null }" :pagination="direction === 'left' ? pagination : { pageSize: 5 }"
-                      @change="(...args) => { direction === 'left' ? handleTableChange(...args) : () => {};}"
+                      @change="(...args) => { direction === 'left' ? handleTableChange(...args) : ()=>{} }"
                       :custom-row="({ key, disabled: itemDisabled }) => ({onClick: () => { if (itemDisabled || listDisabled) return; onItemSelect(key, !selectedKeys.includes(key));},})"
-                      :scroll="direction === 'left' ? { x: 800 } : null">
+                      :scroll="direction === 'left' ? { x: 800 } : { x: 700 }">
 
                       <template #bodyCell="{ column, record }">
+                        <template v-if="column.key === 'status'">
+                          <AttackConfigProcessor :attackMethodID="record.attackMethodID" :currentServerInfo="currentServerInfo"
+                            :currentServerDeclaration="currentServerDeclaration" @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}">
+                          </AttackConfigProcessor>
+                        </template>
                         <template v-if="column.key === 'action'">
                           <span>
                             <a @click="showMethodDetails(record.attackMethodID)">详情 - {{ record.attackMethodName }}</a>
@@ -186,20 +191,25 @@
 <script>
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import ServerNodeCard from '@/components/ServerNodeCard.vue';
-import { defineComponent, ref, onMounted, computed } from 'vue';
+import { defineComponent, ref, onMounted, computed, nextTick } from 'vue';
 import { message, Empty } from 'ant-design-vue';
-import { DeploymentUnitOutlined, ClusterOutlined } from '@ant-design/icons-vue';
+import { DeploymentUnitOutlined, ClusterOutlined, CloseCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue';
 import router from '@/router';
 // import { getModelInfo } from "@/api/model-api/modelInfo.js";
 import { getAtkInfo } from '@/api/atk-api/atkInfo.js';
+
+import AttackConfigProcessor from './components/AttackConfigProcessor';
 
 export default defineComponent({
   name: 'AttackTest',
   components: {
     MainPageNavigation,
     ServerNodeCard,
+    AttackConfigProcessor,
     DeploymentUnitOutlined,
     ClusterOutlined,
+    CloseCircleOutlined,
+    CheckCircleOutlined,
   },
   setup() {
     const current = ref(0);
@@ -231,6 +241,13 @@ export default defineComponent({
       {
         dataIndex: 'attackMethodName',
         title: '攻击方法',
+        width: '140px',
+        fixed: 'left',
+      },
+      {
+        dataIndex: 'status',
+        title: '配置状态',
+        key: 'status',
       },
       {
         dataIndex: 'action',
@@ -238,9 +255,7 @@ export default defineComponent({
         key: 'action',
       },
     ];
-    const handleServerChange = (currentServerInfo) => {
-      console.log(currentServerInfo);
-    };
+
     const toPage = (page) => {
       router.push({ path: '/' + page });
     };
@@ -278,8 +293,13 @@ export default defineComponent({
 
       loadFinished = atkInfo.isLastPage;
     };
-    const handleMoveItemChange = () => {
+    const handleMoveItemChange = (targetKeys, direction, moveKeys) => {
       loadMoreAttackMethodInfo();
+      if (direction == 'right') {
+        nextTick(() => {
+          runConfigTaskQueue();
+        });
+      }
     };
 
     const loadMoreAttackMethodInfo = async () => {
@@ -306,36 +326,49 @@ export default defineComponent({
       });
     };
 
-    const handleChange = (keys, direction, moveKeys) => {
-      console.log(keys, direction, moveKeys);
-    };
-
     const getRowSelection = ({ disabled, selectedKeys, onItemSelectAll, onItemSelect }) => {
-      const getRowSelection = ({ disabled, selectedKeys, onItemSelectAll, onItemSelect }) => {
-        return {
-          getCheckboxProps: (item) => ({
-            disabled: disabled || item.disabled,
-          }),
+      return {
+        getCheckboxProps: (item) => ({
+          disabled: disabled || item.disabled,
+        }),
 
-          onSelectAll(selected, selectedRows) {
-            const treeSelectedKeys = selectedRows.filter((item) => !item.disabled).map(({ key }) => key);
-            onItemSelectAll(treeSelectedKeys, selected);
-          },
+        onSelectAll(selected, selectedRows) {
+          const treeSelectedKeys = selectedRows.filter((item) => !item.disabled).map(({ key }) => key);
+          onItemSelectAll(treeSelectedKeys, selected);
+        },
 
-          onSelect({ key }, selected) {
-            onItemSelect(key, selected);
-          },
+        onSelect({ key }, selected) {
+          onItemSelect(key, selected);
+        },
 
-          selectedRowKeys: selectedKeys,
-        };
+        selectedRowKeys: selectedKeys,
       };
     };
+
     const next = () => {
       current.value++;
     };
 
     const prev = () => {
       current.value--;
+    };
+
+    // 节点切换
+    const currentServerInfo = ref(null);
+    const currentServerDeclaration = ref(null);
+    const handleServerChange = ({ declarationInfo, serverInfo }) => {
+      currentServerDeclaration.value = declarationInfo;
+      currentServerInfo.value = serverInfo;
+    };
+
+    //自动配置队列
+
+    const autoConfigTaskQueue = ref([]);
+    const runConfigTaskQueue = async () => {
+      while (autoConfigTaskQueue.value.length > 0) {
+        let task = autoConfigTaskQueue.value.shift();
+        await task().catch(() => {});
+      }
     };
 
     return {
@@ -349,7 +382,6 @@ export default defineComponent({
       targetKeys,
       getRowSelection,
       handleServerChange,
-      handleChange,
 
       pagination,
       toPage,
@@ -362,6 +394,12 @@ export default defineComponent({
       simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
       next,
       prev,
+      //当前节点信息与声明
+      currentServerInfo,
+      currentServerDeclaration,
+      //自动配置队列
+      autoConfigTaskQueue,
+      runConfigTaskQueue,
     };
   },
 });

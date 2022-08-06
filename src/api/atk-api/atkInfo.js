@@ -22,3 +22,20 @@ export async function getAtkInfo(pageNum, pageSize = 10) {
   });
   return data;
 }
+
+export async function getAtkProvider(attackMethodID, nodeID = null) {
+  let data = null;
+  await axiosPlugin({
+    method: "get",
+    url: "v2/resource/atkInfo/getAttackMethodProvider",
+    params: {
+      attackMethodID: attackMethodID,
+      nodeID: nodeID,
+    },
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = response.data.msg;
+    }
+  });
+  return data;
+}

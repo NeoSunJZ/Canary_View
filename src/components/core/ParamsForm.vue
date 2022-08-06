@@ -25,8 +25,8 @@
               <a-input class="form__input" v-model:value="params[name]" placeholder="placeholder" width="100%" v-if="content.type==='STR'"></a-input>
               <a-input-number class="form__input" v-model:value="params[name]" :step="1" v-if="content.type==='INT'" />
               <a-input-number class="form__input" v-model:value="params[name]" :step="0.01" v-if="content.type==='FLOAT'" />
-              <a-select class="form__input" ref="select" v-model:value="params[name]" :options="content.selector"
-                :fieldNames="{'label':'name'}" v-if="content.type==='SELECT'"></a-select>
+              <a-select class="form__input" ref="select" v-model:value="params[name]" :options="content.selector" :fieldNames="{'label':'name'}"
+                v-if="content.type==='SELECT'"></a-select>
               <template #extra>
                 <a-tooltip placement="left">
                   <template #title>{{content.desc}}</template>
@@ -58,16 +58,16 @@
             </template>
             JSON配置互转
           </a>
-          <a-button class="form__input__json__button" type="primary" @click="submit">保存</a-button>
+          <a-button class="form__input__json__button" type="primary" @click="submit" v-show="showConfirm">保存</a-button>
         </a-col>
       </a-row>
     </a-form>
   </div>
 </template>
 <script>
-import { defineComponent, onMounted, ref, reactive } from 'vue';
+import { defineComponent, onMounted, ref, h, nextTick } from 'vue';
 import { QuestionCircleOutlined, UpOutlined, DownOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
+import { message, Modal } from 'ant-design-vue';
 export default defineComponent({
   components: {
     QuestionCircleOutlined,
@@ -76,6 +76,10 @@ export default defineComponent({
   },
   props: {
     paramsDesc: Object,
+    showConfirm: {
+      type: Boolean,
+      default: true,
+    },
   },
   setup(props, context) {
     const formRef = ref(null);
@@ -126,20 +130,43 @@ export default defineComponent({
       return;
     };
 
-    const submit = () => {
-      formRef.value.validate();
+    const submit = async () => {
+      await formRef.value
+        .validate()
+        .then(() => {
+          context.emit('submit', JSON.stringify(params.value));
+        })
+        .catch((e) => {
+          context.emit('error', e);
+
+          let errorFieldNames = [];
+          e.errorFields.forEach((element) => {
+            element.name.forEach((name) => {
+              errorFieldNames.push(name);
+            });
+          });
+          Modal.error({
+            title: '失败',
+            content: h('div', {}, [
+              h('p', '配置保存失败，请检查字段是否填写正确'),
+              h('p', '问题字段(' + errorFieldNames.length + ') : ' + errorFieldNames.join(' / ')),
+            ]),
+          });
+        });
     };
 
     const paramsToJSONStr = () => {
       paramsJSONStr.value = JSON.stringify(params.value);
     };
     const jsonStrToparams = () => {
-      formRef.value.validate();
       try {
         let data = JSON.parse(paramsJSONStr.value);
         loadParams(data);
+        nextTick(() => {
+          formRef.value.validate();
+        });
       } catch (e) {
-        message.error("JSON字符串验证失败，请检查重试")
+        message.error('JSON字符串验证失败，请检查重试');
         console.log(e);
       }
     };
