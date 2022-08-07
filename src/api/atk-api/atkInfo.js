@@ -39,3 +39,19 @@ export async function getAtkProvider(attackMethodID, nodeID = null) {
   });
   return data;
 }
+
+export async function getAtkConfig(attackMethodProviderID) {
+  let data = null;
+  await axiosPlugin({
+    method: "get",
+    url: "v2/resource/atkInfo/getAttackMethodConfig",
+    params: {
+      attackMethodProviderID: attackMethodProviderID,
+    },
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = response.data.msg;
+    }
+  });
+  return data;
+}

@@ -14,7 +14,7 @@
           <CloseCircleOutlined v-if="notice.status == 'error'" />
           <CheckCircleOutlined v-if="notice.status == 'success'" />
           <SyncOutlined :spin="true" v-if="notice.status == 'processing'" />
-          <ExclamationCircleOutlined v-if="notice.status == 'warning'"/>
+          <ExclamationCircleOutlined v-if="notice.status == 'warning'" />
         </template>
         {{notice.info}}
       </a-tag>
@@ -28,9 +28,7 @@
       <SyncOutlined @click="task(true)" class="processor__refresh" />
     </div>
 
-    <AttackConfigModel ref="attackConfigModel" :atkInfo="atkInfo"
-      :paramsDesc="attackDeclarationStore[atkID].attackDeclaration['attackMethodArgsHandlerParamsDesc']" @submit="handleSubmit" @cancel="handleCancel"
-      v-if="attackDeclarationStore[atkID]!=null && attackDeclarationStore[atkID].attackDeclaration!=null">
+    <AttackConfigModel ref="attackConfigModel" @submit="handleSubmit" @cancel="handleCancel">
     </AttackConfigModel>
 
   </div>
@@ -95,7 +93,10 @@ export default defineComponent({
     const setConfig = async () => {
       await new Promise((resolve, reject) => {
         setNotice('正在完成参数配置', 'processing');
-        attackConfigModel.value.autoConifg();
+
+        let paramsDesc = attackDeclarationStore[atkID].attackDeclaration['attackMethodArgsHandlerParamsDesc'];
+        let atkProviderID = attackDeclarationStore[atkID].attackBindInfo['attackMethodProviderID'];
+        attackConfigModel.value.autoConifg(paramsDesc, atkInfo.value, atkProviderID);
 
         promiseFunc.resolve = resolve;
         promiseFunc.reject = reject;

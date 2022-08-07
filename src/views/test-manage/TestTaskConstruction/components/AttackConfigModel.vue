@@ -7,7 +7,8 @@
 </style>
 <template>
   <div>
-    <a-modal v-model:visible="visible" :title="'攻击方法 '+atkInfo.attackMethodName+' [ AtkID: '+atkInfo.attackMethodID+' ] - 高级配置'" @cancel="onCancel" width="80%">
+    <a-modal v-model:visible="visible" :title="atkInfo == null?'高级配置':('攻击方法 '+ atkInfo.attackMethodName +' [ AtkID: '+atkInfo.attackMethodID+' ] - 高级配置')"
+      @cancel="onCancel" width="80%">
       <template #footer>
         <a-button>使用节点默认配置</a-button>
         <a-button>刷新预设配置</a-button>
@@ -22,7 +23,9 @@
 
       <ParamsForm ref="paramsForm" :paramsDesc="paramsDesc" :showConfirm="false" @submit="onSubmit " @error="onError"></ParamsForm>
       <a-divider></a-divider>
-
+      预设配置：
+      {{presetConfig}}
+      TODO：做成卡片
     </a-modal>
   </div>
 </template>
@@ -33,15 +36,14 @@ import { message } from 'ant-design-vue';
 
 import ParamsForm from '@/components/core/ParamsForm.vue';
 
+import { getAtkConfig } from '@/api/atk-api/atkInfo.js';
+
 export default defineComponent({
   components: {
     ParamsForm,
     SyncOutlined,
   },
-  props: {
-    atkInfo: Object,
-    paramsDesc: Array,
-  },
+  props: {},
   setup(props, context) {
     const visible = ref(false);
 
@@ -50,9 +52,19 @@ export default defineComponent({
 
     let autoTimer;
 
-    const autoConifg = () => {
+    const paramsDesc = ref();
+    const atkInfo = ref();
+    const atkProviderID = ref();
+
+    const autoConifg = (paramsDesc_, atkInfo_, atkProviderID_) => {
+      paramsDesc.value = paramsDesc_;
+      atkProviderID.value = atkProviderID_;
+      atkInfo.value = atkInfo_;
+
       autoConifgFlag.value = true;
       visible.value = true;
+
+      loadPresetConfig();
 
       autoTimer = setInterval(() => {
         if (autoSubmitCountDown.value <= 0) {
@@ -67,6 +79,11 @@ export default defineComponent({
     const stopAutoConifg = () => {
       clearInterval(autoTimer);
       autoConifgFlag.value = false;
+    };
+
+    const presetConfig = ref();
+    const loadPresetConfig = async() => {
+      presetConfig.value = await getAtkConfig(atkProviderID.value);
     };
 
     const paramsForm = ref();
@@ -90,6 +107,11 @@ export default defineComponent({
       visible,
       autoConifgFlag,
       autoSubmitCountDown,
+
+      paramsDesc,
+      atkInfo,
+      presetConfig,
+
       handleSubmit,
       onSubmit,
       onCancel,
