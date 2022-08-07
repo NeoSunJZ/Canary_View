@@ -7,13 +7,14 @@
 </style>
 <template>
   <div>
-    <a-modal v-model:visible="visible" title="Basic Modal" @cancel="onCancel" width="80%">
+    <a-modal v-model:visible="visible" :title="'攻击方法 '+atkInfo.attackMethodName+' [ AtkID: '+atkInfo.attackMethodID+' ] - 高级配置'" @cancel="onCancel" width="80%">
       <template #footer>
         <a-button>使用节点默认配置</a-button>
         <a-button>刷新预设配置</a-button>
         <a-button type="primary" :loading="loading" @click="handleSubmit">提交配置</a-button>
       </template>
-      <a-alert class="config-model__notice" :message="'[自动配置模式] 将在'+autoSubmitCountDown+'秒后自动使用默认配置(默认配置不存在时使用结点定义的缺省配置，可能需要补全)'" type="info" v-if="autoConifgFlag" show-icon>
+      <a-alert class="config-model__notice" :message="'[自动配置模式] 将在'+autoSubmitCountDown+'秒后自动使用默认配置(默认配置不存在时使用结点定义的缺省配置，可能需要补全)'" type="info"
+        v-if="autoConifgFlag" show-icon>
         <template #icon>
           <SyncOutlined :spin="true" />
         </template>
@@ -38,6 +39,7 @@ export default defineComponent({
     SyncOutlined,
   },
   props: {
+    atkInfo: Object,
     paramsDesc: Array,
   },
   setup(props, context) {

@@ -110,7 +110,7 @@
 
                       <template #bodyCell="{ column, record }">
                         <template v-if="column.key === 'status'">
-                          <AttackConfigProcessor :attackMethodID="record.attackMethodID" :currentServerInfo="currentServerInfo"
+                          <AttackConfigProcessor :atkInfo="record" :currentServerInfo="currentServerInfo"
                             :currentServerDeclaration="currentServerDeclaration" @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}">
                           </AttackConfigProcessor>
                         </template>
@@ -118,10 +118,6 @@
                           <span>
                             <a @click="showMethodDetails(record.attackMethodID)">详情 - {{ record.attackMethodName }}</a>
                             <a-divider type="vertical" />
-                            <a class="ant-dropdown-link">
-                              参数配置
-                              <down-outlined />
-                            </a>
                           </span>
                         </template>
                       </template>
@@ -246,6 +242,7 @@ export default defineComponent({
       },
       {
         dataIndex: 'status',
+        width: '280px',
         title: '配置状态',
         key: 'status',
       },

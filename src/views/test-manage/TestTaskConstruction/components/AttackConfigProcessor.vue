@@ -1,98 +1,100 @@
 <style scoped lang="less">
+@import '~ant-design-vue/dist/antd.less';
+.processor {
+  &__refresh {
+    color: @primary-color;
+  }
+}
 </style>
 <template>
   <div>
-    <a-tag color="error" v-if="errorNotice != null">
-      <template #icon>
-        <CloseCircleOutlined />
-      </template>
-      {{errorNotice}}
-    </a-tag>
-
-    <a-tag color="success" v-else-if="successNotice != null">
-      <template #icon>
-        <CheckCircleOutlined />
-      </template>
-      {{successNotice}}
-    </a-tag>
-
-    <a-tag color="processing" v-else-if="processingNotice != null">
-      <template #icon>
-        <SyncOutlined :spin="true" />
-      </template>
-      {{processingNotice}}
-    </a-tag>
-
-    <div v-else>
-      暂时不可用
+    <div>
+      <a-tag :color="notice.status">
+        <template #icon>
+          <CloseCircleOutlined v-if="notice.status == 'error'" />
+          <CheckCircleOutlined v-if="notice.status == 'success'" />
+          <SyncOutlined :spin="true" v-if="notice.status == 'processing'" />
+          <ExclamationCircleOutlined v-if="notice.status == 'warning'"/>
+        </template>
+        {{notice.info}}
+      </a-tag>
+      <span v-if="ready">
+        <a-divider type="vertical" />
+        <a class="ant-dropdown-link" @click="setConfig">
+          参数配置
+        </a>
+      </span>
+      <a-divider type="vertical" />
+      <SyncOutlined @click="task(true)" class="processor__refresh" />
     </div>
 
-    <AttackConfigModel ref="attackConfigModel" :paramsDesc="attackDeclaration.attackMethodArgsHandlerParamsDesc" @submit="handleSubmit" @cancel="handleCancel"></AttackConfigModel>
+    <AttackConfigModel ref="attackConfigModel" :atkInfo="atkInfo"
+      :paramsDesc="attackDeclarationStore[atkID].attackDeclaration['attackMethodArgsHandlerParamsDesc']" @submit="handleSubmit" @cancel="handleCancel"
+      v-if="attackDeclarationStore[atkID]!=null && attackDeclarationStore[atkID].attackDeclaration!=null">
+    </AttackConfigModel>
 
   </div>
 </template>
 <script>
-import { defineComponent, onBeforeMount, ref } from 'vue';
-import { CloseCircleOutlined, CheckCircleOutlined, SyncOutlined } from '@ant-design/icons-vue';
+import { defineComponent, onBeforeMount, onMounted, ref, toRef } from 'vue';
+import { CloseCircleOutlined, CheckCircleOutlined, SyncOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
 import AttackConfigModel from './AttackConfigModel';
 
-import { getAtkProvider } from '@/api/atk-api/atkInfo.js';
+import { attackDeclarationStore, initAttackDeclarationStore, getAttackDeclaration } from './store';
 
 export default defineComponent({
   components: {
     CloseCircleOutlined,
     CheckCircleOutlined,
     SyncOutlined,
+    ExclamationCircleOutlined,
     AttackConfigModel,
   },
   props: {
-    attackMethodID: Number,
+    atkInfo: Object,
     currentServerInfo: Object,
     currentServerDeclaration: Object,
   },
   setup(props, context) {
-    const processingNotice = ref('请等待');
-    const errorNotice = ref(null);
-    const successNotice = ref(null);
-
-    const attackBindInfo = ref({});
-    const attackDeclaration = ref({});
+    const atkInfo = toRef(props, 'atkInfo');
+    const atkID = atkInfo.value['attackMethodID'];
 
     const attackConfigModel = ref();
 
-    onBeforeMount(() => {
+    const notice = ref({
+      status: 'processing',
+      info: '请稍后',
+    });
+
+    const setNotice = (info, status) => {
+      notice.value.info = info;
+      notice.value.status = status;
+    };
+
+    onMounted(() => {
       context.emit('add-async-task', task);
     });
 
+    const ready = ref(false);
+
+    const task = async (update = false) => {
+      if (!attackDeclarationStore[atkID] || update) {
+        initAttackDeclarationStore(atkID);
+      }
+
+      notice.value = attackDeclarationStore[atkID].notice;
+
+      ready.value = await getAttackDeclaration(atkID, props.currentServerInfo.nodeID, props.currentServerDeclaration);
+      if (!ready.value) return;
+      await setConfig();
+    };
+
     let promiseFunc = {};
-    const task = async() => {
-      // 获取绑定
-      processingNotice.value = '正在获取方法绑定的节点信息';
-      let attackBindInfoList = await getAtkProvider(props.attackMethodID, props.currentServerInfo.nodeID);
-      if (attackBindInfoList.length == 1) {
-        attackBindInfo.value = attackBindInfoList[0];
-      } else {
-        errorNotice.value = '方法未绑定当前服务节点';
-        return;
-      }
-
-      processingNotice.value = '正在获取配置列表';
-      let isfindDeclaration = false;
-      props.currentServerDeclaration['attack']['attackList'].forEach((element) => {
-        if (element.attackMethodName == attackBindInfo.value.bindAttackMethodName) {
-          attackDeclaration.value = element;
-          isfindDeclaration = true;
-        }
-      });
-      if (!isfindDeclaration) {
-        errorNotice.value = '方法绑定名称在当前节点中不存在';
-        return;
-      }
-
+    const setConfig = async () => {
       await new Promise((resolve, reject) => {
-        processingNotice.value = '正在完成参数配置';
+        setNotice('正在完成参数配置', 'processing');
         attackConfigModel.value.autoConifg();
 
         promiseFunc.resolve = resolve;
@@ -101,25 +103,23 @@ export default defineComponent({
     };
 
     const handleSubmit = (paramsJSONStr) => {
-      successNotice.value = '就绪';
+      setNotice('就绪', 'success');
       promiseFunc.resolve(paramsJSONStr);
     };
 
     const handleCancel = () => {
-      errorNotice.value = '未完成参数配置';
+      setNotice('未完成参数配置', 'warning');
       promiseFunc.reject();
     };
 
     return {
-      processingNotice,
-      errorNotice,
-      successNotice,
-
-      attackDeclaration,
-
+      atkID,
+      attackDeclarationStore,
       attackConfigModel,
-
+      notice,
+      ready,
       task,
+      setConfig,
       handleSubmit,
       handleCancel,
     };
