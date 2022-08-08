@@ -14,6 +14,16 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow: hidden;
+  &__con {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    background: @success-color;
+    top: -15px;
+    right: -15px;
+    transform: rotate(45deg);
+  }
   &__icon {
     font-size: 32px;
     &--current {
@@ -34,7 +44,9 @@
 <template>
   <div>
     <div class="provider-list">
-      <a-card size="small" class="provider" v-for="(data,index) in attackBindInfoList" :key="index">
+      <a-card size="small" class="provider" v-for="(data,index) in attackBindInfoList" :key="index"
+        @click="currentServerInfo.nodeID==data.attackMethodProviderNodeInfo.nodeID?selectProvider(data.attackMethodProviderID):()=>{}">
+        <div class="provider__con" v-if="data.attackMethodProviderID == selectedAttackMethodProviderID"></div>
         <div>
           <ApiOutlined
             :class="'provider__icon '+(currentServerInfo.nodeID==data.attackMethodProviderNodeInfo.nodeID ? 'provider__icon--current' : 'provider__icon--disable')" />
@@ -62,11 +74,11 @@
   </div>
 </template>
 <script>
-import { computed, defineComponent, onMounted, ref, toRef, watch } from 'vue';
+import { computed, defineComponent, onMounted, provide, ref, toRef, watch } from 'vue';
 import { ApiOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
-import { initStore, getAttackBindInfoList } from './store';
+import { initStore, getAllAttackBindInfos } from './store';
 
 export default defineComponent({
   components: { ApiOutlined, CloseCircleOutlined },
@@ -91,12 +103,20 @@ export default defineComponent({
     const attackBindInfoList = ref([]);
     const getAtkBindList = async (update = false) => {
       initStore(atkID.value, update);
-      attackBindInfoList.value = await getAttackBindInfoList(atkID.value);
+      attackBindInfoList.value = await getAllAttackBindInfos(atkID.value);
+    };
+
+    const selectedAttackMethodProviderID = ref();
+    const selectProvider = (providerID) => {
+      selectedAttackMethodProviderID.value = providerID;
+      context.emit('selectedProvider', atkID.value, providerID);
     };
 
     return {
       attackBindInfoList,
       getAtkBindList,
+      selectProvider,
+      selectedAttackMethodProviderID,
     };
   },
 });

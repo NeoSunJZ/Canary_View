@@ -40,7 +40,7 @@ import { message } from 'ant-design-vue';
 
 import AttackConfigModel from './AttackConfigModel';
 
-import { attackConfigNotice, initStore, getAttackDeclaration, getAttackBindInfo } from './store';
+import { attackConfigNotice, initStore, getAttackDeclaration, getAttackBindInfosByNodeID, getBindInfoByProviderID } from './store';
 
 export default defineComponent({
   components: {
@@ -52,6 +52,7 @@ export default defineComponent({
   },
   props: {
     atkInfo: Object,
+    providerID: Number,
     currentServerInfo: Object,
     currentServerDeclaration: Object,
   },
@@ -75,25 +76,32 @@ export default defineComponent({
       context.emit('add-async-task', task);
     });
 
-    const attackDeclaration = ref();
-
     const task = async (update = false) => {
       initStore(atkID, update);
-      
+
       notice.value = attackConfigNotice[atkID];
 
-      attackDeclaration.value = await getAttackDeclaration(atkID, props.currentServerInfo.nodeID, props.currentServerDeclaration);
-      if (attackDeclaration.value == null) return;
       await setConfig(true);
     };
 
+    const attackDeclaration = ref();
+
     let promiseFunc = {};
     const setConfig = async (autoConfig = false) => {
+      // 检查是否已获取SEFI的声明
+      attackDeclaration.value = await getAttackDeclaration(atkID, props.currentServerInfo.nodeID, props.currentServerDeclaration, props.providerID);
+      // 检查是否获取成功了
+      if (attackDeclaration.value == null) return;
+
+      // 如果已经指定了providerID，直接使用指定的
+      let atkProviderID = props.providerID;
+      if (atkProviderID == null) {
+        let attackBindInfos = await getAttackBindInfosByNodeID(atkID, props.currentServerInfo.nodeID);
+        let attackBindInfo = attackBindInfos[0]; // 没指定，默认取第一个ProviderID
+        atkProviderID = attackBindInfo['attackMethodProviderID'];
+      }
+
       let paramsDesc = attackDeclaration.value['attackMethodArgsHandlerParamsDesc'];
-
-      let attackBindInfo = await getAttackBindInfo(atkID, props.currentServerInfo.nodeID);
-      let atkProviderID = attackBindInfo['attackMethodProviderID'];
-
       await new Promise((resolve, reject) => {
         setNotice('正在完成参数配置', 'processing');
         if (!autoConfig) {

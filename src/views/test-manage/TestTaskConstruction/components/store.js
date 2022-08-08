@@ -26,7 +26,7 @@ const setNotice = (atkID, info, status) => {
     attackConfigNotice[atkID].status = status;
 };
 
-export const getAttackBindInfoList = async (atkID) => {
+export const getAllAttackBindInfos = async (atkID) => {
     if (attackBindInfoStore[atkID] == null) {
         setNotice(atkID, '正在获取方法绑定的节点信息', 'processing');
         attackBindInfoStore[atkID] = await getAtkProvider(atkID);
@@ -34,26 +34,48 @@ export const getAttackBindInfoList = async (atkID) => {
     return attackBindInfoStore[atkID]
 }
 
-export const getAttackBindInfo = async (atkID, nodeID) => {
-    await getAttackBindInfoList(atkID);
-    let attackBindInfo = null
+export const getAttackBindInfosByNodeID = async (atkID, nodeID) => {
+    await getAllAttackBindInfos(atkID);
+    let attackBindInfoList = []
     attackBindInfoStore[atkID].forEach(element => {
         if (element.nodeID == nodeID) {
+            attackBindInfoList.push(element)
+        }
+    });
+    return attackBindInfoList;
+}
+
+export const getBindInfoByProviderID = (attackBindInfos, providerID) => {
+    let attackBindInfo = null
+    attackBindInfos.forEach(element => {
+        if (element.attackMethodProviderID == providerID) {
             attackBindInfo = element
         }
     });
-    return attackBindInfo;
+    return attackBindInfo
 }
 
-export const getAttackDeclaration = async (atkID, nodeID, currentServerDeclaration) => {
-    let attackBindInfo = await getAttackBindInfo(atkID, nodeID)
-    if (attackBindInfo == null) {
-        setNotice(atkID, '方法未绑定当前服务节点', 'error');
+export const getAttackDeclaration = async (atkID, nodeID, currentServerDeclaration, providerID = null) => {
+    let attackBindInfos = await getAttackBindInfosByNodeID(atkID, nodeID)
+
+    if (attackBindInfos.length == 0) {
+        setNotice(atkID, '该攻击方法在当前服务节点没有绑定', 'error');
         return null;
     }
 
-    let attackDeclaration = null
+    let attackBindInfo = null
+    if (attackBindInfos.length > 1) {
+        if (providerID == null) {
+            setNotice(atkID, '该攻击方法在当前服务节点有多个绑定', 'warning');
+            return null;
+        } else {
+            attackBindInfo = getBindInfoByProviderID(attackBindInfos, providerID)
+        }
+    } else {
+        attackBindInfo = attackBindInfos[0]
+    }
 
+    let attackDeclaration = null
 
     setNotice(atkID, '正在获取配置列表', 'processing');
     currentServerDeclaration['attack']['attackList'].forEach((element) => {
@@ -62,7 +84,7 @@ export const getAttackDeclaration = async (atkID, nodeID, currentServerDeclarati
         }
     });
     if (attackDeclaration == null) {
-        setNotice(atkID, '方法绑定名称在当前节点中不存在', 'error');
+        setNotice(atkID, '当前服务节点未提供绑定的方法实现', 'error');
     }
     return attackDeclaration;
 };

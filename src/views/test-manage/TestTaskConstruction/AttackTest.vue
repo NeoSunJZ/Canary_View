@@ -111,7 +111,7 @@
                       <template #bodyCell="{ column, record }">
                         <template v-if="column.key === 'status'">
                           <AttackConfigProcessor :atkInfo="record" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration"
-                            @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}">
+                            :providerID="record.providerID" @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}">
                           </AttackConfigProcessor>
                         </template>
                         <template v-if="column.key === 'action'">
@@ -128,6 +128,54 @@
                     <a-button v-if="direction === 'left'" size="small" style="float: left; margin: 5px" @click="getAttackInfo">
                       刷新方法列表
                     </a-button>
+                    <div v-if="direction === 'right'" style="float: left; margin: 5px">
+                      <a-popconfirm ok-text="关闭" :showCancel="false">
+                        <template #title>
+                          <div>
+                            配置状态可能为如下类型
+                            <br />
+                            <br />
+                            <div style="margin-bottom:5px">
+                              <a-tag color="success">
+                                就绪
+                              </a-tag>: 该方法的配置已经成功完成
+                            </div>
+                            <div style="margin-bottom:5px">
+                              <a-tag color="processing">
+                                请稍后/正在获取……
+                              </a-tag>: 表示正在请求数据，请等待网络请求
+                            </div>
+                            <div style="margin-bottom:5px">
+                              <a-tag color="warning">
+                                未完成参数配置
+                              </a-tag>: 该方法在配置时被用户取消或失败而没有完成配置，请点击 <a-typography-text type="warning">[参数配置]</a-typography-text> 重新配置
+                            </div>
+                            <div style="margin-bottom:5px">
+                              <a-tag color="warning">
+                                该攻击方法在当前服务节点有多个绑定
+                              </a-tag>: 请在 <a-typography-text type="warning">[详情]</a-typography-text> 内选择所希望使用的攻击方法实现，然后点击 <a-typography-text type="warning">
+                                [刷新]</a-typography-text> 继续操作
+                            </div>
+                            <br />
+                            以下两类严重错误<a-typography-text type="error">无法在本页面解决</a-typography-text>
+                            <br />
+                            <div style="margin-bottom:5px">
+                              <a-tag color="error">
+                                该攻击方法在当前服务节点没有绑定
+                              </a-tag>: 请将当前节点已实现的攻击方法绑定至该攻击方法后重试
+                            </div>
+                            <div style="margin-bottom:5px">
+                              <a-tag color="error">
+                                当前服务节点未提供绑定的方法实现
+                              </a-tag>: 请检查当前节点是否已经实现攻击方法，其名称是否与绑定的名称一致
+                            </div>
+                          </div>
+                        </template>
+                        <a>
+                          <QuestionCircleOutlined /> 配置状态含义
+                        </a>
+                      </a-popconfirm>
+                    </div>
                   </template>
                 </a-transfer>
               </a-col>
@@ -169,7 +217,8 @@
                       }}</a-col>
                     </a-row>
                     <a-divider />
-                    <AttackBindNode :atkID="selectedAttackMethodInfo['attackMethodID']" :currentServerInfo="currentServerInfo"></AttackBindNode>
+                    <AttackBindNode :atkID="selectedAttackMethodInfo['attackMethodID']" :currentServerInfo="currentServerInfo"
+                      @selectedProvider="selectedAttackProvider"></AttackBindNode>
                     <a-drawer title="方法详情" placement="right" :visible="methodDetailsVisible" :get-container="false" width="90%"
                       :style="{ position: 'absolute' }" @close="methodDetailsVisible = false">
                       <p v-html="selectedAttackMethodInfo.attackMethodDetails"></p>
@@ -197,7 +246,7 @@ import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import ServerNodeCard from '@/components/ServerNodeCard.vue';
 import { defineComponent, ref, onMounted, computed, nextTick } from 'vue';
 import { message, Empty } from 'ant-design-vue';
-import { DeploymentUnitOutlined, ClusterOutlined, CloseCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue';
+import { DeploymentUnitOutlined, ClusterOutlined, CloseCircleOutlined, CheckCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue';
 import router from '@/router';
 // import { getModelInfo } from "@/api/model-api/modelInfo.js";
 import { getAtkInfo } from '@/api/atk-api/atkInfo.js';
@@ -217,6 +266,7 @@ export default defineComponent({
     ClusterOutlined,
     CloseCircleOutlined,
     CheckCircleOutlined,
+    QuestionCircleOutlined,
   },
   setup() {
     const current = ref(0);
@@ -253,7 +303,7 @@ export default defineComponent({
       },
       {
         dataIndex: 'status',
-        width: '280px',
+        width: '300px',
         title: '配置状态',
         key: 'status',
       },
@@ -381,6 +431,14 @@ export default defineComponent({
 
     const methodDetailsVisible = ref(false);
 
+    const selectedAttackProvider = async (atkID, providerID) => {
+      attackInfo.value.forEach((element) => {
+        if (element.attackMethodID == atkID) {
+          element.providerID = providerID;
+        }
+      });
+    };
+
     return {
       message,
       attackType,
@@ -412,6 +470,7 @@ export default defineComponent({
       runConfigTaskQueue,
 
       methodDetailsVisible,
+      selectedAttackProvider,
     };
   },
 });
