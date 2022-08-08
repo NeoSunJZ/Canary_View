@@ -158,7 +158,10 @@ export default defineComponent({
     const paramsToJSONStr = () => {
       paramsJSONStr.value = JSON.stringify(params.value);
     };
-    const jsonStrToparams = () => {
+    const jsonStrToparams = (jsonStr = null) => {
+      if (jsonStr != null) {
+        paramsJSONStr.value = jsonStr;
+      }
       try {
         let data = JSON.parse(paramsJSONStr.value);
         loadParams(data);
@@ -175,6 +178,7 @@ export default defineComponent({
       params,
       expand,
       paramsJSONStr,
+
       paramsToJSONStr,
       jsonStrToparams,
       rules,

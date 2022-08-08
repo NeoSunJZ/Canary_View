@@ -20,7 +20,7 @@
       </a-tag>
       <span v-if="ready">
         <a-divider type="vertical" />
-        <a class="ant-dropdown-link" @click="setConfig">
+        <a class="ant-dropdown-link" @click="setConfig(false)">
           参数配置
         </a>
       </span>
@@ -86,17 +86,22 @@ export default defineComponent({
 
       ready.value = await getAttackDeclaration(atkID, props.currentServerInfo.nodeID, props.currentServerDeclaration);
       if (!ready.value) return;
-      await setConfig();
+      await setConfig(true);
     };
 
     let promiseFunc = {};
-    const setConfig = async () => {
+    const setConfig = async (autoConfig = false) => {
       await new Promise((resolve, reject) => {
         setNotice('正在完成参数配置', 'processing');
 
         let paramsDesc = attackDeclarationStore[atkID].attackDeclaration['attackMethodArgsHandlerParamsDesc'];
         let atkProviderID = attackDeclarationStore[atkID].attackBindInfo['attackMethodProviderID'];
-        attackConfigModel.value.autoConifg(paramsDesc, atkInfo.value, atkProviderID);
+
+        if (!autoConfig) {
+          attackConfigModel.value.openConfigModel(paramsDesc, atkInfo.value, atkProviderID);
+        } else {
+          attackConfigModel.value.autoConfig(paramsDesc, atkInfo.value, atkProviderID);
+        }
 
         promiseFunc.resolve = resolve;
         promiseFunc.reject = reject;
