@@ -1,3 +1,6 @@
+/*
+ *TinyMCE的编辑器组件
+ */
 <style scoped lang='less'>
 </style>
 <template>

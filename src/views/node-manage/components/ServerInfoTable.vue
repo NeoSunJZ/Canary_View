@@ -140,25 +140,7 @@
       </template>
 
       <template v-else-if="column.dataIndex === 'status'">
-        <div v-if="record.status==='running'">
-          <div class="state">
-            <div class='state__greenpoint'></div>
-            <p class="state__running">运行中</p>
-            <a-button type="link" size="small" shape="circle">
-              <SyncOutlined @click="refresh(record.index)" />
-            </a-button>
-          </div>
-        </div>
-        <div v-else>
-          <div class="state">
-            <div class='state__redpoint'></div>
-            <p class="state__stopping">已断开</p>
-            <a-button type="link" size="small" shape="circle">
-              <SyncOutlined @click="refresh(record.index)" />
-            </a-button>
-
-          </div>
-        </div>
+        <StatusGrid :ip="record.ip" :port="record.port"></StatusGrid>
       </template>
 
       <template v-else-if="column.dataIndex === 'operation'">
@@ -174,11 +156,12 @@
 
 
 <script>
-import AddNodeForm from '@/components/AddNodeForm';
+import AddNodeForm from '@/views/node-manage/components/AddNodeForm.vue';
+import StatusGrid from '@/views/node-manage/components/StatusGrid.vue';
 import { defineComponent, ref, computed, reactive, onBeforeMount } from 'vue';
 import { DeploymentUnitOutlined, ClusterOutlined, CheckOutlined, EditOutlined, SyncOutlined } from '@ant-design/icons-vue';
 import { cloneDeep } from 'lodash-es';
-import { getNodeInfo, addNodeInfo, deleteNodeInfo, updateNodeInfo } from '@/api/node-api/nodeinfo';
+import { getNodeInfo, deleteNodeInfo, updateNodeInfo } from '@/api/node-api/nodeinfo';
 
 export default defineComponent({
   name: 'ServerInfoCard',
@@ -189,6 +172,7 @@ export default defineComponent({
     EditOutlined,
     SyncOutlined,
     AddNodeForm,
+    StatusGrid,
   },
   props: {
     //

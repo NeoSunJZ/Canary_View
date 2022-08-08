@@ -18,7 +18,7 @@
 
 <script>
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
-import ServerInfoTable from '@/components/ServerInfoTable.vue';
+import ServerInfoTable from '@/views/node-manage/components/ServerInfoTable.vue';
 import { ref } from 'vue';
 export default {
   name: 'MyNode',
