@@ -18,7 +18,7 @@
         </template>
         {{notice.info}}
       </a-tag>
-      <span v-if="ready">
+      <span v-if="attackDeclaration!=null">
         <a-divider type="vertical" />
         <a class="ant-dropdown-link" @click="setConfig(false)">
           参数配置
@@ -40,7 +40,7 @@ import { message } from 'ant-design-vue';
 
 import AttackConfigModel from './AttackConfigModel';
 
-import { attackDeclarationStore, initAttackDeclarationStore, getAttackDeclaration } from './store';
+import { attackConfigNotice, initStore, getAttackDeclaration, getAttackBindInfo } from './store';
 
 export default defineComponent({
   components: {
@@ -75,28 +75,27 @@ export default defineComponent({
       context.emit('add-async-task', task);
     });
 
-    const ready = ref(false);
+    const attackDeclaration = ref();
 
     const task = async (update = false) => {
-      if (!attackDeclarationStore[atkID] || update) {
-        initAttackDeclarationStore(atkID);
-      }
+      initStore(atkID, update);
+      
+      notice.value = attackConfigNotice[atkID];
 
-      notice.value = attackDeclarationStore[atkID].notice;
-
-      ready.value = await getAttackDeclaration(atkID, props.currentServerInfo.nodeID, props.currentServerDeclaration);
-      if (!ready.value) return;
+      attackDeclaration.value = await getAttackDeclaration(atkID, props.currentServerInfo.nodeID, props.currentServerDeclaration);
+      if (attackDeclaration.value == null) return;
       await setConfig(true);
     };
 
     let promiseFunc = {};
     const setConfig = async (autoConfig = false) => {
+      let paramsDesc = attackDeclaration.value['attackMethodArgsHandlerParamsDesc'];
+
+      let attackBindInfo = await getAttackBindInfo(atkID, props.currentServerInfo.nodeID);
+      let atkProviderID = attackBindInfo['attackMethodProviderID'];
+
       await new Promise((resolve, reject) => {
         setNotice('正在完成参数配置', 'processing');
-
-        let paramsDesc = attackDeclarationStore[atkID].attackDeclaration['attackMethodArgsHandlerParamsDesc'];
-        let atkProviderID = attackDeclarationStore[atkID].attackBindInfo['attackMethodProviderID'];
-
         if (!autoConfig) {
           attackConfigModel.value.openConfigModel(paramsDesc, atkInfo.value, atkProviderID);
         } else {
@@ -120,10 +119,9 @@ export default defineComponent({
 
     return {
       atkID,
-      attackDeclarationStore,
       attackConfigModel,
       notice,
-      ready,
+      attackDeclaration,
       task,
       setConfig,
       handleSubmit,

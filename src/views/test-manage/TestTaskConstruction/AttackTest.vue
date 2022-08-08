@@ -110,13 +110,13 @@
 
                       <template #bodyCell="{ column, record }">
                         <template v-if="column.key === 'status'">
-                          <AttackConfigProcessor :atkInfo="record" :currentServerInfo="currentServerInfo"
-                            :currentServerDeclaration="currentServerDeclaration" @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}">
+                          <AttackConfigProcessor :atkInfo="record" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration"
+                            @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}">
                           </AttackConfigProcessor>
                         </template>
                         <template v-if="column.key === 'action'">
                           <span>
-                            <a @click="showMethodDetails(record.attackMethodID)">详情 - {{ record.attackMethodName }}</a>
+                            <a @click="showMethodInfo(record.attackMethodID)">详情 - {{ record.attackMethodName }}</a>
                             <a-divider type="vertical" />
                           </span>
                         </template>
@@ -132,14 +132,13 @@
                 </a-transfer>
               </a-col>
               <a-col :span="8" class="attack-task__attack-selector">
-                <a-card size="small" style="width: 100%">
+                <a-card size="small" style="width: 100%; overflow:hidden">
                   <template #title>
                     <div>
                       攻击方法详情<span v-if="selectedAttackMethodInfo != null">
                         - {{ selectedAttackMethodInfo.attackMethodName }}</span>
                     </div>
                   </template>
-                  <template #extra><a href="#">more</a></template>
                   <a-empty :image="simpleImage" v-if="selectedAttackMethodInfo == null" />
                   <div v-else>
                     <a-row type="flex">
@@ -155,6 +154,10 @@
                       }}</a-col>
                     </a-row>
                     <a-row type="flex">
+                      <a-col flex="0 1 100px">方法详情</a-col>
+                      <a-col flex="1 1"><a @click="methodDetailsVisible = true">查看详情</a></a-col>
+                    </a-row>
+                    <a-row type="flex">
                       <a-col flex="100px">参考论文</a-col>
                       <a-col flex="auto"><a :href="selectedAttackMethodInfo.attackMethodPaperUrl">{{ selectedAttackMethodInfo.attackMethodPaper }}</a></a-col>
                     </a-row>
@@ -166,6 +169,11 @@
                       }}</a-col>
                     </a-row>
                     <a-divider />
+                    <AttackBindNode :atkID="selectedAttackMethodInfo['attackMethodID']" :currentServerInfo="currentServerInfo"></AttackBindNode>
+                    <a-drawer title="方法详情" placement="right" :visible="methodDetailsVisible" :get-container="false" width="90%"
+                      :style="{ position: 'absolute' }" @close="methodDetailsVisible = false">
+                      <p v-html="selectedAttackMethodInfo.attackMethodDetails"></p>
+                    </a-drawer>
                   </div>
                 </a-card>
               </a-col>
@@ -195,6 +203,7 @@ import router from '@/router';
 import { getAtkInfo } from '@/api/atk-api/atkInfo.js';
 
 import AttackConfigProcessor from './components/AttackConfigProcessor';
+import AttackBindNode from './components/AttackBindNode';
 
 export default defineComponent({
   name: 'AttackTest',
@@ -202,6 +211,8 @@ export default defineComponent({
     MainPageNavigation,
     ServerNodeCard,
     AttackConfigProcessor,
+    AttackBindNode,
+
     DeploymentUnitOutlined,
     ClusterOutlined,
     CloseCircleOutlined,
@@ -315,7 +326,7 @@ export default defineComponent({
     };
 
     const selectedAttackMethodInfo = ref();
-    const showMethodDetails = (attackMethodID) => {
+    const showMethodInfo = (attackMethodID) => {
       attackInfo.value.forEach((element) => {
         if (element.attackMethodID == attackMethodID) {
           selectedAttackMethodInfo.value = element;
@@ -368,6 +379,8 @@ export default defineComponent({
       }
     };
 
+    const methodDetailsVisible = ref(false);
+
     return {
       message,
       attackType,
@@ -387,7 +400,7 @@ export default defineComponent({
       handleMoveItemChange,
 
       getAttackInfo,
-      showMethodDetails,
+      showMethodInfo,
       simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
       next,
       prev,
@@ -397,6 +410,8 @@ export default defineComponent({
       //自动配置队列
       autoConfigTaskQueue,
       runConfigTaskQueue,
+
+      methodDetailsVisible,
     };
   },
 });
