@@ -43,7 +43,6 @@ export default defineComponent({
   setup(props, context) {
     const NodeStatus = ref('running');
     const refresh = async () => {
-      // 测试用，未完成
       let data = await getDeclarationOnly(props.ip, props.port);
       if (data == null) {
         NodeStatus.value = 'stopping';
@@ -52,12 +51,7 @@ export default defineComponent({
       }
     };
     onBeforeMount(async () => {
-      let data = await getDeclarationOnly(props.ip, props.port);
-      if (data == null) {
-        NodeStatus.value = 'stopping';
-      } else {
-        NodeStatus.value = 'running';
-      }
+      refresh();
     });
     return { NodeStatus, refresh };
   },
