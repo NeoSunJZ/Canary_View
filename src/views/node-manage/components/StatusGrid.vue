@@ -1,7 +1,14 @@
 <style lang="less" scoped>
+@import '~ant-design-vue/dist/antd.less';
 .state {
   display: flex;
   flex-direction: row;
+  &__stoppingtext {
+    color: @red-6;
+  }
+  &__runningtext {
+    color: @green-6;
+  }
 }
 </style>
 
@@ -9,10 +16,12 @@
 <template>
   <div class='state'>
     <div v-if="NodeStatus==='running'">
-      <a-badge status="success" text="运行中" />
+      <a-badge status="success" />
+      <span class="state__runningtext">运行中</span>
     </div>
     <div v-else>
-      <a-badge status="error" text="已断开" />
+      <a-badge status="error" />
+      <span class="state__stoppingtext">已断开</span>
     </div>
     <a-button type="link" size="small" shape="circle">
       <SyncOutlined @click="refresh" />
