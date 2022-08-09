@@ -97,87 +97,11 @@
           <div v-if="current == 0">
             <a-row>
               <a-col :span="16" class="attack-task__attack-selector">
-                <a-transfer v-model:target-keys="targetKeys" :data-source="attackInfo" show-search :rowKey="(record) => record.attackMethodID"
-                  :showSelectAll="false" :list-style="{'min-width': '250px', 'min-height': '300px', flex: 1,}" :titles="[' 可选方法', ' 已选定方法']"
-                  :operations="['加入队列', '移除队列']" @change="handleMoveItemChange" style="width: 100%">
-                  <template #children="{direction, filteredItems, selectedKeys, disabled: listDisabled, onItemSelectAll, onItemSelect}">
-                    <a-table :row-selection="getRowSelection({disabled: listDisabled, selectedKeys, onItemSelectAll, onItemSelect,})"
-                      :columns="direction === 'left' ? leftTableColumns : rightTableColumns" :data-source="filteredItems" size="small"
-                      :style="{ pointerEvents: listDisabled ? 'none' : null }" :pagination="direction === 'left' ? pagination : { pageSize: 5 }"
-                      @change="(...args) => { direction === 'left' ? handleTableChange(...args) : ()=>{} }"
-                      :custom-row="({ key, disabled: itemDisabled }) => ({onClick: () => { if (itemDisabled || listDisabled) return; onItemSelect(key, !selectedKeys.includes(key));},})"
-                      :scroll="direction === 'left' ? { x: 800 } : { x: 700 }">
 
-                      <template #bodyCell="{ column, record }">
-                        <template v-if="column.key === 'status'">
-                          <AttackConfigProcessor :atkInfo="record" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration"
-                            :providerID="record.providerID" @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}">
-                          </AttackConfigProcessor>
-                        </template>
-                        <template v-if="column.key === 'action'">
-                          <span>
-                            <a @click="showMethodInfo(record.attackMethodID)">详情 - {{ record.attackMethodName }}</a>
-                            <a-divider type="vertical" />
-                          </span>
-                        </template>
-                      </template>
-                    </a-table>
-                  </template>
+                <CommonSelector :leftTableColumns="leftTableColumns" :rightTableColumns="rightTableColumns"
+                  :fields="{name:'attackMethodName',id:'attackMethodID'}" :currentServerInfo="currentServerInfo"
+                  :currentServerDeclaration="currentServerDeclaration" :getDataResource="getAtkInfo" @showDataDetails="()=>{}"></CommonSelector>
 
-                  <template #footer="{ direction }">
-                    <a-button v-if="direction === 'left'" size="small" style="float: left; margin: 5px" @click="getAttackInfo">
-                      刷新方法列表
-                    </a-button>
-                    <div v-if="direction === 'right'" style="float: left; margin: 5px">
-                      <a-popconfirm ok-text="关闭" :showCancel="false">
-                        <template #title>
-                          <div>
-                            配置状态可能为如下类型
-                            <br />
-                            <br />
-                            <div style="margin-bottom:5px">
-                              <a-tag color="success">
-                                就绪
-                              </a-tag>: 该方法的配置已经成功完成
-                            </div>
-                            <div style="margin-bottom:5px">
-                              <a-tag color="processing">
-                                请稍后/正在获取……
-                              </a-tag>: 表示正在请求数据，请等待网络请求
-                            </div>
-                            <div style="margin-bottom:5px">
-                              <a-tag color="warning">
-                                未完成参数配置
-                              </a-tag>: 该方法在配置时被用户取消或失败而没有完成配置，请点击 <a-typography-text type="warning">[参数配置]</a-typography-text> 重新配置
-                            </div>
-                            <div style="margin-bottom:5px">
-                              <a-tag color="warning">
-                                该攻击方法在当前服务节点有多个绑定
-                              </a-tag>: 请在 <a-typography-text type="warning">[详情]</a-typography-text> 内选择所希望使用的攻击方法实现，然后点击 <a-typography-text type="warning">
-                                [刷新]</a-typography-text> 继续操作
-                            </div>
-                            <br />
-                            以下两类严重错误<a-typography-text type="error">无法在本页面解决</a-typography-text>
-                            <br />
-                            <div style="margin-bottom:5px">
-                              <a-tag color="error">
-                                该攻击方法在当前服务节点没有绑定
-                              </a-tag>: 请将当前节点已实现的攻击方法绑定至该攻击方法后重试
-                            </div>
-                            <div style="margin-bottom:5px">
-                              <a-tag color="error">
-                                当前服务节点未提供绑定的方法实现
-                              </a-tag>: 请检查当前节点是否已经实现攻击方法，其名称是否与绑定的名称一致
-                            </div>
-                          </div>
-                        </template>
-                        <a>
-                          <QuestionCircleOutlined /> 配置状态含义
-                        </a>
-                      </a-popconfirm>
-                    </div>
-                  </template>
-                </a-transfer>
               </a-col>
               <a-col :span="8" class="attack-task__attack-selector">
                 <a-card size="small" style="width: 100%; overflow:hidden">
@@ -253,6 +177,7 @@ import { getAtkInfo } from '@/api/atk-api/atkInfo.js';
 
 import AttackConfigProcessor from './components/AttackConfigProcessor';
 import AttackBindNode from './components/AttackBindNode';
+import CommonSelector from './components/CommonSelector.vue';
 
 export default defineComponent({
   name: 'AttackTest',
@@ -267,6 +192,7 @@ export default defineComponent({
     CloseCircleOutlined,
     CheckCircleOutlined,
     QuestionCircleOutlined,
+    CommonSelector,
   },
   setup() {
     const current = ref(0);
@@ -317,63 +243,9 @@ export default defineComponent({
     const toPage = (page) => {
       router.push({ path: '/' + page });
     };
-    const pageSize = ref(5);
-    const totalAtkInfo = ref(0);
-    const totalLoad = ref(0);
-
-    const currentPage = ref(1);
 
     const attackInfo = ref([]);
-    const targetKeys = ref([]);
 
-    let loadPage = 1;
-    let loadFinished = false;
-
-    const pagination = computed(() => {
-      return {
-        total: totalAtkInfo.value - targetKeys.value.length,
-        current: currentPage.value,
-        pageSize: pageSize.value,
-      };
-    });
-
-    // 拉取攻击方法信息
-    onMounted(async () => {
-      await getAttackInfo();
-    });
-
-    const getAttackInfo = async () => {
-      const atkInfo = await getAtkInfo(loadPage, pageSize.value);
-
-      attackInfo.value = attackInfo.value.concat(atkInfo.list);
-      totalAtkInfo.value = atkInfo.total;
-      totalLoad.value = totalLoad.value + atkInfo.size;
-
-      loadFinished = atkInfo.isLastPage;
-    };
-    const handleMoveItemChange = (targetKeys, direction, moveKeys) => {
-      loadMoreAttackMethodInfo();
-      if (direction == 'right') {
-        nextTick(() => {
-          runConfigTaskQueue();
-        });
-      }
-    };
-
-    const loadMoreAttackMethodInfo = async () => {
-      // 左侧待选已加载的项目数 totalLoad - targetKeys.value.length
-      // 左侧需显示的项目数 pageSize*currentPage
-      // 若已加载小于需显示，则继续向后加载
-      while (totalLoad.value - targetKeys.value.length < pageSize.value * currentPage.value && !loadFinished) {
-        loadPage++;
-        await getAttackInfo();
-      }
-    };
-
-    const handleTableChange = (newPagination, filters, sorter) => {
-      currentPage.value = newPagination.current;
-      loadMoreAttackMethodInfo();
-    };
 
     const selectedAttackMethodInfo = ref();
     const showMethodInfo = (attackMethodID) => {
@@ -382,25 +254,6 @@ export default defineComponent({
           selectedAttackMethodInfo.value = element;
         }
       });
-    };
-
-    const getRowSelection = ({ disabled, selectedKeys, onItemSelectAll, onItemSelect }) => {
-      return {
-        getCheckboxProps: (item) => ({
-          disabled: disabled || item.disabled,
-        }),
-
-        onSelectAll(selected, selectedRows) {
-          const treeSelectedKeys = selectedRows.filter((item) => !item.disabled).map(({ key }) => key);
-          onItemSelectAll(treeSelectedKeys, selected);
-        },
-
-        onSelect({ key }, selected) {
-          onItemSelect(key, selected);
-        },
-
-        selectedRowKeys: selectedKeys,
-      };
     };
 
     const next = () => {
@@ -417,16 +270,6 @@ export default defineComponent({
     const handleServerChange = ({ declarationInfo, serverInfo }) => {
       currentServerDeclaration.value = declarationInfo;
       currentServerInfo.value = serverInfo;
-    };
-
-    //自动配置队列
-
-    const autoConfigTaskQueue = ref([]);
-    const runConfigTaskQueue = async () => {
-      while (autoConfigTaskQueue.value.length > 0) {
-        let task = autoConfigTaskQueue.value.shift();
-        await task().catch(() => {});
-      }
     };
 
     const methodDetailsVisible = ref(false);
@@ -447,30 +290,23 @@ export default defineComponent({
       selectedAttackMethodInfo,
       leftTableColumns,
       rightTableColumns,
-      targetKeys,
-      getRowSelection,
+      
       handleServerChange,
 
-      pagination,
       toPage,
-      attackInfo,
-      handleTableChange,
-      handleMoveItemChange,
 
-      getAttackInfo,
       showMethodInfo,
       simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
+      
       next,
       prev,
       //当前节点信息与声明
       currentServerInfo,
       currentServerDeclaration,
-      //自动配置队列
-      autoConfigTaskQueue,
-      runConfigTaskQueue,
 
       methodDetailsVisible,
       selectedAttackProvider,
+      getAtkInfo,
     };
   },
 });
