@@ -1,18 +1,21 @@
 <style scoped lang="less">
-.title {
-  margin-bottom: 15px;
-}
-.attack-binding {
-  display: flex;
-  flex-direction: row;
-  &__table {
-    margin-right: 30px;
+  .title {
+    margin-bottom: 15px;
   }
-  &__card {
-    width: 600px;
-    height: 700px;
+
+  .attack-binding {
+    display: flex;
+    flex-direction: row;
+
+    &__table {
+      margin-right: 30px;
+    }
+
+    &__card {
+      width: 600px;
+      height: 700px;
+    }
   }
-}
 </style>
 
 <template>
@@ -25,7 +28,7 @@
       <h2 class="title">攻击方法绑定</h2>
       <div class="attack-binding">
         <div class="attack-binding__table">
-          <a-table :row-selection="rowSelection" :columns="columns" :data-source="attackInfo" :pagination="pagination"
+          <a-table :columns="columns" :data-source="attackInfo" :pagination="pagination"
             @change="(...args) => handleTableChange(...args)">
             <template #bodyCell="{ column }">
               <template v-if="column.dataIndex === 'operation'">
@@ -33,7 +36,20 @@
               </template>
 
             </template>
+            <template #expandedRowRender>
+              <a-table :columns="innerColumns" :data-source="innerData" :pagination="false">
+                <template #bodyCell="{ column }">
+                  <template v-if="column.key === 'state'">
+                    <span>
+                      <a-badge status="success" />
+                      Finished
+                    </span>
+                  </template>
+                </template>
+              </a-table>
+            </template>
           </a-table>
+
         </div>
         <div>
           <a-card class="attack-binding__card">
@@ -53,7 +69,8 @@
 
             <a-card>
               <div style="display:flex; flex-direction:row; flex:1; overflow-x:scroll;">
-                <a-card v-for="(item,index) in dataSource" class="server" size="small" :key="index" style="min-width: 300px;">
+                <a-card v-for="(item,index) in dataSource" class="server" size="small" :key="index"
+                  style="min-width: 300px;">
                   <div v-if="dataSource.length == 0">
                     <p>请您新增服务节点</p>
                   </div>
@@ -86,164 +103,202 @@
 </template>
 
 <script>
-import { getAtkInfo } from '@/api/atk-api/atkInfo';
-import MainPageNavigation from '@/components/MainPageNavigation.vue';
-import { defineComponent, ref, onMounted, computed } from 'vue';
-import tinyEditor from '@/components/TinyEditor.vue';
+  import {
+    getAtkInfo
+  } from '@/api/atk-api/atkInfo';
+  import MainPageNavigation from '@/components/MainPageNavigation.vue';
+  import {
+    defineComponent,
+    ref,
+    onMounted,
+    computed
+  } from 'vue';
+  import tinyEditor from '@/components/TinyEditor.vue';
 
-const columns = [
-  {
+  const innerColumns = [{
+    title: 'Date',
+    dataIndex: 'date',
+    key: 'date',
+  }, {
     title: 'Name',
-    dataIndex: 'attackMethodName',
-  },
-  {
-    title: 'Type',
-    dataIndex: ['attackMethodType', 'attackMethodTypeName'],
-  },
-  {
-    title: ' ',
+    dataIndex: 'name',
+    key: 'name',
+  }, {
+    title: 'Status',
+    key: 'state',
+  }, {
+    title: 'Upgrade Status',
+    dataIndex: 'upgradeNum',
+    key: 'upgradeNum',
+  }, {
+    title: 'Action',
     dataIndex: 'operation',
-  },
-];
+    key: 'operation',
+  }];
+  const innerData = [];
+  for (let i = 0; i < 3; ++i) {
+    innerData.push({
+      key: i,
+      date: '2014-12-24 23:12:00',
+      name: `This is production name ${i + 1}`,
+      upgradeNum: 'Upgraded: 56',
+    });
+  }
 
-export default defineComponent({
-  name: 'AttackMethodBinding',
-  components: { MainPageNavigation, tinyEditor },
-  setup() {
-    const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      },
-      getCheckboxProps: (record) => ({
-        disabled: record.name === 'Disabled User',
-        // Column configuration not to be checked
-        name: record.name,
-      }),
-    };
-    const editable = ref(false);
+  const columns = [{
+      title: 'Name',
+      dataIndex: 'attackMethodName',
+    },
+    {
+      title: 'Type',
+      dataIndex: ['attackMethodType', 'attackMethodTypeName'],
+    },
+    {
+      title: ' ',
+      dataIndex: 'operation',
+    },
+  ];
 
-    const editAtkInfo = () => {
-      editable.value = true;
-    };
-    const attackInfo = ref([]);
-    const pageSize = ref(10);
-    const totalAtkInfo = ref(0);
-    const currentPage = ref(1);
-
-    const dataSource = ref([
-      {
-        key: '1',
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-        ip: '127.0.0.1',
-        port: '8888',
-        appID: '1',
-        appName: 'Server 1',
-        appDesc: '默认服务描述',
-        appStatus: 'Running',
-        createTime: '2022-01-02 13:40:20',
-        createUser: 'admin',
-        isDisabled: 'false',
-      },
-      {
-        key: '2',
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-        ip: '127.0.0.2',
-        port: '8888',
-        appID: '2',
-        appName: 'Server 2',
-        appDesc: 'Alpha测试',
-        appStatus: 'Stop',
-        createTime: '2022-01-01 10:41:20',
-        createUser: 'admin',
-        isDisabled: 'false',
-      },
-      {
-        key: '3',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-        ip: '127.0.0.3',
-        port: '8888',
-        appID: '3',
-        appName: 'Server 3',
-        appDesc: 'Beta测试',
-        appStatus: 'Running',
-        createTime: '2021-01-01 10:41:20',
-        createUser: 'admin',
-        isDisabled: 'false',
-      },
-      {
-        key: '4',
-        name: 'Disabled User',
-        age: 99,
-        address: 'Sidney No. 1 Lake Park',
-        ip: '127.0.0.4',
-        port: '8888',
-        appID: '3',
-        appName: 'Server 4',
-        appDesc: 'Beta测试',
-        appStatus: 'Running',
-        createTime: '2021-01-01 10:41:20',
-        createUser: 'admin',
-        isDisabled: 'false',
-      },
-    ]);
-
-    const pagination = computed(() => {
-      return {
-        total: totalAtkInfo.value,
-        current: currentPage.value,
-        pageSize: pageSize.value,
+  export default defineComponent({
+    name: 'AttackMethodBinding',
+    components: {
+      MainPageNavigation,
+      tinyEditor
+    },
+    setup() {
+      const rowSelection = {
+        onChange: (selectedRowKeys, selectedRows) => {
+          console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        },
+        getCheckboxProps: (record) => ({
+          disabled: record.name === 'Disabled User',
+          // Column configuration not to be checked
+          name: record.name,
+        }),
       };
-    });
+      const editable = ref(false);
 
-    // 拉取攻击信息
-    onMounted(async () => {
-      await getAttackInfo();
-    });
+      const editAtkInfo = () => {
+        editable.value = true;
+      };
+      const attackInfo = ref([]);
+      const pageSize = ref(10);
+      const totalAtkInfo = ref(0);
+      const currentPage = ref(1);
 
-    const loadMoreAttackMethodInfo = async () => {
-      await getAttackInfo();
-    };
+      const dataSource = ref([{
+          key: '1',
+          name: 'John Brown',
+          age: 32,
+          address: 'New York No. 1 Lake Park',
+          ip: '127.0.0.1',
+          port: '8888',
+          appID: '1',
+          appName: 'Server 1',
+          appDesc: '默认服务描述',
+          appStatus: 'Running',
+          createTime: '2022-01-02 13:40:20',
+          createUser: 'admin',
+          isDisabled: 'false',
+        },
+        {
+          key: '2',
+          name: 'Jim Green',
+          age: 42,
+          address: 'London No. 1 Lake Park',
+          ip: '127.0.0.2',
+          port: '8888',
+          appID: '2',
+          appName: 'Server 2',
+          appDesc: 'Alpha测试',
+          appStatus: 'Stop',
+          createTime: '2022-01-01 10:41:20',
+          createUser: 'admin',
+          isDisabled: 'false',
+        },
+        {
+          key: '3',
+          name: 'Joe Black',
+          age: 32,
+          address: 'Sidney No. 1 Lake Park',
+          ip: '127.0.0.3',
+          port: '8888',
+          appID: '3',
+          appName: 'Server 3',
+          appDesc: 'Beta测试',
+          appStatus: 'Running',
+          createTime: '2021-01-01 10:41:20',
+          createUser: 'admin',
+          isDisabled: 'false',
+        },
+        {
+          key: '4',
+          name: 'Disabled User',
+          age: 99,
+          address: 'Sidney No. 1 Lake Park',
+          ip: '127.0.0.4',
+          port: '8888',
+          appID: '3',
+          appName: 'Server 4',
+          appDesc: 'Beta测试',
+          appStatus: 'Running',
+          createTime: '2021-01-01 10:41:20',
+          createUser: 'admin',
+          isDisabled: 'false',
+        },
+      ]);
 
-    const getAttackInfo = async () => {
-      const atkInfo = await getAtkInfo(currentPage.value, pageSize.value);
+      const pagination = computed(() => {
+        return {
+          total: totalAtkInfo.value,
+          current: currentPage.value,
+          pageSize: pageSize.value,
+        };
+      });
 
-      attackInfo.value = attackInfo.value.concat(atkInfo.list);
-      totalAtkInfo.value = atkInfo.total;
-    };
+      // 拉取攻击信息
+      onMounted(async () => {
+        await getAttackInfo();
+      });
 
-    const handleTableChange = (newPagination, filters, sorter) => {
-      currentPage.value = newPagination.current;
-      loadMoreAttackMethodInfo();
-      console.log(pagination);
-    };
+      const loadMoreAttackMethodInfo = async () => {
+        await getAttackInfo();
+      };
 
-    const updateValue = (value) => {
-      console.log(value);
-    };
+      const getAttackInfo = async () => {
+        const atkInfo = await getAtkInfo(currentPage.value, pageSize.value);
 
-    return {
-      columns,
-      rowSelection,
-      editable,
-      editAtkInfo,
-      attackInfo,
-      pageSize,
-      totalAtkInfo,
-      currentPage,
-      pagination,
-      dataSource,
-      handleTableChange,
-      updateValue,
-    };
-  },
-});
+        attackInfo.value = attackInfo.value.concat(atkInfo.list);
+        totalAtkInfo.value = atkInfo.total;
+      };
+
+      const handleTableChange = (newPagination, filters, sorter) => {
+        currentPage.value = newPagination.current;
+        loadMoreAttackMethodInfo();
+        console.log(pagination);
+      };
+
+      const updateValue = (value) => {
+        console.log(value);
+      };
+
+      return {
+        columns,
+        rowSelection,
+        editable,
+        editAtkInfo,
+        attackInfo,
+        pageSize,
+        totalAtkInfo,
+        currentPage,
+        pagination,
+        dataSource,
+        handleTableChange,
+        updateValue,
+
+        innerColumns,
+        innerData,
+      };
+    },
+  });
 </script>
-
-
-
