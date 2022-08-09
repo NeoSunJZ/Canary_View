@@ -1,21 +1,24 @@
 <style lang="less" scoped>
+.state {
+  display: flex;
+  flex-direction: row;
+}
 </style>
 
 
 <template>
+  <div class='state'>
+    <div v-if="NodeStatus==='running'">
+      <a-badge status="success" text="运行中" />
+    </div>
+    <div v-else>
+      <a-badge status="error" text="已断开" />
+    </div>
+    <a-button type="link" size="small" shape="circle">
+      <SyncOutlined @click="refresh" />
+    </a-button>
+  </div>
 
-  <div v-if="NodeStatus==='running'">
-    <a-badge status="success" text="运行中" />
-    <a-button type="link" size="small" shape="circle">
-      <SyncOutlined @click="refresh" />
-    </a-button>
-  </div>
-  <div v-else>
-    <a-badge status="error" text="已断开" />
-    <a-button type="link" size="small" shape="circle">
-      <SyncOutlined @click="refresh" />
-    </a-button>
-  </div>
 </template>
 
 <script>
