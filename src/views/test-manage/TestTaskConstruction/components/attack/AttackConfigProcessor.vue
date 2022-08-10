@@ -18,9 +18,9 @@
         </template>
         {{notice.info}}
       </a-tag>
-      <span v-if="attackDeclaration!=null">
+      <span v-if="attackParamsDesc!=null">
         <a-divider type="vertical" />
-        <a class="ant-dropdown-link" @click="setConfig(false)">
+        <a class="ant-dropdown-link" @click="openConfigModel(false)">
           参数配置
         </a>
       </span>
@@ -28,28 +28,29 @@
       <SyncOutlined @click="task(true)" class="processor__refresh" />
     </div>
 
-    <AttackConfigModel ref="attackConfigModel" @submit="handleSubmit" @cancel="handleCancel">
-    </AttackConfigModel>
+    <CommonConfigModel ref="configModel" :title="'攻击方法 '+ atkInfo.attackMethodName +' [ AtkID: '+atkInfo.attackMethodID+' ] - 高级配置'"
+      :paramsDesc="attackParamsDesc" :providerID="providerID!=null?providerID:defaultProviderID" :getPresetConfig="getAtkConfig" @submit="handleSubmit"
+      @cancel="handleCancel">
+    </CommonConfigModel>
 
   </div>
 </template>
 <script>
-import { defineComponent, onBeforeMount, onMounted, ref, toRef } from 'vue';
+import { defineComponent, onMounted, ref, toRef } from 'vue';
 import { CloseCircleOutlined, CheckCircleOutlined, SyncOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
 
-import AttackConfigModel from './AttackConfigModel';
-
-import { attackConfigNotice, initStore, getAttackDeclaration, getAttackBindInfosByNodeID, getBindInfoByProviderID } from './store';
+import CommonConfigModel from '../CommonConfigModel';
+import { attackConfigNotice, initStore, getAttackDeclaration, getAttackBindInfosByNodeID } from '../store';
+import { getAtkConfig } from '@/api/atk-api/atkInfo.js';
 
 export default defineComponent({
-  name:"AttackConfigProcessor",
+  name: 'AttackConfigProcessor',
   components: {
     CloseCircleOutlined,
     CheckCircleOutlined,
     SyncOutlined,
     ExclamationCircleOutlined,
-    AttackConfigModel,
+    CommonConfigModel,
   },
   props: {
     atkInfo: Object,
@@ -61,7 +62,7 @@ export default defineComponent({
     const atkInfo = toRef(props, 'atkInfo');
     const atkID = atkInfo.value['attackMethodID'];
 
-    const attackConfigModel = ref();
+    const configModel = ref();
 
     const notice = ref({
       status: 'processing',
@@ -82,33 +83,34 @@ export default defineComponent({
 
       notice.value = attackConfigNotice[atkID];
 
-      await setConfig(true);
+      await openConfigModel(true);
     };
 
-    const attackDeclaration = ref();
-
     let promiseFunc = {};
-    const setConfig = async (autoConfig = false) => {
-      // 检查是否已获取SEFI的声明
-      attackDeclaration.value = await getAttackDeclaration(atkID, props.currentServerInfo.nodeID, props.currentServerDeclaration, props.providerID);
-      // 检查是否获取成功了
-      if (attackDeclaration.value == null) return;
 
-      // 如果已经指定了providerID，直接使用指定的
-      let atkProviderID = props.providerID;
-      if (atkProviderID == null) {
+    const defaultProviderID = ref();
+    const attackParamsDesc = ref();
+
+    const openConfigModel = async (autoConfig = false) => {
+      // 检查是否已获取SEFI的声明
+      let attackDeclaration = await getAttackDeclaration(atkID, props.currentServerInfo.nodeID, props.currentServerDeclaration, props.providerID);
+      // 检查是否获取成功了
+      if (attackDeclaration == null) return;
+
+      // 如果未指定providerID，使用第一个可用的
+      if (props.providerID == null) {
         let attackBindInfos = await getAttackBindInfosByNodeID(atkID, props.currentServerInfo.nodeID);
-        let attackBindInfo = attackBindInfos[0]; // 没指定，默认取第一个ProviderID
-        atkProviderID = attackBindInfo['attackMethodProviderID'];
+        defaultProviderID.value = attackBindInfos[0]['attackMethodProviderID']; // 默认取第一个ProviderID
       }
 
-      let paramsDesc = attackDeclaration.value['attackMethodArgsHandlerParamsDesc'];
+      attackParamsDesc.value = attackDeclaration['attackMethodArgsHandlerParamsDesc'];
+
       await new Promise((resolve, reject) => {
         setNotice('正在完成参数配置', 'processing');
         if (!autoConfig) {
-          attackConfigModel.value.openConfigModel(paramsDesc, atkInfo.value, atkProviderID);
+          configModel.value.openConfigModel();
         } else {
-          attackConfigModel.value.autoConfig(paramsDesc, atkInfo.value, atkProviderID);
+          configModel.value.autoConfig();
         }
 
         promiseFunc.resolve = resolve;
@@ -128,13 +130,15 @@ export default defineComponent({
 
     return {
       atkID,
-      attackConfigModel,
+      configModel,
       notice,
-      attackDeclaration,
+      defaultProviderID,
+      attackParamsDesc,
       task,
-      setConfig,
+      openConfigModel,
       handleSubmit,
       handleCancel,
+      getAtkConfig,
     };
   },
 });

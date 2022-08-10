@@ -52,7 +52,7 @@ import { getAtkInfo } from '@/api/atk-api/atkInfo.js';
 import CommonTransfer from '../CommonTransfer.vue';
 import AttackDetails from './AttackDetails.vue';
 import CommonProviderSelector from '../CommonProviderSelector.vue';
-import AttackConfigProcessor from '../AttackConfigProcessor.vue';
+import AttackConfigProcessor from './AttackConfigProcessor.vue';
 
 export default defineComponent({
   name: 'AttackTest',

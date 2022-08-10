@@ -38,13 +38,11 @@
 <script>
 import { defineComponent, ref, onMounted, computed, nextTick } from 'vue';
 
-import AttackConfigProcessor from './AttackConfigProcessor';
 import ConfigStatusNotice from './ConfigStatusNotice.vue';
 
 export default defineComponent({
   name: 'CommonTransfer',
   components: {
-    AttackConfigProcessor,
     ConfigStatusNotice,
   },
   props: {

@@ -39,8 +39,7 @@
 </style>
 <template>
   <div>
-    <a-modal v-model:visible="visible" :title="atkInfo == null?'高级配置':('攻击方法 '+ atkInfo.attackMethodName +' [ AtkID: '+atkInfo.attackMethodID+' ] - 高级配置')"
-      @cancel="onCancel" width="80%">
+    <a-modal v-model:visible="visible" :title="title" @cancel="onCancel" width="80%">
       <template #footer>
         <a-button>使用节点默认配置</a-button>
         <a-button>刷新预设配置</a-button>
@@ -93,20 +92,22 @@
   </div>
 </template>
 <script>
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { SyncOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
 
 import ParamsForm from '@/components/core/ParamsForm.vue';
-
-import { getAtkConfig } from '@/api/atk-api/atkInfo.js';
 
 export default defineComponent({
   components: {
     ParamsForm,
     SyncOutlined,
   },
-  props: {},
+  props: {
+    title: String,
+    providerID: Number,
+    paramsDesc: Object,
+    getPresetConfig:Function,
+  },
   setup(props, context) {
     const visible = ref(false);
 
@@ -119,21 +120,13 @@ export default defineComponent({
     let autoSubmitTimer;
     let autoSelectConfigTimer;
 
-    const paramsDesc = ref();
-    const atkInfo = ref();
-    const atkProviderID = ref();
-
-    const openConfigModel = (paramsDesc_, atkInfo_, atkProviderID_) => {
-      paramsDesc.value = paramsDesc_;
-      atkProviderID.value = atkProviderID_;
-      atkInfo.value = atkInfo_;
-
+    const openConfigModel = () => {
       loadPresetConfig();
       visible.value = true;
     }
 
-    const autoConfig = (paramsDesc, atkInfo, atkProviderID) => {
-      openConfigModel(paramsDesc, atkInfo, atkProviderID)
+    const autoConfig = () => {
+      openConfigModel()
 
       autoConifgFlag.value = true;
       autoSubmitFlag.value = true;
@@ -172,8 +165,9 @@ export default defineComponent({
 
     const presetConfig = ref([]);
     const selectedConfigIndex = ref(0);
+
     const loadPresetConfig = async () => {
-      presetConfig.value = await getAtkConfig(atkProviderID.value);
+      presetConfig.value = await props.getPresetConfig(props.providerID);
     };
 
     const selectConfig = async (index) => {
@@ -208,8 +202,6 @@ export default defineComponent({
       autoSubmitCountDown,
       autoSelectConfigCountDown,
 
-      paramsDesc,
-      atkInfo,
       presetConfig,
       selectedConfigIndex,
 
