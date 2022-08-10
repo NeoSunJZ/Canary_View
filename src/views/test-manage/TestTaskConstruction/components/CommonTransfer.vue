@@ -16,17 +16,7 @@
         @change="(...args) => { direction === 'left' ? handleLeftTableChange(...args) : ()=>{} }" :scroll="direction === 'left' ? { x: 800 } : { x: 700 }">
 
         <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'status'">
-            <AttackConfigProcessor :atkInfo="record" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration"
-              :providerID="record.providerID" @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}">
-            </AttackConfigProcessor>
-          </template>
-          <template v-if="column.key === 'action'">
-            <span>
-              <a @click="showDataDetails(record)">详情 - {{ record[fields.name] }}</a>
-              <a-divider type="vertical" />
-            </span>
-          </template>
+          <slot name="tableCell" :column="column" :record="record"></slot>
         </template>
 
       </a-table>
@@ -52,7 +42,7 @@ import AttackConfigProcessor from './AttackConfigProcessor';
 import ConfigStatusNotice from './ConfigStatusNotice.vue';
 
 export default defineComponent({
-  name: 'CommonSeletor',
+  name: 'CommonTransfer',
   components: {
     AttackConfigProcessor,
     ConfigStatusNotice,
@@ -61,8 +51,6 @@ export default defineComponent({
     leftTableColumns: Array,
     rightTableColumns: Array,
     fields: Object,
-    currentServerInfo: Object,
-    currentServerDeclaration: Object,
     getDataResource: Function,
   },
   setup(props, context) {
@@ -126,19 +114,10 @@ export default defineComponent({
       loadMoreData();
     };
 
-    // 处理选中(穿梭框右移)事件
+    // 处理选中(穿梭框移动)事件
     const handleMoveItemChange = (targetKeys, direction, moveKeys) => {
       loadMoreData();
-      if (direction == 'right') {
-        nextTick(() => {
-          runConfigTaskQueue(); // 触发配置流程
-        });
-      }
-    };
-
-    // 抛出显示详情事件
-    const showDataDetails = (item) => {
-      context.emit('showDataDetails', item);
+      context.emit('change',targetKeys, direction, moveKeys);
     };
 
     const getRowSelection = ({ disabled, selectedKeys, onItemSelectAll, onItemSelect }) => {
@@ -160,30 +139,17 @@ export default defineComponent({
       };
     };
 
-    //自动配置队列
-    const autoConfigTaskQueue = ref([]);
-    const runConfigTaskQueue = async () => {
-      while (autoConfigTaskQueue.value.length > 0) {
-        let task = autoConfigTaskQueue.value.shift();
-        await task().catch(() => {});
-      }
-    };
 
     return {
       data,
       pagination,
       targetKeys,
 
-      autoConfigTaskQueue,
-
       getRowSelection,
       handleLeftTableChange,
       handleMoveItemChange,
 
       loadData,
-      showDataDetails,
-
-      runConfigTaskQueue,
     };
   },
 });

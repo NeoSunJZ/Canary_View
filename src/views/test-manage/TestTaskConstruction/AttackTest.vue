@@ -95,12 +95,14 @@
         </a-steps>
         <div class="steps-content">
           <div v-if="current == 0">
-            <a-row>
+
+            <AttackSelector :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration" ></AttackSelector>
+            <!-- <a-row>
               <a-col :span="16" class="attack-task__attack-selector">
 
-                <CommonSelector :leftTableColumns="leftTableColumns" :rightTableColumns="rightTableColumns"
+                <CommonTransfer :leftTableColumns="leftTableColumns" :rightTableColumns="rightTableColumns"
                   :fields="{name:'attackMethodName',id:'attackMethodID'}" :currentServerInfo="currentServerInfo"
-                  :currentServerDeclaration="currentServerDeclaration" :getDataResource="getAtkInfo" @showDataDetails="()=>{}"></CommonSelector>
+                  :currentServerDeclaration="currentServerDeclaration" :getDataResource="getAtkInfo" @showDataDetails="()=>{}"></CommonTransfer>
 
               </a-col>
               <a-col :span="8" class="attack-task__attack-selector">
@@ -150,7 +152,7 @@
                   </div>
                 </a-card>
               </a-col>
-            </a-row>
+            </a-row> -->
           </div>
         </div>
         <div class="steps-action">
@@ -176,8 +178,9 @@ import router from '@/router';
 import { getAtkInfo } from '@/api/atk-api/atkInfo.js';
 
 import AttackConfigProcessor from './components/AttackConfigProcessor';
-import AttackBindNode from './components/AttackBindNode';
-import CommonSelector from './components/CommonSelector.vue';
+// import AttackBindNode from './components/AttackBindNode';
+import CommonTransfer from './components/CommonTransfer.vue';
+import AttackSelector from './components/attack/AttackSelector.vue';
 
 export default defineComponent({
   name: 'AttackTest',
@@ -185,14 +188,15 @@ export default defineComponent({
     MainPageNavigation,
     ServerNodeCard,
     AttackConfigProcessor,
-    AttackBindNode,
+    // AttackBindNode,
 
     DeploymentUnitOutlined,
     ClusterOutlined,
     CloseCircleOutlined,
     CheckCircleOutlined,
     QuestionCircleOutlined,
-    CommonSelector,
+    CommonTransfer,
+    AttackSelector,
   },
   setup() {
     const current = ref(0);
@@ -272,15 +276,15 @@ export default defineComponent({
       currentServerInfo.value = serverInfo;
     };
 
-    const methodDetailsVisible = ref(false);
+    // const methodDetailsVisible = ref(false);
 
-    const selectedAttackProvider = async (atkID, providerID) => {
-      attackInfo.value.forEach((element) => {
-        if (element.attackMethodID == atkID) {
-          element.providerID = providerID;
-        }
-      });
-    };
+    // const selectedAttackProvider = async (atkID, providerID) => {
+    //   attackInfo.value.forEach((element) => {
+    //     if (element.attackMethodID == atkID) {
+    //       element.providerID = providerID;
+    //     }
+    //   });
+    // };
 
     return {
       message,
@@ -297,15 +301,15 @@ export default defineComponent({
 
       showMethodInfo,
       simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
-      
+
       next,
       prev,
       //当前节点信息与声明
       currentServerInfo,
       currentServerDeclaration,
 
-      methodDetailsVisible,
-      selectedAttackProvider,
+      // methodDetailsVisible,
+      // selectedAttackProvider,
       getAtkInfo,
     };
   },

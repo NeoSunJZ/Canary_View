@@ -45,28 +45,27 @@
   <div>
     <div class="provider-list">
       <a-card size="small" class="provider" v-for="(data,index) in attackBindInfoList" :key="index"
-        @click="currentServerInfo.nodeID==data.attackMethodProviderNodeInfo.nodeID?selectProvider(data.attackMethodProviderID):()=>{}">
-        <div class="provider__con" v-if="data.attackMethodProviderID == selectedAttackMethodProviderID"></div>
+        @click="currentServerInfo.nodeID==data.nodeInfo.nodeID?selectProvider(data[field.providerID]):()=>{}">
+        <div class="provider__con" v-if="data[field.providerID] == selectedProviderID"></div>
         <div>
-          <ApiOutlined
-            :class="'provider__icon '+(currentServerInfo.nodeID==data.attackMethodProviderNodeInfo.nodeID ? 'provider__icon--current' : 'provider__icon--disable')" />
+          <ApiOutlined :class="'provider__icon '+(currentServerInfo.nodeID==data.nodeInfo.nodeID ? 'provider__icon--current' : 'provider__icon--disable')" />
           <span class="provider__title">
             <a-typography-text type="secondary">方法实现源: </a-typography-text>
-            {{ data.attackMethodSource }}
+            {{ data[field.providerID] }}
           </span>
         </div>
         <div class="provider__detail">
-          提供者 - {{ data.attackMethodProviderNodeInfo.nodeName }} (NodeID: {{ data.attackMethodProviderNodeInfo.nodeID }})
-          <a-tag color="error" v-if="currentServerInfo.nodeID!=data.attackMethodProviderNodeInfo.nodeID">
+          提供者 - {{ data.nodeInfo.nodeName }} (NodeID: {{ data.nodeInfo.nodeID }})
+          <a-tag color="error" v-if="currentServerInfo.nodeID!=data.nodeInfo.nodeID">
             <CloseCircleOutlined /> 提供者非当前所选节点
           </a-tag>
           <br />
-          提供者路径 - {{ data.attackMethodProviderNodeInfo.host }}:{{ data.attackMethodProviderNodeInfo.port }}<br />
-          提供者绑定名 - {{ data.bindAttackMethodName }}
+          提供者路径 - {{ data.nodeInfo.host }}:{{ data.nodeInfo.port }}<br />
+          提供者绑定名 - {{ data[field.bindName] }}
         </div>
         <a-tag color="processing">
           <template #icon>
-            ProviderID:{{data.attackMethodProviderID}}
+            ProviderID:{{ data[field.providerID] }}
           </template>
         </a-tag>
       </a-card>
@@ -74,15 +73,15 @@
   </div>
 </template>
 <script>
-import { computed, defineComponent, onMounted, provide, ref, toRef, watch } from 'vue';
+import { defineComponent, onMounted, ref, toRef, watch } from 'vue';
 import { ApiOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
 
 import { initStore, getAllAttackBindInfos } from './store';
 
 export default defineComponent({
   components: { ApiOutlined, CloseCircleOutlined },
   props: {
+    field: Object,
     atkID: Number,
     currentServerInfo: Object,
   },
@@ -106,17 +105,17 @@ export default defineComponent({
       attackBindInfoList.value = await getAllAttackBindInfos(atkID.value);
     };
 
-    const selectedAttackMethodProviderID = ref();
+    const selectedProviderID = ref();
     const selectProvider = (providerID) => {
-      selectedAttackMethodProviderID.value = providerID;
-      context.emit('selectedProvider', atkID.value, providerID);
+      selectedProviderID.value = providerID;
+      context.emit('selected-provider', atkID.value, providerID);
     };
 
     return {
       attackBindInfoList,
       getAtkBindList,
       selectProvider,
-      selectedAttackMethodProviderID,
+      selectedProviderID,
     };
   },
 });

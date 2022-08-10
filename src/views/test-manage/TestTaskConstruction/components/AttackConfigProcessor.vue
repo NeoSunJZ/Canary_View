@@ -43,6 +43,7 @@ import AttackConfigModel from './AttackConfigModel';
 import { attackConfigNotice, initStore, getAttackDeclaration, getAttackBindInfosByNodeID, getBindInfoByProviderID } from './store';
 
 export default defineComponent({
+  name:"AttackConfigProcessor",
   components: {
     CloseCircleOutlined,
     CheckCircleOutlined,
