@@ -40,7 +40,7 @@ import { defineComponent, onMounted, ref, toRef, nextTick } from 'vue';
 import { CloseCircleOutlined, CheckCircleOutlined, SyncOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
 
 import CommonConfigModel from '../CommonConfigModel';
-import { attackConfigNotice, initStore, getAttackDeclaration, getAttackBindInfosByNodeID } from '../store';
+import { attackConfigNotice, initStore, getAttackDeclaration, getAttackBindInfosByNodeID } from './store';
 import { getAtkConfig } from '@/api/atk-api/atkInfo.js';
 
 export default defineComponent({

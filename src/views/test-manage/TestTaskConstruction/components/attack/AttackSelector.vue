@@ -36,7 +36,7 @@
       <AttackDetails ref="attackDetails">
         <template #extra="{ record }">
           <CommonProviderSelector :field="{providerID:'attackMethodProviderID',source:'attackMethodSource',bindName:'bindAttackMethodName'}"
-            :atkID="record.attackMethodID" :currentServerInfo="currentServerInfo" @selected-provider="handleSelectProvider">
+            :atkID="record.attackMethodID" :currentServerInfo="currentServerInfo" @selected-provider="handleSelectProvider" :getProviderList="getProviderList">
           </CommonProviderSelector>
         </template>
       </AttackDetails>
@@ -53,6 +53,8 @@ import CommonTransfer from '../CommonTransfer.vue';
 import AttackDetails from './AttackDetails.vue';
 import CommonProviderSelector from '../CommonProviderSelector.vue';
 import AttackConfigProcessor from './AttackConfigProcessor.vue';
+
+import { initStore, getAllAttackBindInfos } from './store';
 
 export default defineComponent({
   name: 'AttackTest',
@@ -130,6 +132,12 @@ export default defineComponent({
       }
     };
 
+    const getProviderList = async (atkID, update = false) => {
+      initStore(atkID, update);
+      return await getAllAttackBindInfos(atkID);
+    };
+
+
     return {
       leftTableColumns,
       rightTableColumns,
@@ -141,6 +149,7 @@ export default defineComponent({
       handleMoveItemChange,
       runConfigTaskQueue,
       getAtkInfo,
+      getProviderList,
     };
   },
 });

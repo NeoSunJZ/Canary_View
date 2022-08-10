@@ -95,7 +95,10 @@
         </a-steps>
         <div class="steps-content">
           <div v-if="current == 0">
-            <AttackSelector :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration" ></AttackSelector>
+            <AttackSelector :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration"></AttackSelector>
+          </div>
+          <div v-if="current == 1">
+            <AttackSelector :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration"></AttackSelector>
           </div>
         </div>
         <div class="steps-action">
@@ -151,7 +154,6 @@ export default defineComponent({
     };
 
     const selectedAttackMethodInfo = ref();
-
 
     const next = () => {
       current.value++;

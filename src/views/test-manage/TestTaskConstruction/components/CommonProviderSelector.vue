@@ -44,7 +44,7 @@
 <template>
   <div>
     <div class="provider-list">
-      <a-card size="small" class="provider" v-for="(data,index) in attackBindInfoList" :key="index"
+      <a-card size="small" class="provider" v-for="(data,index) in providerList" :key="index"
         @click="currentServerInfo.nodeID==data.nodeInfo.nodeID?selectProvider(data[field.providerID]):()=>{}">
         <div class="provider__con" v-if="data[field.providerID] == selectedProviderID"></div>
         <div>
@@ -76,7 +76,7 @@
 import { defineComponent, onMounted, ref, toRef, watch } from 'vue';
 import { ApiOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
 
-import { initStore, getAllAttackBindInfos } from './store';
+import { initStore, getAllAttackBindInfos } from './attack/store';
 
 export default defineComponent({
   components: { ApiOutlined, CloseCircleOutlined },
@@ -84,6 +84,7 @@ export default defineComponent({
     field: Object,
     atkID: Number,
     currentServerInfo: Object,
+    getProviderList: Function
   },
   setup(props, context) {
     const atkID = toRef(props, 'atkID');
@@ -91,18 +92,17 @@ export default defineComponent({
     watch(
       () => atkID.value,
       async (newValue, oldValue) => {
-        await getAtkBindList();
+        await loadProviderList();
       }
     );
 
     onMounted(async () => {
-      await getAtkBindList();
+      await loadProviderList();
     });
 
-    const attackBindInfoList = ref([]);
-    const getAtkBindList = async (update = false) => {
-      initStore(atkID.value, update);
-      attackBindInfoList.value = await getAllAttackBindInfos(atkID.value);
+    const providerList = ref([]);
+    const loadProviderList = async (update = false) => {
+      providerList.value = await props.getProviderList(atkID.value, update);
     };
 
     const selectedProviderID = ref();
@@ -112,8 +112,8 @@ export default defineComponent({
     };
 
     return {
-      attackBindInfoList,
-      getAtkBindList,
+      providerList,
+      loadProviderList,
       selectProvider,
       selectedProviderID,
     };
