@@ -36,7 +36,7 @@
   </div>
 </template>
 <script>
-import { defineComponent, onMounted, ref, toRef } from 'vue';
+import { defineComponent, onMounted, ref, toRef, nextTick } from 'vue';
 import { CloseCircleOutlined, CheckCircleOutlined, SyncOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
 
 import CommonConfigModel from '../CommonConfigModel';
@@ -104,17 +104,18 @@ export default defineComponent({
       }
 
       attackParamsDesc.value = attackDeclaration['attackMethodArgsHandlerParamsDesc'];
+      nextTick(async () => {
+        await new Promise((resolve, reject) => {
+          setNotice('正在完成参数配置', 'processing');
+          if (!autoConfig) {
+            configModel.value.openConfigModel();
+          } else {
+            configModel.value.autoConfig();
+          }
 
-      await new Promise((resolve, reject) => {
-        setNotice('正在完成参数配置', 'processing');
-        if (!autoConfig) {
-          configModel.value.openConfigModel();
-        } else {
-          configModel.value.autoConfig();
-        }
-
-        promiseFunc.resolve = resolve;
-        promiseFunc.reject = reject;
+          promiseFunc.resolve = resolve;
+          promiseFunc.reject = reject;
+        });
       });
     };
 
