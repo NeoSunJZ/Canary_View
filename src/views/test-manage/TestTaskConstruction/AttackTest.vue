@@ -95,64 +95,7 @@
         </a-steps>
         <div class="steps-content">
           <div v-if="current == 0">
-
             <AttackSelector :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration" ></AttackSelector>
-            <!-- <a-row>
-              <a-col :span="16" class="attack-task__attack-selector">
-
-                <CommonTransfer :leftTableColumns="leftTableColumns" :rightTableColumns="rightTableColumns"
-                  :fields="{name:'attackMethodName',id:'attackMethodID'}" :currentServerInfo="currentServerInfo"
-                  :currentServerDeclaration="currentServerDeclaration" :getDataResource="getAtkInfo" @showDataDetails="()=>{}"></CommonTransfer>
-
-              </a-col>
-              <a-col :span="8" class="attack-task__attack-selector">
-                <a-card size="small" style="width: 100%; overflow:hidden">
-                  <template #title>
-                    <div>
-                      攻击方法详情<span v-if="selectedAttackMethodInfo != null">
-                        - {{ selectedAttackMethodInfo.attackMethodName }}</span>
-                    </div>
-                  </template>
-                  <a-empty :image="simpleImage" v-if="selectedAttackMethodInfo == null" />
-                  <div v-else>
-                    <a-row type="flex">
-                      <a-col flex="0 1 100px">方法名称</a-col>
-                      <a-col flex="1 1">{{
-                        selectedAttackMethodInfo.attackMethodName
-                      }}</a-col>
-                    </a-row>
-                    <a-row type="flex">
-                      <a-col flex="0 1 100px">简介</a-col>
-                      <a-col flex="1 1">{{
-                        selectedAttackMethodInfo.attackMethodDesc
-                      }}</a-col>
-                    </a-row>
-                    <a-row type="flex">
-                      <a-col flex="0 1 100px">方法详情</a-col>
-                      <a-col flex="1 1"><a @click="methodDetailsVisible = true">查看详情</a></a-col>
-                    </a-row>
-                    <a-row type="flex">
-                      <a-col flex="100px">参考论文</a-col>
-                      <a-col flex="auto"><a :href="selectedAttackMethodInfo.attackMethodPaperUrl">{{ selectedAttackMethodInfo.attackMethodPaper }}</a></a-col>
-                    </a-row>
-                    <a-row type="flex">
-                      <a-col flex="100px">方法类别</a-col>
-                      <a-col flex="auto">{{
-                        selectedAttackMethodInfo.attackMethodType
-                          .attackMethodTypeName
-                      }}</a-col>
-                    </a-row>
-                    <a-divider />
-                    <AttackBindNode :atkID="selectedAttackMethodInfo['attackMethodID']" :currentServerInfo="currentServerInfo"
-                      @selectedProvider="selectedAttackProvider"></AttackBindNode>
-                    <a-drawer title="方法详情" placement="right" :visible="methodDetailsVisible" :get-container="false" width="90%"
-                      :style="{ position: 'absolute' }" @close="methodDetailsVisible = false">
-                      <p v-html="selectedAttackMethodInfo.attackMethodDetails"></p>
-                    </a-drawer>
-                  </div>
-                </a-card>
-              </a-col>
-            </a-row> -->
           </div>
         </div>
         <div class="steps-action">
@@ -170,15 +113,11 @@
 <script>
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import ServerNodeCard from '@/components/ServerNodeCard.vue';
-import { defineComponent, ref, onMounted, computed, nextTick } from 'vue';
-import { message, Empty } from 'ant-design-vue';
+import { defineComponent, ref } from 'vue';
+import { message } from 'ant-design-vue';
 import { DeploymentUnitOutlined, ClusterOutlined, CloseCircleOutlined, CheckCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue';
 import router from '@/router';
-// import { getModelInfo } from "@/api/model-api/modelInfo.js";
-import { getAtkInfo } from '@/api/atk-api/atkInfo.js';
 
-import AttackConfigProcessor from './components/AttackConfigProcessor';
-// import AttackBindNode from './components/AttackBindNode';
 import CommonTransfer from './components/CommonTransfer.vue';
 import AttackSelector from './components/attack/AttackSelector.vue';
 
@@ -187,7 +126,6 @@ export default defineComponent({
   components: {
     MainPageNavigation,
     ServerNodeCard,
-    AttackConfigProcessor,
     // AttackBindNode,
 
     DeploymentUnitOutlined,
@@ -207,58 +145,13 @@ export default defineComponent({
         label: '生成对抗样本',
       },
     ];
-    const leftTableColumns = [
-      {
-        dataIndex: 'attackMethodName',
-        title: '攻击方法',
-        width: '140px',
-        fixed: 'left',
-      },
-      {
-        dataIndex: 'attackMethodDesc',
-        width: '480px',
-        title: '简介',
-      },
-      {
-        dataIndex: ['attackMethodType', 'attackMethodTypeName'],
-        title: '攻击类型',
-      },
-    ];
-    const rightTableColumns = [
-      {
-        dataIndex: 'attackMethodName',
-        title: '攻击方法',
-        width: '140px',
-        fixed: 'left',
-      },
-      {
-        dataIndex: 'status',
-        width: '300px',
-        title: '配置状态',
-        key: 'status',
-      },
-      {
-        dataIndex: 'action',
-        title: '操作',
-        key: 'action',
-      },
-    ];
 
     const toPage = (page) => {
       router.push({ path: '/' + page });
     };
 
-    const attackInfo = ref([]);
-
-
     const selectedAttackMethodInfo = ref();
-    const showMethodInfo = (attackMethodID) => {
-      attackInfo.value.forEach((element) => {
-        if (element.attackMethodID == attackMethodID) {
-          selectedAttackMethodInfo.value = element;
-        }
-      });
-    };
+
 
     const next = () => {
       current.value++;
@@ -276,41 +169,19 @@ export default defineComponent({
       currentServerInfo.value = serverInfo;
     };
 
-    // const methodDetailsVisible = ref(false);
-
-    // const selectedAttackProvider = async (atkID, providerID) => {
-    //   attackInfo.value.forEach((element) => {
-    //     if (element.attackMethodID == atkID) {
-    //       element.providerID = providerID;
-    //     }
-    //   });
-    // };
-
     return {
       message,
       attackType,
       attackTypes,
       current,
       selectedAttackMethodInfo,
-      leftTableColumns,
-      rightTableColumns,
-      
       handleServerChange,
-
       toPage,
-
-      showMethodInfo,
-      simpleImage: Empty.PRESENTED_IMAGE_SIMPLE,
-
       next,
       prev,
       //当前节点信息与声明
       currentServerInfo,
       currentServerDeclaration,
-
-      // methodDetailsVisible,
-      // selectedAttackProvider,
-      getAtkInfo,
     };
   },
 });
