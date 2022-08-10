@@ -1,59 +1,33 @@
 <style lang="less" scoped>
+@import '~ant-design-vue/dist/antd.less';
 .state {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  // justify-content: space-around;
-  &__greenpoint {
-    display: inline-block;
-    height: 5px;
-    width: 5px;
-    border-radius: 16px;
-    color: #fff;
-    background: rgb(119, 228, 119);
-    margin-right: 3px;
+  &__stoppingtext {
+    color: @red-6;
   }
-  &__redpoint {
-    display: inline-block;
-    height: 5px;
-    width: 5px;
-    border-radius: 16px;
-    color: #fff;
-    background: rgb(175, 2, 2);
-    margin-right: 3px;
-  }
-  &__running {
-    margin-right: 10px;
-    color: rgb(8, 179, 8);
-  }
-  &__stopping {
-    margin-right: 10px;
-    color: rgb(237, 6, 6);
+  &__runningtext {
+    color: @green-6;
   }
 }
 </style>
 
 
 <template>
-  <div v-if="NodeStatus==='running'">
-    <div class="state">
-      <div class='state__greenpoint'></div>
-      <p class="state__running">运行中</p>
-      <a-button type="link" size="small" shape="circle">
-        <SyncOutlined @click="refresh" />
-      </a-button>
+  <div class='state'>
+    <div v-if="NodeStatus==='running'">
+      <a-badge status="success" />
+      <span class="state__runningtext">运行中</span>
     </div>
+    <div v-else>
+      <a-badge status="error" />
+      <span class="state__stoppingtext">已断开</span>
+    </div>
+    <a-button type="link" size="small" shape="circle">
+      <SyncOutlined @click="refresh" />
+    </a-button>
   </div>
-  <div v-else>
-    <div class="state">
-      <div class='state__redpoint'></div>
-      <p class="state__stopping">已断开</p>
-      <a-button type="link" size="small" shape="circle">
-        <SyncOutlined @click="refresh" />
-      </a-button>
 
-    </div>
-  </div>
 </template>
 
 <script>
@@ -78,21 +52,15 @@ export default defineComponent({
   setup(props, context) {
     const NodeStatus = ref('running');
     const refresh = async () => {
-      // 测试用，未完成
       let data = await getDeclarationOnly(props.ip, props.port);
       if (data == null) {
-        NodeStatus.value = 'running';
-      } else {
         NodeStatus.value = 'stopping';
+      } else {
+        NodeStatus.value = 'running';
       }
     };
     onBeforeMount(async () => {
-      let data = await getDeclarationOnly(props.ip, props.port);
-      if (data == null) {
-        NodeStatus.value = 'stopping';
-      } else {
-        NodeStatus.value = 'running';
-      }
+      refresh();
     });
     return { NodeStatus, refresh };
   },
