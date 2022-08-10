@@ -51,7 +51,7 @@
           <ApiOutlined :class="'provider__icon '+(currentServerInfo.nodeID==data.nodeInfo.nodeID ? 'provider__icon--current' : 'provider__icon--disable')" />
           <span class="provider__title">
             <a-typography-text type="secondary">方法实现源: </a-typography-text>
-            {{ data[field.providerID] }}
+            {{ data[field.source] }}
           </span>
         </div>
         <div class="provider__detail">
