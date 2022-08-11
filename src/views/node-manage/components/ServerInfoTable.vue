@@ -144,7 +144,7 @@
       </template>
 
       <template v-else-if="column.dataIndex === 'operation'">
-        <a-popconfirm v-if="dataSource.length" title="Sure to delete?" @confirm="onDelete(record.key)">
+        <a-popconfirm v-if="dataSource.length" title="确认删除?" @confirm="onDelete(record.key)">
           <a>删除</a>
         </a-popconfirm>
       </template>
