@@ -27,12 +27,13 @@
       <h2 class="title">攻击方法绑定</h2>
       <div class="attack-binding">
 
+        <!-- 这一部分是左边的表格，这里用tableLayout=fixed使之非弹性 -->
         <div class="attack-binding__table">
           <a-table tableLayout="fixed" :columns="columns" :data-source="attackInfo" :pagination="pagination" @change="(...args) => handleTableChange(...args)">
             <template #bodyCell="{column,record}">
               <template v-if="column.dataIndex === 'operation'">
                 <a>新增节点</a>
-                <a @click="atkShowing.showDetails(record)"> 详情</a>
+                <a @click="atkDetails.showDetails(record)"> 详情</a>
               </template>
             </template>
             <template #expandedRowRender="{record}">
@@ -47,8 +48,8 @@
             <a-modal v-model:visible="editable" @ok="handleOk" :closable='false' :width="700">
               <tinyEditor :height="400" :width="650" :initialValue="string" @updateValue="updateValue" />
             </a-modal>
-            <AttackDetails ref="atkShowing">
-              <template #extra="{  }">
+            <AttackDetails ref="atkDetails">
+              <template #extra="{}">
               </template>
             </AttackDetails>
           </a-card>
@@ -93,21 +94,12 @@ export default defineComponent({
       },
     ];
 
-    const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      },
-      getCheckboxProps: (record) => ({
-        disabled: record.name === 'Disabled User',
-        // Column configuration not to be checked
-        name: record.name,
-      }),
-    };
     const editable = ref(false);
 
     const editAtkInfo = () => {
       editable.value = true;
     };
+
     const attackInfo = ref([]);
     const pageSize = ref(10);
     const totalAtkInfo = ref(0);
@@ -152,11 +144,10 @@ export default defineComponent({
 
     const handleOk = () => {};
 
-    const atkShowing = ref({});
+    const atkDetails = ref({});
 
     return {
       columns,
-      rowSelection,
       editable,
       editAtkInfo,
       attackInfo,
@@ -165,7 +156,7 @@ export default defineComponent({
       currentPage,
       pagination,
       dataSource,
-      atkShowing,
+      atkDetails,
       handleTableChange,
       updateValue,
       handleOk,

@@ -26,9 +26,9 @@ export async function getAtkInfo(pageNum, pageSize = 10) {
 
 /**
  * @description: 用于请求对应服务器返回攻击提供者
- * @param {Number} attackMethodID
- * @param {Number} nodeID 
- * @return 返回
+ * @param {Number} attackMethodID 攻击方法ID
+ * @param {Number} nodeID 节点ID，默认为空时返回所有此方法的提供者，否则只返回指定节点的
+ * @return 返回一串包含方法提供者的信息
  */
 export async function getAtkProvider(attackMethodID, nodeID = null) {
   let data = null;
@@ -65,12 +65,12 @@ export async function getAtkConfig(attackMethodProviderID) {
 
 /**
  * @description: 用于请求对应服务器更新攻击方法提供者信息
- * @param {Number} attackMethodProviderID
- * @param {Number} attackMethodID
- * @param {String} nodeID
- * @param {String} attackMethodSource
- * @param {String} bindAttackMethodName
- * @return 返回
+ * @param {Number} attackMethodProviderID 攻击方法提供者ID
+ * @param {Number} attackMethodID 攻击方法ID
+ * @param {String} nodeID 节点ID
+ * @param {String} attackMethodSource 攻击方法源
+ * @param {String} bindAttackMethodName 绑定名
+ * @return 返回是否成功
  */
 export async function updateAtkMethodProvider(attackMethodProviderID, attackMethodID, nodeID, attackMethodSource, bindAttackMethodName) {
   let data = null;
@@ -94,8 +94,8 @@ export async function updateAtkMethodProvider(attackMethodProviderID, attackMeth
 
 /**
  * @description: 用于请求对应服务器软删除攻击方法提供者信息
- * @param {Number} attackMethodProviderID
- * @return 返回
+ * @param {Number} attackMethodProviderID 攻击方法提供者ID
+ * @return 返回是否成功
  */
 export async function deleteAtkMethodProvider(attackMethodProviderID) {
   let data = null;

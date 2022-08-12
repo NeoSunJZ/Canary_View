@@ -178,7 +178,6 @@ export default defineComponent({
     onBeforeMount(async () => {
       data.value = await getAtkProvider(props.attackMethodID);
       data.value.forEach((element) => {
-        console.log(element);
         element.nodeName = element.nodeInfo.nodeName + element.nodeInfo.nodeID;
         element.nodePath = element.nodeInfo.host + ':' + element.nodeInfo.port;
       });

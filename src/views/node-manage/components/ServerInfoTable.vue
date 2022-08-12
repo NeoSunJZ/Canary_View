@@ -85,6 +85,7 @@
 
   <!-- 节点表 -->
   <a-table bordered :data-source="dataSource" :columns="columns" size="small">
+    <!-- record是每一行数据的副本 -->
     <template #bodyCell="{ column, text, record }">
 
       <template v-if="column.dataIndex === 'name'">
@@ -178,10 +179,8 @@ export default defineComponent({
     //
   },
   setup() {
-    const refresh = async (index) => {
-      //
-    };
     const getInfo = async (nodeInfo) => {
+      // 新增节点了直接刷新
       const data = await getNodeInfo(1, 10);
       data.list.forEach((element, index) => {
         dataSource.value[index] = {
@@ -194,9 +193,9 @@ export default defineComponent({
           createTime: element.createTime,
           status: 'unknown',
         };
-        // Todo:根据状态赋予status值
       });
     };
+
     // 表格显示的每一列的标题等属性
     const columns = [
       {
@@ -234,21 +233,24 @@ export default defineComponent({
         dataIndex: 'operation',
       },
     ];
+
     // 显示的数据源
     const dataSource = ref([]);
 
-    // 正在编辑的行数据proxy
+    // 正在编辑的行的数据副本
     const editableData = reactive({});
 
     // 正在编辑的属性
     const editableElement = ref({});
 
     const edit = (key, element) => {
+      // 深拷贝一份原有数据
       editableData[key] = cloneDeep(dataSource.value.filter((item) => key === item.key)[0]);
       editableElement.value[key] = element;
     };
 
     const save = async (key) => {
+      // 将编辑的数据覆盖数据源中对应的对象
       Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData[key]);
       let success = await updateNodeInfo(
         editableData[key].key,
@@ -285,7 +287,6 @@ export default defineComponent({
     });
     return {
       getInfo,
-      refresh,
       columns,
       onDelete,
       dataSource,

@@ -3,7 +3,6 @@ import Qs from 'qs'
 
 /**
  * @description: 用于请求返回服务器节点信息
- * @param {String?} userToken 用户身份令牌，还没用上
  * @param {Number} pageNum
  * @param {Number} pageSize 默认 2
  * @return 返回一个包含服务器节点信息的对象
@@ -27,7 +26,6 @@ export async function getNodeInfo(pageNum, pageSize = 2) {
 
 /**
  * @description: 用于请求增加一个节服务器点
- * @param {String?} userToken 用户身份令牌，还没用上
  * @param {String} ip 
  * @param {String} port
  * @param {String} name 服务器名
@@ -55,7 +53,6 @@ export async function addNodeInfo(ip, port, name, desc) {
 
 /**
  * @description: 用于请求删除一个服务器节点
- * @param {String?} userToken 用户身份令牌，还没用上
  * @param {Number} nodeID 删除的节点ID
  * @return 返回是否成功
  */
@@ -77,7 +74,6 @@ export async function deleteNodeInfo(nodeID) {
 
 /**
  * @description: 用于请求更新一个服务器节点
- * @param {String?} userToken 用户身份令牌，还没用上
  * @param {Number} nodeID 删除的节点ID
  * @param {String} ip 
  * @param {String} port
