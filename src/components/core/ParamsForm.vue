@@ -18,49 +18,61 @@
 <template>
   <div>
     <a-form ref="formRef" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" :model="params" @submit="finish">
-      <a-row :gutter="24">
-        <template v-for="(content,name) in paramsDesc" :key="name">
-          <a-col :span="8">
-            <a-form-item :name="name" :label="name" :rules="rules(content)" has-feedback>
-              <a-input class="form__input" v-model:value="params[name]" placeholder="placeholder" width="100%" v-if="content.type==='STR'"></a-input>
-              <a-input-number class="form__input" v-model:value="params[name]" :step="1" v-if="content.type==='INT'" />
-              <a-input-number class="form__input" v-model:value="params[name]" :step="0.01" v-if="content.type==='FLOAT'" />
-              <a-select class="form__input" ref="select" v-model:value="params[name]" :options="content.selector" :fieldNames="{'label':'name'}"
-                v-if="content.type==='SELECT'"></a-select>
-              <template #extra>
-                <a-tooltip placement="left">
-                  <template #title>{{content.desc}}</template>
-                  <div class="form__input__notice">
-                    {{content.desc}}
-                  </div>
-                </a-tooltip>
-              </template>
-            </a-form-item>
+
+      <div v-if="paramsDesc==null || Object.keys(paramsDesc).length==0">
+        <a-alert message="没有可用的配置" type="warning" show-icon>
+          <template #description>
+            服务结点未声明任何配置信息，请检查SEFI服务框架中 <a-typography-text type="warning"> 对应 </a-typography-text>攻击方法/模型/图片处理/防御方法
+            <a-typography-text type="warning"> 配置参数修饰器(config_params_handler)的 [params] 属性 </a-typography-text>是否已正确配置。
+            <a-typography-text type="danger"> 若确无需额外配置请忽略。</a-typography-text>
+          </template>
+        </a-alert>
+      </div>
+      <div v-else>
+        <a-row :gutter="24">
+          <template v-for="(content,name) in paramsDesc" :key="name">
+            <a-col :span="8">
+              <a-form-item :name="name" :label="name" :rules="rules(content)" has-feedback>
+                <a-input class="form__input" v-model:value="params[name]" placeholder="placeholder" width="100%" v-if="content.type==='STR'"></a-input>
+                <a-input-number class="form__input" v-model:value="params[name]" :step="1" v-if="content.type==='INT'" />
+                <a-input-number class="form__input" v-model:value="params[name]" :step="0.01" v-if="content.type==='FLOAT'" />
+                <a-select class="form__input" ref="select" v-model:value="params[name]" :options="content.selector" :fieldNames="{'label':'name'}"
+                  v-if="content.type==='SELECT'"></a-select>
+                <template #extra>
+                  <a-tooltip placement="left">
+                    <template #title>{{content.desc}}</template>
+                    <div class="form__input__notice">
+                      {{content.desc}}
+                    </div>
+                  </a-tooltip>
+                </template>
+              </a-form-item>
+            </a-col>
+          </template>
+        </a-row>
+        <a-row>
+          <a-col :span="24" style="text-align: right;padding-bottom:5px" v-if="expand">
+            <a-textarea v-model:value="paramsJSONStr" placeholder="请输入JSON或点击按钮输出JSON" :rows="2" />
           </a-col>
-        </template>
-      </a-row>
-      <a-row>
-        <a-col :span="24" style="text-align: right;padding-bottom:5px" v-if="expand">
-          <a-textarea v-model:value="paramsJSONStr" placeholder="请输入JSON或点击按钮输出JSON" :rows="2" />
-        </a-col>
-        <a-col :span="24" style="text-align: right;padding-bottom:10px" v-if="expand">
-          <a-button class="form__input__json__button" type="primary" @click="paramsToJSONStr">配置导出为JSON</a-button>
-          <a-button class="form__input__json__button" type="primary" @click="jsonStrToparams">从JSON导入配置</a-button>
-          <a-button class="form__input__json__button" @click="paramsJSONStr = null">清空</a-button>
-        </a-col>
-        <a-col :span="24" style="text-align: right">
-          <a style="font-size: 12px" @click="expand = !expand">
-            <template v-if="expand">
-              <UpOutlined />
-            </template>
-            <template v-else>
-              <DownOutlined />
-            </template>
-            JSON配置互转
-          </a>
-          <a-button class="form__input__json__button" type="primary" @click="submit" v-show="showConfirm">保存</a-button>
-        </a-col>
-      </a-row>
+          <a-col :span="24" style="text-align: right;padding-bottom:10px" v-if="expand">
+            <a-button class="form__input__json__button" type="primary" @click="paramsToJSONStr">配置导出为JSON</a-button>
+            <a-button class="form__input__json__button" type="primary" @click="jsonStrToparams">从JSON导入配置</a-button>
+            <a-button class="form__input__json__button" @click="paramsJSONStr = null">清空</a-button>
+          </a-col>
+          <a-col :span="24" style="text-align: right">
+            <a style="font-size: 12px" @click="expand = !expand">
+              <template v-if="expand">
+                <UpOutlined />
+              </template>
+              <template v-else>
+                <DownOutlined />
+              </template>
+              JSON配置互转
+            </a>
+            <a-button class="form__input__json__button" type="primary" @click="submit" v-show="showConfirm">保存</a-button>
+          </a-col>
+        </a-row>
+      </div>
     </a-form>
   </div>
 </template>

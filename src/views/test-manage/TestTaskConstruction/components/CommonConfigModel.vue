@@ -73,7 +73,7 @@
             <div class="config-model__preset-config__con" v-if="selectedConfigIndex == index"></div>
             <div class="config-model__preset-config__title">
               <h2 class="config-model__preset-config__title--text">{{data.configName}} </h2>
-              <a-tag color="default">ConfigID: {{data.attackMethodConfigID}}</a-tag>
+              <a-tag color="default">ConfigID: {{data[field.configID]}}</a-tag>
             </div>
             <div class="config-model__preset-config__desc">
               <a-typography-text type="secondary">{{data.configDesc}}</a-typography-text>
@@ -103,10 +103,12 @@ export default defineComponent({
     SyncOutlined,
   },
   props: {
+    field: Object,
     title: String,
     providerID: Number,
     paramsDesc: Object,
     getPresetConfig:Function,
+    providerType: String,
   },
   setup(props, context) {
     const visible = ref(false);
@@ -167,7 +169,7 @@ export default defineComponent({
     const selectedConfigIndex = ref(0);
 
     const loadPresetConfig = async () => {
-      presetConfig.value = await props.getPresetConfig(props.providerID);
+      presetConfig.value = await props.getPresetConfig(props.providerID, props.providerType);
     };
 
     const selectConfig = async (index) => {

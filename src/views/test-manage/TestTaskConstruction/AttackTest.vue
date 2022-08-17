@@ -54,7 +54,7 @@
           <h2 class="attack-task__title">攻击测试构建</h2>
           <div>
             <p class="attack-task__type-select__title">
-              <deployment-unit-outlined /> 构建向导类型
+              <DeploymentUnitOutlined /> 构建向导类型
             </p>
             <a-select ref="select" v-model:value="attackType" style="width: 100%" :options="attackTypes"></a-select>
           </div>
@@ -89,24 +89,31 @@
 
       <div>
         <a-steps :current="current" class="attack-task__steps">
-          <a-step :key="1" title="选择攻击方法" description="选择白盒/黑盒方法" />
-          <a-step :key="2" title="选择AI模型" description="选择欲攻击的AI模型" />
-          <a-step :key="3" title="启动测试" description="配置测试任务" />
+          <a-step :key="1" title="指定测试数据集" description="选择测试基于的数据集" />
+          <a-step :key="2" title="选择攻击方法" description="选择白盒/黑盒方法" />
+          <a-step :key="3" title="选择AI模型" description="选择欲攻击的AI模型" />
+          <a-step :key="4" title="启动测试" description="配置测试任务" />
         </a-steps>
         <div class="steps-content">
-          <div v-if="current == 0">
-            <AttackSelector :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration"></AttackSelector>
-          </div>
-          <div v-if="current == 1">
-            <AttackSelector :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration"></AttackSelector>
+          <DatasetSelector ref="datasetSelector" :currentServerInfo="currentServerInfo" v-show="current == 0"></DatasetSelector>
+          <AttackSelector ref="attackSelector" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration"
+            v-show="current == 1">
+          </AttackSelector>
+          <ModelSelector ref="modelSelector" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration" v-show="current == 2">
+          </ModelSelector>
+          <div v-if="current == 3">
+            
+            {{allConfig}}
           </div>
         </div>
         <div class="steps-action">
-          <a-button v-if="current < 2" type="primary" @click="next">Next</a-button>
-          <a-button v-if="current == 2" type="primary" @click="message.success('Processing complete!')">
-            Done
+          <a-button type="primary" @click="submitDataset" v-if="current == 0">确认数据集选择</a-button>
+          <a-button type="primary" @click="submitAttack" v-if="current == 1">确认攻击方法选择</a-button>
+          <a-button type="primary" @click="submitModel" v-if="current == 2">确认AI模型选择</a-button>
+          <a-button type="primary" @click="message.success('Processing complete!')" v-if="current == 3">
+            提交测试
           </a-button>
-          <a-button v-if="current > 0" style="margin-left: 8px" @click="prev">Previous</a-button>
+          <a-button v-if="current > 0" style="margin-left: 8px" @click="prev">返回上一步</a-button>
         </div>
       </div>
     </template>
@@ -118,25 +125,22 @@ import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import ServerNodeCard from '@/components/ServerNodeCard.vue';
 import { defineComponent, ref } from 'vue';
 import { message } from 'ant-design-vue';
-import { DeploymentUnitOutlined, ClusterOutlined, CloseCircleOutlined, CheckCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue';
+import { DeploymentUnitOutlined } from '@ant-design/icons-vue';
 import router from '@/router';
 
-import CommonTransfer from './components/CommonTransfer.vue';
 import AttackSelector from './components/attack/AttackSelector.vue';
+import ModelSelector from './components/ai-model/ModelSelector.vue';
+import DatasetSelector from './components/dataset/DatasetSelector.vue';
 
 export default defineComponent({
   name: 'AttackTest',
   components: {
     MainPageNavigation,
     ServerNodeCard,
-    // AttackBindNode,
 
     DeploymentUnitOutlined,
-    ClusterOutlined,
-    CloseCircleOutlined,
-    CheckCircleOutlined,
-    QuestionCircleOutlined,
-    CommonTransfer,
+    DatasetSelector,
+    ModelSelector,
     AttackSelector,
   },
   setup() {
@@ -171,6 +175,36 @@ export default defineComponent({
       currentServerInfo.value = serverInfo;
     };
 
+    const allConfig = ref({});
+
+    const datasetSelector = ref();
+    const attackSelector = ref();
+    const modelSelector = ref();
+    const submitDataset = () => {
+      try {
+        allConfig.value['dataset'] = datasetSelector.value.submit();
+        current.value++;
+      } catch (error) {
+        message.error(error.message);
+      }
+    };
+    const submitAttack = () => {
+      try {
+        [allConfig.value['attacker_list'], allConfig.value['attacker_config']] = attackSelector.value.submit();
+        current.value++;
+      } catch (error) {
+        message.error(error.message);
+      }
+    };
+    const submitModel = () => {
+      try {
+        [allConfig.value['model_list'], allConfig.value['model_config'], allConfig.value['img_proc_config']] = modelSelector.value.submit();
+        current.value++;
+      } catch (error) {
+        message.error(error.message);
+      }
+    };
+
     return {
       message,
       attackType,
@@ -184,6 +218,15 @@ export default defineComponent({
       //当前节点信息与声明
       currentServerInfo,
       currentServerDeclaration,
+
+      datasetSelector,
+      attackSelector,
+      modelSelector,
+      submitDataset,
+      submitAttack,
+      submitModel,
+
+      allConfig,
     };
   },
 });

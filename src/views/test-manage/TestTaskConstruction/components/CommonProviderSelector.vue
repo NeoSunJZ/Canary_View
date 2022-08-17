@@ -45,12 +45,12 @@
   <div>
     <div class="provider-list">
       <a-card size="small" class="provider" v-for="(data,index) in providerList" :key="index"
-        @click="currentServerInfo.nodeID==data.nodeInfo.nodeID?selectProvider(data[field.providerID]):()=>{}">
+        @click="currentServerInfo.nodeID==data.nodeInfo.nodeID?selectProvider(data):()=>{}">
         <div class="provider__con" v-if="data[field.providerID] == selectedProviderID"></div>
         <div>
           <ApiOutlined :class="'provider__icon '+(currentServerInfo.nodeID==data.nodeInfo.nodeID ? 'provider__icon--current' : 'provider__icon--disable')" />
           <span class="provider__title">
-            <a-typography-text type="secondary">方法实现源: </a-typography-text>
+            <a-typography-text type="secondary">来源: </a-typography-text>
             {{ data[field.source] }}
           </span>
         </div>
@@ -62,6 +62,7 @@
           <br />
           提供者路径 - {{ data.nodeInfo.host }}:{{ data.nodeInfo.port }}<br />
           提供者绑定名 - {{ data[field.bindName] }}
+          <slot name="extra" :record="data"></slot>
         </div>
         <a-tag color="processing">
           <template #icon>
@@ -76,21 +77,19 @@
 import { defineComponent, onMounted, ref, toRef, watch } from 'vue';
 import { ApiOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
 
-import { initStore, getAllAttackBindInfos } from './attack/store';
-
 export default defineComponent({
   components: { ApiOutlined, CloseCircleOutlined },
   props: {
     field: Object,
-    atkID: Number,
+    id: Number,
     currentServerInfo: Object,
-    getProviderList: Function
+    getProviderList: Function,
   },
   setup(props, context) {
-    const atkID = toRef(props, 'atkID');
+    const id = toRef(props, 'id');
 
     watch(
-      () => atkID.value,
+      () => id.value,
       async (newValue, oldValue) => {
         await loadProviderList();
       }
@@ -102,13 +101,21 @@ export default defineComponent({
 
     const providerList = ref([]);
     const loadProviderList = async (update = false) => {
-      providerList.value = await props.getProviderList(atkID.value, update);
+      providerList.value = await props.getProviderList(id.value, update);
+      // 默认选中第一个可以选择的Provider
+
+      for (let element of providerList.value) {
+        if (props.currentServerInfo.nodeID == element.nodeInfo.nodeID) {
+          selectProvider(element);
+          break;
+        }
+      }
     };
 
     const selectedProviderID = ref();
-    const selectProvider = (providerID) => {
-      selectedProviderID.value = providerID;
-      context.emit('selected-provider', atkID.value, providerID);
+    const selectProvider = (providerData) => {
+      selectedProviderID.value = providerData[props.field.providerID];
+      context.emit('selected-provider', id.value, providerData);
     };
 
     return {
