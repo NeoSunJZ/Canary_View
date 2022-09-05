@@ -59,8 +59,8 @@ import { defineComponent, ref } from 'vue';
 import { getDatasetInfo } from '@/api/dataset-api/datasetInfo.js';
 import { getAllDatasetBindInfos } from './DatasetBindInfoStore';
 
-import CommonTransfer from '../CommonTransfer.vue';
-import CommonProviderSelector from '../CommonProviderSelector.vue';
+import CommonTransfer from '@/components/core/CommonTransfer.vue';
+import CommonProviderSelector from '@/components/core/CommonProviderSelector.vue';
 import DatasetDetails from './DatasetDetails.vue';
 
 import { DatabaseOutlined, TagsOutlined } from '@ant-design/icons-vue';

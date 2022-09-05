@@ -8,7 +8,7 @@
 }
 .provider {
   flex-shrink: 0;
-  width: 260px;
+  width: 300px;
   height: 100%;
   margin-right: 10px;
   display: flex;
@@ -44,8 +44,7 @@
 <template>
   <div>
     <div class="provider-list">
-      <a-card size="small" class="provider" v-for="(data,index) in providerList" :key="index"
-        @click="currentServerInfo.nodeID==data.nodeInfo.nodeID?selectProvider(data):()=>{}">
+      <a-card size="small" class="provider" v-for="(data,index) in providerList" :key="index" @click="currentServerInfo.nodeID==data.nodeInfo.nodeID?selectProvider(data):()=>{}">
         <div class="provider__con" v-if="data[field.providerID] == selectedProviderID"></div>
         <div>
           <ApiOutlined :class="'provider__icon '+(currentServerInfo.nodeID==data.nodeInfo.nodeID ? 'provider__icon--current' : 'provider__icon--disable')" />
@@ -56,8 +55,8 @@
         </div>
         <div class="provider__detail">
           提供者 - {{ data.nodeInfo.nodeName }} (NodeID: {{ data.nodeInfo.nodeID }})
-          <a-tag color="error" v-if="currentServerInfo.nodeID!=data.nodeInfo.nodeID">
-            <CloseCircleOutlined /> 提供者非当前所选节点
+          <a-tag color="error" v-if="currentServerInfo.nodeID!=data.nodeInfo.nodeID" style="margin-left:5px">
+            <CloseCircleOutlined /> 非当前节点
           </a-tag>
           <br />
           提供者路径 - {{ data.nodeInfo.host }}:{{ data.nodeInfo.port }}<br />

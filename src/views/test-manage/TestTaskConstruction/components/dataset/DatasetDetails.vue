@@ -1,3 +1,9 @@
+<style lang="less" scoped>
+/deep/ .ant-card-body {
+  overflow: auto;
+  max-height: 400px;
+}
+</style>
 <template>
   <a-card size="small" style="width: 100%; overflow:hidden">
     <template #title>
@@ -34,7 +40,6 @@ import { defineComponent, ref } from 'vue';
 import { Empty } from 'ant-design-vue';
 
 export default defineComponent({
-
   name: 'AttackDetails',
   setup() {
     const datasetInfo = ref();

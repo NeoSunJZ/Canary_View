@@ -11,8 +11,8 @@
 <template>
   <a-row>
     <a-col :span="16" class="attack-selector">
-      <CommonTransfer ref="commonTransfer" :leftTableColumns="leftTableColumns" :rightTableColumns="rightTableColumns" :fields="{id:'attackMethodID'}"
-        :getDataResource="getAtkInfo" @moveItemChange="handleMoveItemChange">
+      <CommonTransfer ref="commonTransfer" :leftTableColumns="leftTableColumns" :rightTableColumns="rightTableColumns" :fields="{id:'attackMethodID'}" :getDataResource="getAtkInfo"
+        @moveItemChange="handleMoveItemChange">
 
         <template #tableCell="{ column, record }">
 
@@ -40,9 +40,15 @@
     <a-col :span="8" class="attack-selector">
       <AttackDetails ref="attackDetails">
         <template #extra="{ record }">
-          <CommonProviderSelector :field="{providerID:'attackMethodProviderID',source:'attackMethodSource',bindName:'bindAttackMethodName'}"
-            :id="record.attackMethodID" :currentServerInfo="currentServerInfo" @selected-provider="handleSelectProvider" :getProviderList="getAllAtkBindInfos">
+          <CommonProviderSelector :field="{providerID:'attackMethodProviderID',source:'attackMethodSource',bindName:'bindAttackMethodName'}" :id="record.attackMethodID"
+            :currentServerInfo="currentServerInfo" @selected-provider="handleSelectProvider" :getProviderList="getAllAtkBindInfos">
           </CommonProviderSelector>
+          <a-divider></a-divider>
+          <a-alert message="将在已选中的模型上尝试使用该攻击方法测试" type="info" show-icon />
+          <a-card size="small">
+            <p>靶向模型</p>
+            <a-checkbox-group v-model:value="attackAndModelComposeList[record.attackMethodID]" :options="modelList" />
+          </a-card>
         </template>
       </AttackDetails>
     </a-col>
@@ -55,9 +61,9 @@ import { defineComponent, ref, nextTick } from 'vue';
 import { getAtkInfo, getAtkConfig } from '@/api/atk-api/atkInfo.js';
 import { getAllAtkBindInfos } from './AtkBindInfoStore';
 
-import CommonTransfer from '../CommonTransfer.vue';
-import CommonProviderSelector from '../CommonProviderSelector.vue';
-import CommonConfigProcessor from '../CommonConfigProcessor.vue';
+import CommonTransfer from '@/components/core/CommonTransfer.vue';
+import CommonProviderSelector from '@/components/core/CommonProviderSelector.vue';
+import CommonConfigProcessor from '@/components/core/CommonConfigProcessor.vue';
 import AttackDetails from './AttackDetails.vue';
 
 export default defineComponent({
@@ -65,6 +71,7 @@ export default defineComponent({
   props: {
     currentServerInfo: Object,
     currentServerDeclaration: Object,
+    modelList: Array,
   },
   components: {
     CommonTransfer,
@@ -72,7 +79,7 @@ export default defineComponent({
     CommonProviderSelector,
     CommonConfigProcessor,
   },
-  setup() {
+  setup(props, context) {
     const leftTableColumns = [
       {
         dataIndex: 'attackMethodName',
@@ -126,12 +133,14 @@ export default defineComponent({
 
     const commonTransfer = ref();
 
+    const attackAndModelComposeList = ref({});
+
     const submit = () => {
       let selectedAttack = commonTransfer.value.submit();
       if (selectedAttack.length == 0) {
         throw new Error('尚未选择任何攻击方法');
       } else {
-        let attackerList = [];
+        let attackerList = {};
         let configList = {};
 
         selectedAttack.forEach((element) => {
@@ -139,7 +148,7 @@ export default defineComponent({
           if (confirmedConfig.value[attackMethodID] != null) {
             let bindName = Object.keys(confirmedConfig.value[attackMethodID])[0];
             let config = Object.values(confirmedConfig.value[attackMethodID])[0];
-            attackerList.push(bindName);
+            attackerList[bindName] = attackAndModelComposeList.value[attackMethodID];
             configList[bindName] = JSON.parse(config);
           } else {
             throw new Error('尚未正确配置已选的攻击方法: ' + element['attackMethodName']);
@@ -154,6 +163,9 @@ export default defineComponent({
       if (direction == 'right') {
         nextTick(() => {
           runConfigTaskQueue(); // 触发配置流程
+        });
+        moveKeys.forEach((element) => {
+          attackAndModelComposeList.value[moveKeys] = props.modelList;
         });
       }
     };
@@ -175,6 +187,8 @@ export default defineComponent({
       autoConfigTaskQueue,
 
       commonTransfer,
+
+      attackAndModelComposeList,
 
       handleSelectProvider,
       handleConfigConfirm,

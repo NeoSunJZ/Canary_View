@@ -55,7 +55,12 @@ const routes = [{
   {
     path: "/TaskRealtimeBoard",
     name: "TaskRealtimeBoard",
-    component: () => import("@/views/test-manage/TaskRealtimeBoard.vue")
+    component: () => import("@/views/test-manage/TestTaskConsole/TaskRealtimeBoard.vue")
+  },
+  {
+    path: "/TaskRealtimeBoard/TaskConsole",
+    name: "TaskConsole",
+    component: () => import("@/views/test-manage/TestTaskConsole/TaskConsole.vue")
   },
   {
     path: "/ResultAnalysis",

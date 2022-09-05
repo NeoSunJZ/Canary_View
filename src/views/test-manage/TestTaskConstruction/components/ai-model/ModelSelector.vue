@@ -82,9 +82,9 @@ import { defineComponent, ref, nextTick } from 'vue';
 import { getModelInfo, getModelConfig } from '@/api/model-api/modelInfo.js';
 import { getAllModelBindInfos } from './ModelBindInfoStore';
 
-import CommonTransfer from '../CommonTransfer.vue';
-import CommonProviderSelector from '../CommonProviderSelector.vue';
-import CommonConfigProcessor from '../CommonConfigProcessor.vue';
+import CommonTransfer from '@/components/core/CommonTransfer.vue';
+import CommonProviderSelector from '@/components/core/CommonProviderSelector.vue';
+import CommonConfigProcessor from '@/components/core/CommonConfigProcessor.vue';
 import ModelDetails from './ModelDetails.vue';
 
 import { DatabaseOutlined, CloudOutlined } from '@ant-design/icons-vue';

@@ -1,8 +1,8 @@
 import axios from 'axios'
 import router from "./router";
 
-
-export const baseURL = 'http://localhost:8888/';
+export const baseServerAddr = 'localhost:8888';
+export const baseURL = 'http://' + baseServerAddr + '/';
 
 export const Axios = axios.create({
     baseURL: baseURL,
