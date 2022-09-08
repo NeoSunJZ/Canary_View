@@ -32,7 +32,7 @@
 
 <script>
 import { defineComponent, onBeforeMount, ref } from 'vue';
-import { getDeclarationOnly } from '@/api/framework-api/declaration';
+import { getDeclaration } from '@/api/framework-api/declaration';
 import { SyncOutlined } from '@ant-design/icons-vue';
 // import { notification } from 'ant-design-vue';
 export default defineComponent({
@@ -52,7 +52,7 @@ export default defineComponent({
   setup(props, context) {
     const NodeStatus = ref('running');
     const refresh = async () => {
-      let data = await getDeclarationOnly(props.ip, props.port);
+      let data = await getDeclaration(props.ip, props.port, null, false);
       if (data == null) {
         NodeStatus.value = 'stopping';
       } else {
