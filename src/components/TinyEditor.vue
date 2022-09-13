@@ -65,7 +65,9 @@ export default defineComponent({
         // favs: { title: 'My Favorites', items: 'code visualaid | searchreplace | emoticons' },
       },
       // 菜单栏
-      menubar: 'favs file edit view insert format tools table help',
+      menubar: 'edit view insert format tools table',
+      // menubar: 'favs file edit view insert format tools table help',
+
       // 去掉商标
       branding: false,
       // 默认风格

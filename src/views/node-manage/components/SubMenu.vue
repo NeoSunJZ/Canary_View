@@ -46,7 +46,7 @@
   <a-table :columns="Columns" :data-source="data" :pagination="false" :scroll="{x:1000}">
     <template #bodyCell="{ column,record,text }">
       <template v-if="column.dataIndex === 'operation'">
-        <a-popconfirm v-if="data.length" title="确认删除?" @confirm="onDelete(record.attackMethodProviderID)">
+        <a-popconfirm v-if="data.length" title="确认删除?" okText="确定" cancelText="取消" @confirm="onDelete(record.attackMethodProviderID)">
           <a>删除</a>
         </a-popconfirm>
       </template>
@@ -151,12 +151,14 @@ export default defineComponent({
     // 正在编辑的属性
     const editableElement = ref({});
 
+    // 编辑
     const edit = (key, element) => {
       editableData[key] = cloneDeep(data.value.filter((item) => key === item.attackMethodProviderID)[0]);
       console.log(editableData[key]);
       editableElement.value[key] = element;
     };
 
+    // 保存编辑，更为准确和详细的逻辑是先等待success再根据结果修改前端或是报错
     const save = async (key) => {
       Object.assign(data.value.filter((item) => key === item.attackMethodProviderID)[0], editableData[key]);
       let success = await updateAtkMethodProvider(
@@ -170,6 +172,7 @@ export default defineComponent({
       editableElement.value[key] = '';
     };
 
+    // 删除，同上可优化逻辑
     const onDelete = async (key) => {
       data.value = data.value.filter((item) => item.attackMethodProviderID !== key);
       let success = await deleteAtkMethodProvider(key);
