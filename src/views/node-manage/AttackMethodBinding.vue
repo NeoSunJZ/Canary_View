@@ -25,7 +25,12 @@
       <a-button class="add-attack-method-button" @click="addAtkMethodFormVisiable = true">新增方法</a-button>
       <a-modal v-model:visible="addAtkMethodFormVisiable" @ok="AddAtkMethod()" :closable='false' :width="1000">
         <h2>新增攻击方法</h2>
-        ahhhh,chicken soup is coming!
+        <p>方法名</p>
+        <p>类别select</p>
+        <p>简介</p>
+        <p>参考论文</p>
+        <p>链接</p>
+        <p>详情</p>
       </a-modal>
 
       <!-- 表格，这里用tableLayout=fixed使之非弹性 -->

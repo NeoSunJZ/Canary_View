@@ -13,7 +13,7 @@
 
   <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">新增节点</a-button>
 
-  <a-modal v-model:visible="visible" okText="确定" cancelText="取消" width="500px" @ok="handleOk" :closable='false'>
+  <a-modal v-model:visible="visible" width="500px" :footer="null" :closable='false'>
     <h2 class='title'>新增节点</h2>
     <a-form :model="formState" v-bind="layout" name="nest-messages" :validate-messages="validateMessages" @finish="onFinish">
       <a-form-item :name="['node', 'name']" label="名称" :rules="[{ required: true }]">
@@ -28,6 +28,11 @@
       <a-form-item :name="['node', 'introduction']" label="简介">
         <a-textarea v-model:value="formState.node.introduction" />
       </a-form-item>
+      <a-form-item :wrapper-col="{ span: 14, offset: 3 }">
+        <a-button type="primary" html-type="submit" @click="handleOk">确定</a-button>
+        <a-button style="margin-left: 10px" @click="resetForm">清空</a-button>
+        <a-button style="margin-left: 10px" @click="visible=false">取消</a-button>
+      </a-form-item>
     </a-form>
   </a-modal>
 
@@ -39,12 +44,12 @@ import { notification } from 'ant-design-vue';
 export default defineComponent({
   props: {},
   setup(props, context) {
-    const visible = ref(false);
+    const visible = ref(true);
 
     // 确认添加节点
     const handleOk = async () => {
       let success = await addNodeInfo(formState.node.ip, formState.node.port, formState.node.name, formState.node.introduction);
-      visible.value = false;
+      // visible.value = false;
       if (success == false) {
         notification['error']({
           message: '添加失败',
@@ -66,6 +71,15 @@ export default defineComponent({
       visible.value = true;
     };
 
+    const resetForm = () => {
+      formState.node = {
+        name: '',
+        ip: '',
+        port: '',
+        introduction: '',
+      };
+    };
+
     // 表单布局
     const layout = {
       labelCol: {
@@ -73,7 +87,7 @@ export default defineComponent({
           span: 24,
         },
         sm: {
-          span: 5,
+          span: 3,
         },
       },
       wrapperCol: {
@@ -81,7 +95,7 @@ export default defineComponent({
           span: 24,
         },
         sm: {
-          span: 16,
+          span: 20,
         },
       },
     };
@@ -111,6 +125,7 @@ export default defineComponent({
       visible,
       handleOk,
       handleAdd,
+      resetForm,
       formState,
       layout,
       validateMessages,
