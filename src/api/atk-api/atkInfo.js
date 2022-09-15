@@ -112,3 +112,34 @@ export async function deleteAtkMethodProvider(attackMethodProviderID) {
   });
   return data;
 }
+
+/**
+ * @description: 用于请求对应服务器新增一个方法
+ * @param {String} attackMethodName 攻击方法名
+ * @param {String} attackMethodDesc 
+ * @param {string} attackMethodDetails
+ * @param {String} attackMethodPaper
+ * @param {String} attackMethodPaperUrl
+ * @param {Number} attackMethodTypeID
+ * @return 返回是否成功
+ */
+export async function addAtkMethod(attackMethodName, attackMethodDesc, attackMethodDetails, attackMethodPaper, attackMethodPaperUrl, attackMethodTypeID) {
+  let data = null;
+  await axiosPlugin({
+    method: "post",
+    url: "v2/resource/atkInfo/addAttackMethod",
+    data: Qs.stringify({
+      attackMethodName: attackMethodName,
+      attackMethodDesc: attackMethodDesc,
+      attackMethodDetails: attackMethodDetails,
+      attackMethodPaper: attackMethodPaper,
+      attackMethodPaperUrl: attackMethodPaperUrl,
+      attackMethodTypeID: attackMethodTypeID
+    }),
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = 'success'
+    }
+  });
+  return data;
+}

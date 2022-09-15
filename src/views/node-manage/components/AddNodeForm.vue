@@ -6,15 +6,13 @@
 .add-node-button {
   margin-bottom: 10px;
 }
-.title {
-  margin-bottom: 15px;
-}
 </style>
 
 <template>
   <a-button class="add-node-button" type="primary" @click="handleAdd">新增节点</a-button>
   <a-modal v-model:visible="visible" width="500px" :footer="null" :closable='false'>
-    <h2 class='title'>新增节点</h2>
+    <h2>新增节点</h2>
+    <a-divider />
     <a-form :model="formState" v-bind="layout" ref="formRef" name="new-node-info" :rules="rules" @finish="handleFinish" @finishFailed="handleFinishFailed">
       <a-form-item has-feedback name="name" label="名称">
         <a-input v-model:value="formState.name" />

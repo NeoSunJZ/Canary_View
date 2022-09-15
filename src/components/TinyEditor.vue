@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, watch } from 'vue';
 import Editor from '@tinymce/tinymce-vue';
 
 export default defineComponent({
@@ -75,6 +75,7 @@ export default defineComponent({
       height: props.height,
       width: props.width,
     });
+
     return {
       initOptions,
       contentValue: computed({

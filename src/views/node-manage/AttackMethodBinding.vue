@@ -2,9 +2,6 @@
 .title {
   margin-bottom: 15px;
 }
-.add-attack-method-button {
-  margin-bottom: 10px;
-}
 .attack-method-paper {
   display: flex;
   flex-direction: row;
@@ -22,17 +19,7 @@
 
     <template v-slot:content>
       <h2 class="title">攻击方法绑定</h2>
-      <a-button class="add-attack-method-button" @click="addAtkMethodFormVisiable = true">新增方法</a-button>
-      <a-modal v-model:visible="addAtkMethodFormVisiable" @ok="AddAtkMethod()" :closable='false' :width="1000">
-        <h2>新增攻击方法</h2>
-        <p>方法名</p>
-        <p>类别select</p>
-        <p>简介</p>
-        <p>参考论文</p>
-        <p>链接</p>
-        <p>详情</p>
-      </a-modal>
-
+      <AddAtkMethodForm></AddAtkMethodForm>
       <!-- 表格，这里用tableLayout=fixed使之非弹性 -->
       <a-table tableLayout="fixed" :columns="columns" :data-source="attackInfo" :pagination="pagination" @change="(...args) => handleTableChange(...args)">
         <template #bodyCell="{column,record}">
@@ -53,7 +40,7 @@
         </template>
       </a-table>
 
-      <a-drawer title="方法详情" placement="right" :visible="methodDetailsVisible" :get-container="false" width="30%" :style="{ position: 'fixed' }"
+      <a-drawer title="方法详情" placement="right" :visible="methodDetailsVisible" :get-container="false" width="30%" :style="{ position: 'fixed'}"
         @close="methodDetailsVisible = false">
         <a @click="editAtkInfo(methodDetails)"> 编辑</a>
         <p v-html="methodDetails"></p>
@@ -73,20 +60,14 @@ import { defineComponent, ref, onMounted, computed } from 'vue';
 import tinyEditor from '@/components/TinyEditor.vue';
 import SubMenu from '@/views/node-manage/components/SubMenu.vue';
 import AttackDetails from '@/views/test-manage/TestTaskConstruction/components/attack/AttackDetails.vue';
+import AddAtkMethodForm from '@/views/node-manage/components/AddAtkMethodForm.vue';
 
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails },
+  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddAtkMethodForm },
 
   setup() {
-    // 新增攻击方法的表单是否可见
-    const addAtkMethodFormVisiable = ref(false);
-    // 新增攻击方法（未完成）
-    const AddAtkMethod = () => {
-      //
-    };
-
     // 主表格列名
     const columns = [
       {
@@ -181,8 +162,6 @@ export default defineComponent({
 
     return {
       columns,
-      addAtkMethodFormVisiable,
-      AddAtkMethod,
       editable,
       initAtkDetails,
       editAtkInfo,
