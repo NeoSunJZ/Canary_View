@@ -25,12 +25,18 @@
         <template #bodyCell="{column,record}">
           <template v-if="column.dataIndex === 'operation'">
             <a>新增节点</a>
-            <a @click="showDetails(record.attackMethodDetails)"> 详情</a>
+            <a @click="showDetails(record)"> 详情</a>
           </template>
           <template v-if="column.dataIndex === 'attackMethodPaper'">
             <div class="attack-method-paper">
               <a :href="record.attackMethodPaperUrl" target="_blank">{{record.attackMethodPaper}}</a>
-              <a-button type="link">修改</a-button>
+              <Poptip placement="left" width="400">
+                <template #content>
+                  hhh
+                </template>
+                <a-button type="link">修改</a-button>
+              </Poptip>
+
             </div>
           </template>
         </template>
@@ -42,8 +48,8 @@
 
       <a-drawer title="方法详情" placement="right" :visible="methodDetailsVisible" :get-container="false" width="30%" :style="{ position: 'fixed'}"
         @close="methodDetailsVisible = false">
-        <a @click="editAtkInfo(methodDetails)"> 编辑</a>
-        <p v-html="methodDetails"></p>
+        <a @click="editAtkInfo(methodSelected.attackMethodDetails)"> 编辑</a>
+        <p v-html="methodSelected.attackMethodDetails"></p>
       </a-drawer>
 
       <a-modal v-model:visible="editable" @ok="saveAtkDetails()" :closable='false' :width="700">
@@ -54,7 +60,7 @@
 </template>
 
 <script>
-import { getAtkInfo } from '@/api/atk-api/atkInfo';
+import { getAtkInfo, updateAtkMethod } from '@/api/atk-api/atkInfo';
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import tinyEditor from '@/components/TinyEditor.vue';
@@ -135,11 +141,11 @@ export default defineComponent({
       loadMoreAttackMethodInfo();
     };
 
-    const methodDetails = ref('');
+    const methodSelected = ref('');
     const methodDetailsVisible = ref(false);
     // 显示某方法详情
-    const showDetails = (attackMethodDetails) => {
-      methodDetails.value = attackMethodDetails;
+    const showDetails = (attackMethod) => {
+      methodSelected.value = attackMethod;
       methodDetailsVisible.value = true;
     };
 
@@ -151,8 +157,22 @@ export default defineComponent({
       editable.value = true;
     };
 
+    const newDetails = ref();
+
     // 保存某一方法详情的修改
-    const saveAtkDetails = () => {};
+    const saveAtkDetails = async () => {
+      let success = await updateAtkMethod(
+        methodSelected.value.attackMethodID,
+        methodSelected.value.attackMethodName,
+        methodSelected.value.attackMethodDesc,
+        newDetails.value,
+        methodSelected.value.attackMethodPaper,
+        methodSelected.value.attackMethodPaperUrl,
+        methodSelected.value.attackMethodTypeID
+      );
+      editable.value = false;
+      methodSelected.value.attackMethodDetails = newDetails.value;
+    };
 
     // 拉取攻击信息
     onMounted(async () => {
@@ -161,6 +181,7 @@ export default defineComponent({
 
     // 富文本编辑器实时更新后的内容
     const updateValue = (value) => {
+      newDetails.value = value;
       console.log(value);
     };
 
@@ -170,7 +191,8 @@ export default defineComponent({
       initAtkDetails,
       editAtkInfo,
       methodDetailsVisible,
-      methodDetails,
+      methodSelected,
+      newDetails,
       addAtkInfoSucceed,
       showDetails,
       attackInfo,

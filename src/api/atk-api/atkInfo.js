@@ -143,3 +143,36 @@ export async function addAtkMethod(attackMethodName, attackMethodDesc, attackMet
   });
   return data;
 }
+
+/**
+ * @description: 用于请求对应服务器更新对应方法
+ * @param {Number} attackMethodID
+ * @param {String} attackMethodName 攻击方法名
+ * @param {String} attackMethodDesc 
+ * @param {string} attackMethodDetails
+ * @param {String} attackMethodPaper
+ * @param {String} attackMethodPaperUrl
+ * @param {Number} attackMethodTypeID
+ * @return 返回是否成功
+ */
+export async function updateAtkMethod(attackMethodID, attackMethodName, attackMethodDesc, attackMethodDetails, attackMethodPaper, attackMethodPaperUrl, attackMethodTypeID) {
+  let data = null;
+  await axiosPlugin({
+    method: "post",
+    url: "v2/resource/atkInfo/updateAttackMethod",
+    data: Qs.stringify({
+      attackMethodID: attackMethodID,
+      attackMethodName: attackMethodName,
+      attackMethodDesc: attackMethodDesc,
+      attackMethodDetails: attackMethodDetails,
+      attackMethodPaper: attackMethodPaper,
+      attackMethodPaperUrl: attackMethodPaperUrl,
+      attackMethodTypeID: attackMethodTypeID
+    }),
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = 'success'
+    }
+  });
+  return data;
+}
