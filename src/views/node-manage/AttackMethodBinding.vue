@@ -19,7 +19,7 @@
 
     <template v-slot:content>
       <h2 class="title">攻击方法绑定</h2>
-      <AddAtkMethodForm></AddAtkMethodForm>
+      <AddAtkMethodForm @addAtkInfoSucceed="addAtkInfoSucceed"></AddAtkMethodForm>
       <!-- 表格，这里用tableLayout=fixed使之非弹性 -->
       <a-table tableLayout="fixed" :columns="columns" :data-source="attackInfo" :pagination="pagination" @change="(...args) => handleTableChange(...args)">
         <template #bodyCell="{column,record}">
@@ -98,7 +98,6 @@ export default defineComponent({
 
     // 获取的全部攻击方法信息，用作表格数据源
     const attackInfo = ref([]);
-
     const totalAtkInfo = ref(0);
     const currentPage = ref(1);
     const pageSize = ref(5);
@@ -114,11 +113,16 @@ export default defineComponent({
     // 获取攻击方法信息
     const getAttackInfo = async () => {
       const atkInfo = await getAtkInfo(currentPage.value, pageSize.value);
+      attackInfo.value = [];
       attackInfo.value = attackInfo.value.concat(atkInfo.list);
       attackInfo.value.forEach((element, index) => {
         element.key = index;
       });
       totalAtkInfo.value = atkInfo.total;
+    };
+
+    const addAtkInfoSucceed = (value) => {
+      getAttackInfo();
     };
 
     const loadMoreAttackMethodInfo = async () => {
@@ -167,6 +171,7 @@ export default defineComponent({
       editAtkInfo,
       methodDetailsVisible,
       methodDetails,
+      addAtkInfoSucceed,
       showDetails,
       attackInfo,
       pageSize,
