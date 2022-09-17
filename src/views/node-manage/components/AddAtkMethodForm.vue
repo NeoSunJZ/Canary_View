@@ -2,9 +2,6 @@
 .add-attack-method-button {
   margin-bottom: 10px;
 }
-.add-attack-method-model {
-  overflow: scroll;
-}
 </style>
 
 <template>
@@ -19,7 +16,6 @@
       </a-form-item>
       <a-form-item name="type" label="类别" has-feedback>
         <a-select v-model:value="formState.type" placeholder="请选择" style="width:200px">
-          <!-- advSampleAtk-black -->
           <a-select-option value="1">对抗样本攻击(白盒)</a-select-option>
           <a-select-option value="2">对抗样本攻击(黑盒)</a-select-option>
         </a-select>
@@ -51,6 +47,7 @@ import { defineComponent, reactive, ref } from 'vue';
 import TinyEditor from '@/components/TinyEditor.vue';
 import { addAtkMethod } from '@/api/atk-api/atkInfo';
 // import { notification } from 'ant-design-vue';
+
 export default defineComponent({
   name: 'AddAtkMethodForm',
   components: { TinyEditor },
@@ -66,6 +63,8 @@ export default defineComponent({
       details: '',
       // type: '',
     });
+
+    // 标签和输入框的布局
     const layout = {
       labelCol: {
         span: 3,
@@ -74,14 +73,18 @@ export default defineComponent({
         span: 19,
       },
     };
+
+    // 编辑器宽度
     const editorWidth = ref('585px');
 
     const initialValue = ref('');
 
+    // 接受组件的传值回调
     const updateValue = (value) => {
       formState.details = value;
       initialValue.value = value;
     };
+
     const checkName = async (_rule, value) => {
       if (!value) {
         return Promise.reject('名称不能为空!');

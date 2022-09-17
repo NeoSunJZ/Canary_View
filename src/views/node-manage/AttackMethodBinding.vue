@@ -26,16 +26,18 @@
           <template v-if="column.dataIndex === 'operation'">
             <a>新增节点</a>
             <a @click="showDetails(record)"> 详情</a>
+            <a> 删除</a>
           </template>
           <template v-if="column.dataIndex === 'attackMethodPaper'">
             <div class="attack-method-paper">
               <a :href="record.attackMethodPaperUrl" target="_blank">{{record.attackMethodPaper}}</a>
-              <Poptip placement="left" width="400">
+              <!-- <Poptip placement="left" width="400">
                 <template #content>
-                  hhh
+                  
                 </template>
                 <a-button type="link">修改</a-button>
-              </Poptip>
+              </Poptip> -->
+              <UpdatePaperForm :methodSelected="record" @updatePaper="updatePaper"></UpdatePaperForm>
 
             </div>
           </template>
@@ -46,12 +48,14 @@
         </template>
       </a-table>
 
+      <!-- 右侧详情栏 -->
       <a-drawer title="方法详情" placement="right" :visible="methodDetailsVisible" :get-container="false" width="30%" :style="{ position: 'fixed'}"
         @close="methodDetailsVisible = false">
         <a @click="editAtkInfo(methodSelected.attackMethodDetails)"> 编辑</a>
         <p v-html="methodSelected.attackMethodDetails"></p>
       </a-drawer>
 
+      <!-- 修改详情 -->
       <a-modal v-model:visible="editable" @ok="saveAtkDetails()" :closable='false' :width="700">
         <tinyEditor :height="400" :width="650" :initialValue="initAtkDetails" @updateValue="updateValue" />
       </a-modal>
@@ -67,11 +71,12 @@ import tinyEditor from '@/components/TinyEditor.vue';
 import SubMenu from '@/views/node-manage/components/SubMenu.vue';
 import AttackDetails from '@/views/test-manage/TestTaskConstruction/components/attack/AttackDetails.vue';
 import AddAtkMethodForm from '@/views/node-manage/components/AddAtkMethodForm.vue';
+import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
 
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddAtkMethodForm },
+  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddAtkMethodForm, UpdatePaperForm },
 
   setup() {
     // 主表格列名
@@ -174,6 +179,13 @@ export default defineComponent({
       methodSelected.value.attackMethodDetails = newDetails.value;
     };
 
+    const updatePaper = (key, newPaper) => {
+      attackInfo.value[key].attackMethodPaper = newPaper.paper;
+      attackInfo.value[key].attackMethodPaperUrl = newPaper.url;
+      // console.log(key);
+      // console.log(newPaper);
+    };
+
     // 拉取攻击信息
     onMounted(async () => {
       await getAttackInfo();
@@ -195,6 +207,7 @@ export default defineComponent({
       newDetails,
       addAtkInfoSucceed,
       showDetails,
+      updatePaper,
       attackInfo,
       pageSize,
       totalAtkInfo,

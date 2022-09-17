@@ -88,7 +88,7 @@ export default defineComponent({
     };
 
     const checkPort = async (_rule, value) => {
-      if (!value) {
+      if (!value && value != 0) {
         return Promise.reject('端口不能为空!');
       } else if (value > 65535 || value < 0) {
         return Promise.reject('非法端口!');
