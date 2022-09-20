@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, reactive, onBeforeMount } from 'vue';
+import { defineComponent, ref, reactive } from 'vue';
 import { updateAtkMethod } from '@/api/atk-api/atkInfo';
 
 export default defineComponent({

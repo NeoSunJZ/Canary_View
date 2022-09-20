@@ -65,6 +65,33 @@ export async function getAtkConfig(attackMethodProviderID) {
 
 /**
  * @description: 用于请求对应服务器更新攻击方法提供者信息
+ * @param {Number} attackMethodID       攻击方法ID
+ * @param {String} nodeID               节点ID
+ * @param {String} attackMethodSource   攻击方法源
+ * @param {String} bindAttackMethodName 绑定名
+ * @return 返回是否成功
+ */
+export async function addAtkMethodProvider(attackMethodID, nodeID, attackMethodSource, bindAttackMethodName) {
+  let data = null;
+  await axiosPlugin({
+    method: "post",
+    url: "v2/resource/atkInfo/addAttackMethodProvider",
+    data: Qs.stringify({
+      attackMethodID: attackMethodID,
+      nodeID: nodeID,
+      attackMethodSource: attackMethodSource,
+      bindAttackMethodName: bindAttackMethodName
+    }),
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = 'success'
+    }
+  });
+  return data;
+}
+
+/**
+ * @description: 用于请求对应服务器更新攻击方法提供者信息
  * @param {Number} attackMethodProviderID 攻击方法提供者ID
  * @param {Number} attackMethodID 攻击方法ID
  * @param {String} nodeID 节点ID
@@ -115,12 +142,12 @@ export async function deleteAtkMethodProvider(attackMethodProviderID) {
 
 /**
  * @description: 用于请求对应服务器新增一个方法
- * @param {String} attackMethodName 攻击方法名
- * @param {String} attackMethodDesc 
- * @param {string} attackMethodDetails
- * @param {String} attackMethodPaper
- * @param {String} attackMethodPaperUrl
- * @param {Number} attackMethodTypeID
+ * @param {String} attackMethodName     攻击方法名
+ * @param {String} attackMethodDesc     简介
+ * @param {string} attackMethodDetails  详情
+ * @param {String} attackMethodPaper    相关论文
+ * @param {String} attackMethodPaperUrl 链接
+ * @param {Number} attackMethodTypeID   类型
  * @return 返回是否成功
  */
 export async function addAtkMethod(attackMethodName, attackMethodDesc, attackMethodDetails, attackMethodPaper, attackMethodPaperUrl, attackMethodTypeID) {
@@ -146,13 +173,13 @@ export async function addAtkMethod(attackMethodName, attackMethodDesc, attackMet
 
 /**
  * @description: 用于请求对应服务器更新对应方法
- * @param {Number} attackMethodID
- * @param {String} attackMethodName 攻击方法名
- * @param {String} attackMethodDesc 
- * @param {string} attackMethodDetails
- * @param {String} attackMethodPaper
- * @param {String} attackMethodPaperUrl
- * @param {Number} attackMethodTypeID
+ * @param {Number} attackMethodID       攻击方法ID(主键)
+ * @param {String} attackMethodName     攻击方法名
+ * @param {String} attackMethodDesc     简介
+ * @param {string} attackMethodDetails  详情
+ * @param {String} attackMethodPaper    相关论文
+ * @param {String} attackMethodPaperUrl 链接
+ * @param {Number} attackMethodTypeID   类型
  * @return 返回是否成功
  */
 export async function updateAtkMethod(attackMethodID, attackMethodName, attackMethodDesc, attackMethodDetails, attackMethodPaper, attackMethodPaperUrl, attackMethodTypeID) {

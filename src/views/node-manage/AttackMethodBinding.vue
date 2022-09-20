@@ -24,21 +24,14 @@
       <a-table tableLayout="fixed" :columns="columns" :data-source="attackInfo" :pagination="pagination" @change="(...args) => handleTableChange(...args)">
         <template #bodyCell="{column,record}">
           <template v-if="column.dataIndex === 'operation'">
-            <a>新增节点</a>
+            <NodeBinding></NodeBinding>
             <a @click="showDetails(record)"> 详情</a>
             <a> 删除</a>
           </template>
           <template v-if="column.dataIndex === 'attackMethodPaper'">
             <div class="attack-method-paper">
               <a :href="record.attackMethodPaperUrl" target="_blank">{{record.attackMethodPaper}}</a>
-              <!-- <Poptip placement="left" width="400">
-                <template #content>
-                  
-                </template>
-                <a-button type="link">修改</a-button>
-              </Poptip> -->
               <UpdatePaperForm :methodSelected="record" @updatePaper="updatePaper"></UpdatePaperForm>
-
             </div>
           </template>
         </template>
@@ -72,11 +65,12 @@ import SubMenu from '@/views/node-manage/components/SubMenu.vue';
 import AttackDetails from '@/views/test-manage/TestTaskConstruction/components/attack/AttackDetails.vue';
 import AddAtkMethodForm from '@/views/node-manage/components/AddAtkMethodForm.vue';
 import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
+import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
 
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddAtkMethodForm, UpdatePaperForm },
+  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddAtkMethodForm, UpdatePaperForm, NodeBinding },
 
   setup() {
     // 主表格列名
@@ -182,8 +176,6 @@ export default defineComponent({
     const updatePaper = (key, newPaper) => {
       attackInfo.value[key].attackMethodPaper = newPaper.paper;
       attackInfo.value[key].attackMethodPaperUrl = newPaper.url;
-      // console.log(key);
-      // console.log(newPaper);
     };
 
     // 拉取攻击信息
@@ -196,6 +188,8 @@ export default defineComponent({
       newDetails.value = value;
       console.log(value);
     };
+
+    const addNodeVisiable = ref(false);
 
     return {
       columns,
@@ -216,6 +210,7 @@ export default defineComponent({
       handleTableChange,
       updateValue,
       saveAtkDetails,
+      addNodeVisiable,
     };
   },
 });
