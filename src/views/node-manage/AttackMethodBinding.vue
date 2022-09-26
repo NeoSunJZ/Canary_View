@@ -8,6 +8,12 @@
   justify-content: space-between;
   align-items: center;
 }
+.attack-method-desc {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
 </style>
 
 <template>
@@ -23,6 +29,12 @@
       <!-- 表格，这里用tableLayout=fixed使之非弹性 -->
       <a-table tableLayout="fixed" :columns="columns" :data-source="attackInfo" :pagination="pagination" @change="(...args) => handleTableChange(...args)">
         <template #bodyCell="{column,record}">
+          <template v-if="column.dataIndex === 'attackMethodDesc'">
+            <div class="attack-method-desc">
+              <p>{{record.attackMethodDesc}}</p>
+              <a-button type="link">修改</a-button>
+            </div>
+          </template>
           <template v-if="column.dataIndex === 'operation'">
             <NodeBinding></NodeBinding>
             <a @click="showDetails(record)"> 详情</a>
@@ -88,7 +100,7 @@ export default defineComponent({
       {
         title: '简介',
         dataIndex: 'attackMethodDesc',
-        width: '20%',
+        width: '28%',
       },
       {
         title: '参考论文',
@@ -152,6 +164,9 @@ export default defineComponent({
     const editable = ref(false);
     const initAtkDetails = ref('');
     const editAtkInfo = (attackMethodDetails) => {
+      if (attackMethodDetails == null) {
+        attackMethodDetails = '';
+      }
       initAtkDetails.value = attackMethodDetails;
       editable.value = true;
     };

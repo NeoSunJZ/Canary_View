@@ -19,18 +19,18 @@
 
     <template v-slot:content>
       <h2 class="title">模型绑定</h2>
-      <AddAtkMethodForm @addAtkInfoSucceed="addAtkInfoSucceed"></AddAtkMethodForm>
-      <!-- 表格，这里用tableLayout=fixed使之非弹性 -->
-      <a-table tableLayout="fixed" :columns="columns" :data-source="attackInfo" :pagination="pagination" @change="(...args) => handleTableChange(...args)">
+      <!-- <AddAtkMethodForm @addAtkInfoSucceed="addAtkInfoSucceed"></AddAtkMethodForm> -->
+
+      <a-table tableLayout="fixed" :columns="columns" :data-source="modelInfo" :pagination="pagination" @change="(...args) => handleTableChange(...args)">
         <template #bodyCell="{column,record}">
           <template v-if="column.dataIndex === 'operation'">
             <NodeBinding></NodeBinding>
             <a @click="showDetails(record)"> 详情</a>
             <a> 删除</a>
           </template>
-          <template v-if="column.dataIndex === 'attackMethodPaper'">
+          <template v-if="column.dataIndex === 'modelPaper'">
             <div class="attack-method-paper">
-              <a :href="record.attackMethodPaperUrl" target="_blank">{{record.attackMethodPaper}}</a>
+              <a :href="record.modelPaperUrl" target="_blank">{{record.modelPaper}}</a>
               <UpdatePaperForm :methodSelected="record" @updatePaper="updatePaper"></UpdatePaperForm>
             </div>
           </template>
@@ -42,10 +42,10 @@
       </a-table>
 
       <!-- 右侧详情栏 -->
-      <a-drawer title="方法详情" placement="right" :visible="methodDetailsVisible" :get-container="false" width="30%" :style="{ position: 'fixed'}"
-        @close="methodDetailsVisible = false">
-        <a @click="editAtkInfo(methodSelected.attackMethodDetails)"> 编辑</a>
-        <p v-html="methodSelected.attackMethodDetails"></p>
+      <a-drawer title="方法详情" placement="right" :visible="modelDetailsVisible" :get-container="false" width="30%" :style="{ position: 'fixed'}"
+        @close="modelDetailsVisible = false">
+        <a @click="editAtkInfo(methodSelected.modelDetails)"> 编辑</a>
+        <p v-html="methodSelected.modelDetails"></p>
       </a-drawer>
 
       <!-- 修改详情 -->
@@ -57,12 +57,11 @@
 </template>
 
 <script>
-import { getAtkInfo, updateAtkMethod } from '@/api/atk-api/atkInfo';
+import { getModelInfo, getModelProvider } from '@/api/model-api/modelInfo';
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import tinyEditor from '@/components/TinyEditor.vue';
 import SubMenu from '@/views/node-manage/components/SubMenu.vue';
-import AttackDetails from '@/views/test-manage/TestTaskConstruction/components/attack/AttackDetails.vue';
 import AddAtkMethodForm from '@/views/node-manage/components/AddAtkMethodForm.vue';
 import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
 import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
@@ -70,29 +69,29 @@ import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddAtkMethodForm, UpdatePaperForm, NodeBinding },
+  components: { MainPageNavigation, tinyEditor, SubMenu, AddAtkMethodForm, UpdatePaperForm, NodeBinding },
 
   setup() {
     // 主表格列名
     const columns = [
       {
-        title: '方法',
-        dataIndex: 'attackMethodName',
+        title: '模型',
+        dataIndex: 'modelName',
         width: '15%',
       },
       {
         title: '类别',
-        dataIndex: ['attackMethodType', 'attackMethodTypeName'],
+        dataIndex: ['modelType', 'modelTypeName'],
         width: '15%',
       },
       {
         title: '简介',
-        dataIndex: 'attackMethodDesc',
+        dataIndex: 'modelDesc',
         width: '20%',
       },
       {
         title: '参考论文',
-        dataIndex: 'attackMethodPaper',
+        dataIndex: 'modelPaper',
       },
       {
         title: '操作',
@@ -102,7 +101,7 @@ export default defineComponent({
     ];
 
     // 获取的全部攻击方法信息，用作表格数据源
-    const attackInfo = ref([]);
+    const modelInfo = ref([]);
     const totalAtkInfo = ref(0);
     const currentPage = ref(1);
     const pageSize = ref(5);
@@ -117,10 +116,10 @@ export default defineComponent({
 
     // 获取攻击方法信息
     const getAttackInfo = async () => {
-      const atkInfo = await getAtkInfo(currentPage.value, pageSize.value);
-      attackInfo.value = [];
-      attackInfo.value = attackInfo.value.concat(atkInfo.list);
-      attackInfo.value.forEach((element, index) => {
+      const atkInfo = await getModelInfo(currentPage.value, pageSize.value);
+      modelInfo.value = [];
+      modelInfo.value = modelInfo.value.concat(atkInfo.list);
+      modelInfo.value.forEach((element, index) => {
         element.key = index;
       });
       totalAtkInfo.value = atkInfo.total;
@@ -141,18 +140,18 @@ export default defineComponent({
     };
 
     const methodSelected = ref('');
-    const methodDetailsVisible = ref(false);
+    const modelDetailsVisible = ref(false);
     // 显示某方法详情
     const showDetails = (attackMethod) => {
       methodSelected.value = attackMethod;
-      methodDetailsVisible.value = true;
+      modelDetailsVisible.value = true;
     };
 
     // 是否编辑详情的弹出框可见
     const editable = ref(false);
     const initAtkDetails = ref('');
-    const editAtkInfo = (attackMethodDetails) => {
-      initAtkDetails.value = attackMethodDetails;
+    const editAtkInfo = (modelDetails) => {
+      initAtkDetails.value = modelDetails;
       editable.value = true;
     };
 
@@ -160,22 +159,22 @@ export default defineComponent({
 
     // 保存某一方法详情的修改
     const saveAtkDetails = async () => {
-      let success = await updateAtkMethod(
-        methodSelected.value.attackMethodID,
-        methodSelected.value.attackMethodName,
-        methodSelected.value.attackMethodDesc,
-        newDetails.value,
-        methodSelected.value.attackMethodPaper,
-        methodSelected.value.attackMethodPaperUrl,
-        methodSelected.value.attackMethodTypeID
-      );
-      editable.value = false;
-      methodSelected.value.attackMethodDetails = newDetails.value;
+      // let success = await updateAtkMethod(
+      //   methodSelected.value.attackMethodID,
+      //   methodSelected.value.attackMethodName,
+      //   methodSelected.value.attackMethodDesc,
+      //   newDetails.value,
+      //   methodSelected.value.modelPaper,
+      //   methodSelected.value.modelPaperUrl,
+      //   methodSelected.value.attackMethodTypeID
+      // );
+      // editable.value = false;
+      // methodSelected.value.modelDetails = newDetails.value;
     };
 
     const updatePaper = (key, newPaper) => {
-      attackInfo.value[key].attackMethodPaper = newPaper.paper;
-      attackInfo.value[key].attackMethodPaperUrl = newPaper.url;
+      modelInfo.value[key].modelPaper = newPaper.paper;
+      modelInfo.value[key].modelPaperUrl = newPaper.url;
     };
 
     // 拉取攻击信息
@@ -196,13 +195,13 @@ export default defineComponent({
       editable,
       initAtkDetails,
       editAtkInfo,
-      methodDetailsVisible,
+      modelDetailsVisible,
       methodSelected,
       newDetails,
       addAtkInfoSucceed,
       showDetails,
       updatePaper,
-      attackInfo,
+      modelInfo,
       pageSize,
       totalAtkInfo,
       currentPage,
