@@ -7,7 +7,7 @@
       <a-breadcrumb-item>防御方法绑定</a-breadcrumb-item>
     </template>
     <template v-slot:content>
-      <p>防御方法绑定页面</p>
+      <h2 class="title">防御方法绑定</h2>
     </template>
   </MainPageNavigation>
 </template>

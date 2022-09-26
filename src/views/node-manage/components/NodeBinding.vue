@@ -8,7 +8,7 @@
   }
   &__select {
     width: 100%;
-    margin-bottom: 200px;
+    margin-bottom: 280px;
   }
 }
 </style>
@@ -20,9 +20,9 @@
     <a-select v-model:value="value" mode="multiple" class="model__select" placeholder="Please select" @change="handleChange"
       :options="[...Array(25)].map((_, i) => ({ value: (i + 10).toString(36) + (i + 1) }))"></a-select>
     <div>
-      <a-button type="primary">确定</a-button>
-      <a-button>清空</a-button>
-      <a-button>取消</a-button>
+      <a-button type="primary" html-type="submit" @click="nodeBinding">确定</a-button>
+      <a-button style="margin-left: 10px" @click="resetSelect">清空</a-button>
+      <a-button style="margin-left: 10px" @click="addNodeVisiable=false">取消</a-button>
     </div>
 
   </a-modal>
@@ -39,14 +39,25 @@ export default defineComponent({
   setup(props, context) {
     const addNodeVisiable = ref(false);
     const value = ref([]);
+
+    const resetSelect = () => {
+      value.value = [];
+    };
+
     const handleChange = (value) => {
       console.log(`selected ${value}`);
+    };
+
+    const nodeBinding = () => {
+      context.emit('nodeList', value.value);
     };
 
     return {
       addNodeVisiable,
       handleChange,
       value,
+      resetSelect,
+      nodeBinding,
     };
   },
 });
