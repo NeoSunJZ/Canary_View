@@ -22,7 +22,7 @@
             <a> 删除</a>
           </template>
           <template v-if="column.dataIndex === 'datasetDesc'">
-            <div style="overflow:scroll;height:100px">{{record.datasetDesc}}</div>
+            <div style="overflow:scroll;height:150px">{{record.datasetDesc}}</div>
           </template>
         </template>
         <!-- 附加子表 -->
