@@ -8,6 +8,16 @@
   justify-content: space-between;
   align-items: center;
 }
+.model-desc {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  &__details {
+    overflow: auto;
+    height: 70px;
+  }
+}
 </style>
 
 <template>
@@ -32,6 +42,12 @@
             <div class="attack-method-paper">
               <a :href="record.modelPaperUrl" target="_blank">{{record.modelPaper}}</a>
               <UpdatePaperForm :methodSelected="record" @updatePaper="updatePaper"></UpdatePaperForm>
+            </div>
+          </template>
+          <template v-if="column.dataIndex === 'modelDesc'">
+            <div class="model-desc">
+              <p class="model-desc__details">{{record.modelDesc}}</p>
+              <a-button type="link">修改</a-button>
             </div>
           </template>
         </template>
@@ -77,17 +93,17 @@ export default defineComponent({
       {
         title: '模型',
         dataIndex: 'modelName',
-        width: '15%',
+        width: '12%',
       },
       {
         title: '类别',
         dataIndex: ['modelType', 'modelTypeName'],
-        width: '15%',
+        width: '12%',
       },
       {
         title: '简介',
         dataIndex: 'modelDesc',
-        width: '20%',
+        width: '30%',
       },
       {
         title: '参考论文',

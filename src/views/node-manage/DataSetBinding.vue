@@ -2,6 +2,16 @@
 .title {
   margin-bottom: 15px;
 }
+.dataset-desc {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  &__details {
+    overflow: auto;
+    height: 70px;
+  }
+}
 </style>
 
 <template>
@@ -22,7 +32,11 @@
             <a> 删除</a>
           </template>
           <template v-if="column.dataIndex === 'datasetDesc'">
-            <div style="overflow:auto;height:70px">{{record.datasetDesc}}</div>
+            <div class="dataset-desc">
+              <p class="dataset-desc__details">{{record.datasetDesc}}</p>
+              <a-button type="link">修改</a-button>
+            </div>
+
           </template>
         </template>
         <!-- 附加子表 -->

@@ -13,6 +13,10 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  &__details {
+    overflow: auto;
+    height: 70px;
+  }
 }
 </style>
 
@@ -31,8 +35,8 @@
         <template #bodyCell="{column,record}">
           <template v-if="column.dataIndex === 'attackMethodDesc'">
             <div class="attack-method-desc">
-              <p>{{record.attackMethodDesc}}</p>
-              <a-button type="link">修改</a-button>
+              <p class="attack-method-desc__details">{{record.attackMethodDesc}}</p>
+              <UpdateDesc :oldDesc="record.attackMethodDesc" @newDesc="newDesc" @changeDesc="changeDesc(record)"></UpdateDesc>
             </div>
           </template>
           <template v-if="column.dataIndex === 'operation'">
@@ -78,11 +82,12 @@ import AttackDetails from '@/views/test-manage/TestTaskConstruction/components/a
 import AddAtkMethodForm from '@/views/node-manage/components/AddAtkMethodForm.vue';
 import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
 import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
+import UpdateDesc from '@/views/node-manage/components/UpdateDesc.vue';
 
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddAtkMethodForm, UpdatePaperForm, NodeBinding },
+  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddAtkMethodForm, UpdatePaperForm, UpdateDesc, NodeBinding },
 
   setup() {
     // 主表格列名
@@ -206,6 +211,26 @@ export default defineComponent({
 
     const addNodeVisiable = ref(false);
 
+    const descTemp = ref('');
+
+    const newDesc = (newDesc) => {
+      descTemp.value = newDesc;
+    };
+
+    const changeDesc = async (record) => {
+      let success = await updateAtkMethod(
+        record.attackMethodID,
+        record.attackMethodName,
+        descTemp.value,
+        record.attackMethodDetails,
+        record.attackMethodPaper,
+        record.attackMethodPaperUrl,
+        record.attackMethodTypeID
+      );
+      attackInfo.value[record.key].attackMethodDesc = descTemp.value;
+      descTemp.value = '';
+    };
+
     return {
       columns,
       editable,
@@ -214,6 +239,9 @@ export default defineComponent({
       methodDetailsVisible,
       methodSelected,
       newDetails,
+      descTemp,
+      newDesc,
+      changeDesc,
       addAtkInfoSucceed,
       showDetails,
       updatePaper,
