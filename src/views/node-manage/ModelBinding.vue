@@ -29,7 +29,7 @@
 
     <template v-slot:content>
       <h2 class="title">模型绑定</h2>
-      <!-- <AddAtkMethodForm @addAtkInfoSucceed="addAtkInfoSucceed"></AddAtkMethodForm> -->
+      <AddModelForm @addAtkInfoSucceed="addAtkInfoSucceed"></AddModelForm>
 
       <a-table tableLayout="fixed" :columns="columns" :data-source="modelInfo" :pagination="pagination" @change="(...args) => handleTableChange(...args)">
         <template #bodyCell="{column,record}">
@@ -78,14 +78,14 @@ import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import tinyEditor from '@/components/TinyEditor.vue';
 import SubMenu from '@/views/node-manage/components/SubMenu.vue';
-import AddAtkMethodForm from '@/views/node-manage/components/AddAtkMethodForm.vue';
+import AddModelForm from '@/views/node-manage/components/AddModelForm.vue';
 import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
 import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
 
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AddAtkMethodForm, UpdatePaperForm, NodeBinding },
+  components: { MainPageNavigation, tinyEditor, SubMenu, AddModelForm, UpdatePaperForm, NodeBinding },
 
   setup() {
     // 主表格列名

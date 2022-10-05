@@ -1,11 +1,11 @@
 <style lang="less" scoped>
-.add-attack-method-button {
+.add-dataset-button {
   margin-bottom: 10px;
 }
 </style>
 
 <template>
-  <a-button class="add-attack-method-button" type="primary" @click="addDatasetFormVisiable = true">新增数据集</a-button>
+  <a-button class="add-dataset-button" type="primary" @click="addDatasetFormVisiable = true">新增数据集</a-button>
   <a-modal v-model:visible="addDatasetFormVisiable" :footer="false" :closable='false' :width="600" :bodyStyle="{height:'500px' ,overflow:'scroll'}">
     <h2>新增数据集</h2>
     <a-divider />
