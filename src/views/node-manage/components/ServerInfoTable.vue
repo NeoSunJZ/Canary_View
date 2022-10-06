@@ -82,7 +82,7 @@
   <AddNodeForm @nodeInfo="getInfo"></AddNodeForm>
 
   <!-- 节点表 -->
-  <a-table bordered :data-source="dataSource" :columns="columns" size="small">
+  <a-table bordered :data-source="dataSource" :columns="columns" :pagination="pagination" @change="(...args) => handleTableChange(...args)" size="small">
     <!-- record是每一行数据的副本 -->
     <template #bodyCell="{ column, text, record }">
 
@@ -179,8 +179,8 @@ export default defineComponent({
   setup() {
     const getInfo = async (nodeInfo) => {
       // 新增节点了直接刷新
-      const data = await getNodeInfo(1, 10);
-      data.list.forEach((element, index) => {
+      const data = await getNodeInfo();
+      data.forEach((element, index) => {
         dataSource.value[index] = {
           key: element.nodeID,
           index: index + 1,
@@ -192,6 +192,7 @@ export default defineComponent({
           status: 'unknown',
         };
       });
+      totalNodeInfo.value = data.length;
     };
 
     // 表格显示的每一列的标题等属性
@@ -232,6 +233,22 @@ export default defineComponent({
       },
     ];
 
+    const totalNodeInfo = ref(0);
+    const currentPage = ref(1);
+    const pageSize = ref(10);
+    const pagination = computed(() => {
+      return {
+        total: totalNodeInfo.value,
+        current: currentPage.value,
+        pageSize: pageSize.value,
+      };
+    });
+
+    // 换页面
+    const handleTableChange = (newPagination, filters, sorter) => {
+      currentPage.value = newPagination.current;
+    };
+
     // 显示的数据源
     const dataSource = ref([]);
 
@@ -269,8 +286,8 @@ export default defineComponent({
     };
 
     onBeforeMount(async () => {
-      const data = await getNodeInfo(1, 10);
-      data.list.forEach((element, index) => {
+      const data = await getNodeInfo();
+      data.forEach((element, index) => {
         dataSource.value[index] = {
           key: element.nodeID,
           index: index + 1,
@@ -282,6 +299,7 @@ export default defineComponent({
           status: 'unknown',
         };
       });
+      totalNodeInfo.value = data.length;
     });
     return {
       getInfo,
@@ -290,6 +308,11 @@ export default defineComponent({
       dataSource,
       editableData,
       editableElement,
+      totalNodeInfo,
+      currentPage,
+      pageSize,
+      pagination,
+      handleTableChange,
       edit,
       save,
     };

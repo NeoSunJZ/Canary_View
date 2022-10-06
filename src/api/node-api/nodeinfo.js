@@ -7,33 +7,14 @@ import Qs from 'qs'
  * @param {Number} pageSize 默认 2
  * @return 返回一个包含服务器节点信息的对象
  */
-export async function getNodeInfo(pageNum, pageSize = 2) {
+export async function getNodeInfo() {
     let data = null;
     await axiosPlugin({
         method: "get",
         url: "v2/resource/NodeInfo/getNodeInfo",
         params: {
-            pageNum: pageNum,
-            pageSize: pageSize,
+            //
         },
-    }).then((response) => {
-        if (response.data.state === "SUCCESS") {
-            data = response.data.msg;
-        }
-    });
-    return data;
-}
-
-/**
- * @description: 用于请求返回服务器节点信息
- * @return 返回一个包含所有服务器节点信息的对象
- */
-export async function getAllNodeInfo() {
-    let data = null;
-    await axiosPlugin({
-        method: "get",
-        url: "v2/resource/NodeInfo/getAllNodeInfo",
-        params: {},
     }).then((response) => {
         if (response.data.state === "SUCCESS") {
             data = response.data.msg;

@@ -93,7 +93,7 @@ export default defineComponent({
 
     const checkType = async (_rule, value) => {
       if (value == undefined) {
-        return Promise.reject('请选择类型！');
+        return Promise.reject('请选择类型!');
       }
     };
 
