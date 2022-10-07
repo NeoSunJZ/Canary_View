@@ -43,7 +43,7 @@
         </template>
         <!-- 附加子表 -->
         <template #expandedRowRender="{record}">
-          <SubMenu :attackMethodID="record.datasetID"></SubMenu>
+          <DatasetBindSubMenu :attackMethodID="record.datasetID"></DatasetBindSubMenu>
         </template>
       </a-table>
 
@@ -56,7 +56,7 @@ import { getDatasetInfo, updateDatasetInfo, deleteDatasetInfo } from '@/api/data
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import tinyEditor from '@/components/TinyEditor.vue';
-import SubMenu from '@/views/node-manage/components/SubMenu.vue';
+import DatasetBindSubMenu from '@/views/node-manage/components/DatasetBindSubMenu.vue';
 import AttackDetails from '@/views/test-manage/TestTaskConstruction/components/attack/AttackDetails.vue';
 import AddDatasetForm from '@/views/node-manage/components/AddDatasetForm.vue';
 import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
@@ -66,7 +66,7 @@ import UpdateDesc from '@/views/node-manage/components/UpdateDesc.vue';
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddDatasetForm, UpdatePaperForm, NodeBinding, UpdateDesc },
+  components: { MainPageNavigation, tinyEditor, DatasetBindSubMenu, AttackDetails, AddDatasetForm, UpdatePaperForm, NodeBinding, UpdateDesc },
 
   setup() {
     // 主表格列名

@@ -55,7 +55,7 @@
         </template>
         <!-- 附加子表 -->
         <template #expandedRowRender="{record}">
-          <SubMenu :attackMethodID="record.attackMethodID" :refreshSubmenu="refreshSubmenu"></SubMenu>
+          <AtkBindSubMenu :attackMethodID="record.attackMethodID" :refreshSubmenu="refreshSubmenu"></AtkBindSubMenu>
         </template>
       </a-table>
 
@@ -79,7 +79,7 @@ import { getAtkInfo, updateAtkMethod, addAtkMethodProvider, deleteAtkMethod } fr
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import tinyEditor from '@/components/TinyEditor.vue';
-import SubMenu from '@/views/node-manage/components/SubMenu.vue';
+import AtkBindSubMenu from '@/views/node-manage/components/AtkBindSubMenu.vue';
 import AttackDetails from '@/views/test-manage/TestTaskConstruction/components/attack/AttackDetails.vue';
 import AddAtkMethodForm from '@/views/node-manage/components/AddAtkMethodForm.vue';
 import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
@@ -89,7 +89,7 @@ import UpdateDesc from '@/views/node-manage/components/UpdateDesc.vue';
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddAtkMethodForm, UpdatePaperForm, UpdateDesc, NodeBinding },
+  components: { MainPageNavigation, tinyEditor, AtkBindSubMenu, AttackDetails, AddAtkMethodForm, UpdatePaperForm, UpdateDesc, NodeBinding },
 
   setup() {
     // 主表格列名
@@ -238,9 +238,10 @@ export default defineComponent({
     const nodeBindingMsg = (nodeMsg) => {
       nodeMsgTemp.value = nodeMsg;
     };
-
+    const refreshSubmenu = ref(0);
     const nodeBinding = async (record) => {
       let success = await addAtkMethodProvider(record.attackMethodID, nodeMsgTemp.value.nodeID, nodeMsgTemp.value.methodSource, nodeMsgTemp.value.bindingName);
+      refreshSubmenu.value++;
     };
 
     const deleteAttackMethod = async (nodeID) => {
@@ -252,6 +253,7 @@ export default defineComponent({
       columns,
       editable,
       initAtkDetails,
+      refreshSubmenu,
       editAtkInfo,
       nodeMsgTemp,
       nodeBinding,

@@ -53,7 +53,7 @@
         </template>
         <!-- 附加子表 -->
         <template #expandedRowRender="{record}">
-          <SubMenu :attackMethodID="record.attackMethodID"></SubMenu>
+          <ModelBindSubMenu :attackMethodID="record.attackMethodID"></ModelBindSubMenu>
         </template>
       </a-table>
 
@@ -77,7 +77,7 @@ import { getModelInfo, getModelProvider } from '@/api/model-api/modelInfo';
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import tinyEditor from '@/components/TinyEditor.vue';
-import SubMenu from '@/views/node-manage/components/SubMenu.vue';
+import ModelBindSubMenu from '@/views/node-manage/components/ModelBindSubMenu.vue';
 import AddModelForm from '@/views/node-manage/components/AddModelForm.vue';
 import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
 import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
@@ -86,7 +86,7 @@ import UpdateDesc from '@/views/node-manage/components/UpdateDesc.vue';
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AddModelForm, UpdatePaperForm, NodeBinding, UpdateDesc },
+  components: { MainPageNavigation, tinyEditor, ModelBindSubMenu, AddModelForm, UpdatePaperForm, NodeBinding, UpdateDesc },
 
   setup() {
     // 主表格列名

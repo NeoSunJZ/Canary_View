@@ -92,7 +92,7 @@ import { DeploymentUnitOutlined, ClusterOutlined, CheckOutlined, EditOutlined, S
 import { cloneDeep } from 'lodash-es';
 
 export default defineComponent({
-  name: 'SubMenu',
+  name: 'AtkBindSubMenu',
   components: {
     DeploymentUnitOutlined,
     ClusterOutlined,
