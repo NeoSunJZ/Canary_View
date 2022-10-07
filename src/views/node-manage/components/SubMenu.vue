@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { defineComponent, onBeforeMount, ref, reactive } from 'vue';
+import { defineComponent, onBeforeMount, ref, reactive, computed } from 'vue';
 import { getAtkProvider, updateAtkMethodProvider, deleteAtkMethodProvider } from '@/api/atk-api/atkInfo';
 import { DeploymentUnitOutlined, ClusterOutlined, CheckOutlined, EditOutlined, SyncOutlined } from '@ant-design/icons-vue';
 import { cloneDeep } from 'lodash-es';
@@ -104,6 +104,9 @@ export default defineComponent({
     attackMethodID: {
       type: Number,
       default: -1,
+    },
+    refreshSubmenu: {
+      type: Boolean,
     },
   },
 

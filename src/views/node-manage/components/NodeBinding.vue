@@ -18,8 +18,9 @@
     <h2 class="model__title">新增节点</h2>
     <a-divider />
     <a-form :model="formState" v-bind="layout" ref="formRef" name="new-node-bind" :rules="rules" @finish="handleFinish" @finishFailed="handleFinishFailed">
-      <a-form-item has-feedback name="nodeValue" label="节点名">
-        <a-select v-model:value="formState.nodeValue" class="model__select" placeholder="请选择" @change="handleChange" :options="dataSource" showSearch />
+      <a-form-item has-feedback name="nodeID" label="节点名">
+        <a-select v-model:value="formState.nodeID" class="model__select" placeholder="请选择" @change="handleChange" :field-names="{ label: 'value', value: 'id'}"
+          :options="dataSource" showSearch />
       </a-form-item>
       <a-form-item has-feedback name="methodSource" label="方法源">
         <a-input v-model:value="formState.methodSource" />
@@ -46,11 +47,11 @@ export default defineComponent({
   name: 'NodeBinding',
   components: {},
   props: {},
-  emits: ['nodeBindingMsg'],
+  emits: ['nodeBindingMsg', 'nodeBinding'],
   setup(props, context) {
     const formRef = ref();
     const formState = reactive({
-      nodeValue: '',
+      nodeID: '',
       methodSource: '',
       bindingName: '',
     });
@@ -80,7 +81,7 @@ export default defineComponent({
     };
 
     const rules = {
-      nodeValue: [
+      nodeID: [
         {
           required: true,
           validator: checkNodeValue,
@@ -116,8 +117,11 @@ export default defineComponent({
     const dataSource = ref([]);
 
     const handleFinish = (value) => {
-      console.log(value);
+      // console.log(value);
       context.emit('nodeBindingMsg', value);
+      context.emit('nodeBinding');
+      addNodeVisiable.value = false;
+      resetForm();
     };
 
     const handleFinishFailed = (errors) => {
@@ -127,7 +131,7 @@ export default defineComponent({
     onBeforeMount(async () => {
       const data = await getNodeInfo();
       data.forEach((element, index) => {
-        dataSource.value.push({ value: element.nodeName + ' ' + element.host + ':' + element.port, disabled: false });
+        dataSource.value.push({ id: element.nodeID, value: element.nodeName + ' ' + element.host + ':' + element.port, disabled: false });
       });
     });
 

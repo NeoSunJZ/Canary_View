@@ -203,3 +203,25 @@ export async function updateAtkMethod(attackMethodID, attackMethodName, attackMe
   });
   return data;
 }
+
+
+/**
+ * @description: 用于请求对应服务器软删除对应方法
+ * @param {Number} attackMethodID   攻击方法ID(主键)
+ * @return 返回是否成功
+ */
+export async function deleteAtkMethod(attackMethodID) {
+  let data = null;
+  await axiosPlugin({
+    method: "post",
+    url: "v2/resource/atkInfo/deleteAttackMethod",
+    data: Qs.stringify({
+      attackMethodID: attackMethodID,
+    }),
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = 'success'
+    }
+  });
+  return data;
+}
