@@ -23,18 +23,20 @@
 
     <template v-slot:content>
       <h2 class="title">数据集绑定</h2>
-      <AddDatasetForm @addAtkInfoSucceed="addAtkInfoSucceed"></AddDatasetForm>
+      <AddDatasetForm @addDatasetSucceed="addDatasetSucceed"></AddDatasetForm>
       <!-- 表格，这里用tableLayout=fixed使之非弹性 -->
       <a-table tableLayout="fixed" :columns="columns" :data-source="datasetInfo" :pagination="pagination" @change="(...args) => handleTableChange(...args)">
         <template #bodyCell="{column,record}">
           <template v-if="column.dataIndex === 'operation'">
             <NodeBinding></NodeBinding>
-            <a> 删除</a>
+            <a-popconfirm title="确认删除?" okText="确定" cancelText="取消" @confirm="deleteDataset(record.datasetID)">
+              <a> 删除</a>
+            </a-popconfirm>
           </template>
           <template v-if="column.dataIndex === 'datasetDesc'">
             <div class="dataset-desc">
               <p class="dataset-desc__details">{{record.datasetDesc}}</p>
-              <a-button type="link">修改</a-button>
+              <UpdateDesc :oldDesc="record.datasetDesc" @newDesc="newDesc" @changeDesc="changeDesc(record)"></UpdateDesc>
             </div>
 
           </template>
@@ -50,7 +52,7 @@
 </template>
 
 <script>
-import { getDatasetInfo } from '@/api/dataset-api/datasetInfo';
+import { getDatasetInfo, updateDatasetInfo, deleteDatasetInfo } from '@/api/dataset-api/datasetInfo';
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import tinyEditor from '@/components/TinyEditor.vue';
@@ -59,11 +61,12 @@ import AttackDetails from '@/views/test-manage/TestTaskConstruction/components/a
 import AddDatasetForm from '@/views/node-manage/components/AddDatasetForm.vue';
 import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
 import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
+import UpdateDesc from '@/views/node-manage/components/UpdateDesc.vue';
 
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddDatasetForm, UpdatePaperForm, NodeBinding },
+  components: { MainPageNavigation, tinyEditor, SubMenu, AttackDetails, AddDatasetForm, UpdatePaperForm, NodeBinding, UpdateDesc },
 
   setup() {
     // 主表格列名
@@ -119,8 +122,8 @@ export default defineComponent({
       totalAtkInfo.value = dataInfo.total;
     };
 
-    const addAtkInfoSucceed = (value) => {
-      getDataSetInfo();
+    const addDatasetSucceed = async (value) => {
+      await getDataSetInfo();
     };
 
     const loadMoreAttackMethodInfo = async () => {
@@ -164,15 +167,35 @@ export default defineComponent({
 
     const addNodeVisiable = ref(false);
 
+    const deleteDataset = async (datasetID) => {
+      let success = await deleteDatasetInfo(datasetID);
+      await getDataSetInfo();
+    };
+
+    const descTemp = ref('');
+
+    const newDesc = (newDesc) => {
+      descTemp.value = newDesc;
+    };
+
+    const changeDesc = async (record) => {
+      let success = await updateDatasetInfo(record.datasetID, record.datasetName, descTemp.value, record.datasetWebsite, record.datasetClassNumber);
+      datasetInfo.value[record.key].datasetDesc = descTemp.value;
+      descTemp.value = '';
+    };
+
     return {
       columns,
       editable,
       initAtkDetails,
       editAtkInfo,
+      descTemp,
+      newDesc,
+      changeDesc,
       methodDetailsVisible,
       methodSelected,
       newDetails,
-      addAtkInfoSucceed,
+      addDatasetSucceed,
       showDetails,
       datasetInfo,
       pageSize,
@@ -182,6 +205,7 @@ export default defineComponent({
       handleTableChange,
       updateValue,
       addNodeVisiable,
+      deleteDataset,
     };
   },
 });

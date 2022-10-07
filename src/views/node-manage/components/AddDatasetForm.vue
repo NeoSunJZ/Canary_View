@@ -36,11 +36,12 @@
 
 <script>
 import { defineComponent, reactive, ref } from 'vue';
-import { addAtkMethod } from '@/api/atk-api/atkInfo';
+import { addDatasetInfo, updateDatasetInfo } from '@/api/dataset-api/datasetInfo';
 
 export default defineComponent({
   name: 'AddDatasetForm',
   props: {},
+  emits: ['addDatasetSucceed'],
   setup(props, context) {
     const addDatasetFormVisiable = ref(false);
     const formRef = ref();
@@ -87,15 +88,16 @@ export default defineComponent({
       ],
       classNumber: [
         {
+          required: true,
           validator: checkNumber,
           trigger: 'change',
         },
       ],
     };
     const handleFinish = async (value) => {
-      //   let success = await addAtkMethod(value.name, value.introduction, value.details, value.paper, value.paperUrl, value.type);
-      //   addDatasetFormVisiable.value = false;
-      //   context.emit('addAtkInfoSucceed', value);
+      let success = await addDatasetInfo(value.name, value.website, value.introduction, value.classNumber);
+      addDatasetFormVisiable.value = false;
+      context.emit('addDatasetSucceed', value);
     };
 
     const resetForm = () => {

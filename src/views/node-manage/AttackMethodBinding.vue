@@ -43,7 +43,7 @@
             <NodeBinding @nodeBindingMsg="nodeBindingMsg" @nodeBinding="nodeBinding(record)"></NodeBinding>
             <a @click="showDetails(record)"> 详情</a>
             <a-popconfirm title="确认删除?" okText="确定" cancelText="取消" @confirm="deleteAttackMethod(record.attackMethodID)">
-              <a @click="showDeletePop=true"> 删除</a>
+              <a> 删除</a>
             </a-popconfirm>
           </template>
           <template v-if="column.dataIndex === 'attackMethodPaper'">
@@ -243,7 +243,6 @@ export default defineComponent({
       let success = await addAtkMethodProvider(record.attackMethodID, nodeMsgTemp.value.nodeID, nodeMsgTemp.value.methodSource, nodeMsgTemp.value.bindingName);
     };
 
-    const showDeletePop = ref(false);
     const deleteAttackMethod = async (nodeID) => {
       let success = await deleteAtkMethod(nodeID);
       getAttackInfo();
@@ -255,7 +254,6 @@ export default defineComponent({
       initAtkDetails,
       editAtkInfo,
       nodeMsgTemp,
-      showDeletePop,
       nodeBinding,
       nodeBindingMsg,
       methodDetailsVisible,

@@ -47,7 +47,7 @@
           <template v-if="column.dataIndex === 'modelDesc'">
             <div class="model-desc">
               <p class="model-desc__details">{{record.modelDesc}}</p>
-              <a-button type="link">修改</a-button>
+              <UpdateDesc :oldDesc="record.modelDesc" @newDesc="newDesc" @changeDesc="changeDesc(record)"></UpdateDesc>
             </div>
           </template>
         </template>
@@ -81,11 +81,12 @@ import SubMenu from '@/views/node-manage/components/SubMenu.vue';
 import AddModelForm from '@/views/node-manage/components/AddModelForm.vue';
 import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
 import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
+import UpdateDesc from '@/views/node-manage/components/UpdateDesc.vue';
 
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, SubMenu, AddModelForm, UpdatePaperForm, NodeBinding },
+  components: { MainPageNavigation, tinyEditor, SubMenu, AddModelForm, UpdatePaperForm, NodeBinding, UpdateDesc },
 
   setup() {
     // 主表格列名
@@ -188,6 +189,26 @@ export default defineComponent({
       // methodSelected.value.modelDetails = newDetails.value;
     };
 
+    const descTemp = ref('');
+
+    const newDesc = (newDesc) => {
+      descTemp.value = newDesc;
+    };
+
+    const changeDesc = async (record) => {
+      // let success = await updateAtkMethod(
+      //   record.attackMethodID,
+      //   record.attackMethodName,
+      //   descTemp.value,
+      //   record.attackMethodDetails,
+      //   record.attackMethodPaper,
+      //   record.attackMethodPaperUrl,
+      //   record.attackMethodTypeID
+      // );
+      // attackInfo.value[record.key].attackMethodDesc = descTemp.value;
+      // descTemp.value = '';
+    };
+
     const updatePaper = (key, newPaper) => {
       modelInfo.value[key].modelPaper = newPaper.paper;
       modelInfo.value[key].modelPaperUrl = newPaper.url;
@@ -209,6 +230,9 @@ export default defineComponent({
     return {
       columns,
       editable,
+      descTemp,
+      newDesc,
+      changeDesc,
       initAtkDetails,
       editAtkInfo,
       modelDetailsVisible,
