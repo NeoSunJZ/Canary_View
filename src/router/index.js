@@ -63,9 +63,19 @@ const routes = [{
     component: () => import("@/views/test-manage/TestTaskConsole/TaskConsole.vue")
   },
   {
-    path: "/ResultAnalysis",
-    name: "ResultAnalysis",
-    component: () => import("@/views/test-manage/ResultAnalysis.vue")
+    path: "/ResultAnalysisBoard",
+    name: "ResultAnalysisBoard",
+    component: () => import("@/views/test-manage/ResultAnalysis/ResultAnalysisBoard.vue")
+  },
+  {
+    path: "/ResultAnalysisBoard/Analysis/ModelViewResultAnalysis",
+    name: "ModelViewResultAnalysis",
+    component: () => import("@/views/test-manage/ResultAnalysis/analysis/ModelView.vue")
+  },
+  {
+    path: "/ResultAnalysisBoard/Analysis/ExplorePerturbationViewResultAnalysis",
+    name: "ExplorePerturbationViewResultAnalysis",
+    component: () => import("@/views/test-manage/ResultAnalysis/analysis/ExplorePerturbationView.vue")
   },
   {
     path: "/RankingList",

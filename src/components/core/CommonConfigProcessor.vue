@@ -28,9 +28,8 @@
       <SyncOutlined @click.stop="task(true)" class="processor__refresh" />
     </div>
 
-    <CommonConfigModel ref="configModel" v-if="declaration!=null" :title="configModelTitle" :field="{configID: field['configID']}"
-      :paramsDesc="declaration[field['paramsDesc']]" :providerID="providerID!=null?providerID:defaultProviderID" :providerType="providerType"
-      :getPresetConfig="getConfig" @submit="handleSubmit" @cancel="handleCancel">
+    <CommonConfigModel ref="configModel" v-if="declaration!=null" :title="configModelTitle" :field="{configID: field['configID']}" :paramsDesc="declaration[field['paramsDesc']]"
+      :providerID="providerID!=null?providerID:defaultProviderID" :providerType="providerType" :getPresetConfig="getConfig" @submit="handleSubmit" @cancel="handleCancel">
     </CommonConfigModel>
 
   </div>
@@ -155,14 +154,14 @@ export default defineComponent({
 
     const getDeclaration = async (bindInfos, currentServerDeclaration, providerID = null) => {
       if (bindInfos.length == 0) {
-        setNotice('该攻击方法在当前服务节点没有绑定', 'error');
+        setNotice('当前服务节点没有绑定', 'error');
         return [null, null];
       }
 
       let bindInfo = null;
       if (bindInfos.length > 1) {
         if (providerID == null) {
-          setNotice('该攻击方法在当前服务节点有多个绑定', 'warning');
+          setNotice('当前服务节点有多个绑定', 'warning');
           return [null, null];
         } else {
           bindInfo = getBindInfoByProviderID(bindInfos, providerID);
@@ -179,7 +178,7 @@ export default defineComponent({
         }
       });
       if (declaration == null) {
-        setNotice('当前服务节点未提供绑定的方法实现', 'error');
+        setNotice('当前服务节点未提供绑定的实现', 'error');
       }
       return [declaration, bindInfo[props.field['providerBindName']]];
     };

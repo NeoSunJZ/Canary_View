@@ -43,9 +43,7 @@
       </div>
 
       <a-menu theme="dark" mode="horizontal">
-        <a-menu-item key="1">关于我们</a-menu-item>
-        <a-menu-item key="2">nav 2</a-menu-item>
-        <a-menu-item key="3">nav 3</a-menu-item>
+        <a-menu-item key="1">关于系统</a-menu-item>
       </a-menu>
     </a-layout-header>
 
@@ -95,7 +93,7 @@
               <ExperimentOutlined />
             </template>
             <template #title>测试任务管理</template>
-            <a-menu-item key="6" @click="toPage('TestTaskConstruction/DefenseTest')">
+            <a-menu-item key="6" @click="toPage('TestTaskConstruction/AttackTest')">
               <template #icon>
                 <AppstoreAddOutlined />
               </template>
@@ -107,7 +105,7 @@
               </template>
               任务实时看板
             </a-menu-item>
-            <a-menu-item key="8" @click="toPage('ResultAnalysis')">
+            <a-menu-item key="8" @click="toPage('ResultAnalysisBoard')">
               <template #icon>
                 <FundOutlined />
               </template>

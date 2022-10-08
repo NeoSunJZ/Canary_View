@@ -38,3 +38,36 @@ export async function getTaskListByType(typeName, pageNum, pageSize = 10) {
   });
   return data;
 }
+
+export async function getTaskByTaskID(taskID) {
+  let data = null;
+  await axiosPlugin({
+    method: "get",
+    url: "v2/task/getTaskByTaskID",
+    params: {
+      taskID: taskID,
+    },
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = response.data.msg;
+    }
+  });
+  return data;
+}
+
+export async function setTaskStatus(taskID, batchToken) {
+  let data = null;
+  await axiosPlugin({
+    method: "get",
+    url: "v2/task/setTaskStatus",
+    params: {
+      taskID: taskID,
+      batchToken: batchToken
+    },
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = response.data.msg;
+    }
+  });
+  return data;
+}

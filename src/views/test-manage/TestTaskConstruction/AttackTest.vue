@@ -71,11 +71,7 @@
             <span class="attack-task__type-select__notice__title">最佳扰动限制估算</span> - 依据您指定的步长与范围，尝试所有可能的扰动配置并加以比较，估算出最佳的扰动限制配置（所选攻击方法须支持该操作）。
           </div>
           <div>
-            <span class="attack-task__type-select__notice__title">单一方法测评</span> - 将依据您指定的配置，对某一方法进行测试，并就其表现进行综合排序。该测试其他方法采取历史测评数据。
-          </div>
-          <div>
-            <span class="attack-task__type-select__notice__title">全量方法测评</span> - 将依据您指定的配置，对所有攻击方法进行测试，并就其表现进行综合排序。
-            <span class="attack-task__type-select__notice__warning">该测试不依赖历史测评数据，耗时极长。</span>
+            <span class="attack-task__type-select__notice__title">攻击方法测评</span> - 将依据您指定的配置，对一种或多种方法进行测试，并就其表现进行综合排序。
           </div>
           <br />
           <div>
@@ -99,7 +95,7 @@
           <ModelSelector ref="modelSelector" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration" v-show="current == 1">
           </ModelSelector>
           <AttackSelector ref="attackSelector" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration" :modelList="allConfig['model_list']"
-            v-show="current == 2">
+            v-show="current==2">
           </AttackSelector>
           <div v-if="current == 3">
             <TaskSubmit ref="taskSubmit" :config="allConfig" :currentServerInfo="currentServerInfo" :taskTypeID="attackType" v-show="current == 3"
@@ -162,7 +158,7 @@ export default defineComponent({
     const attackTypes = [
       {
         value: 1,
-        label: '生成对抗样本',
+        label: '攻击方法测评',
       },
     ];
 
@@ -216,7 +212,12 @@ export default defineComponent({
     };
     const submitAttack = () => {
       try {
-        [allConfig.value['attacker_list'], allConfig.value['attacker_config']] = attackSelector.value.submit();
+        [
+          allConfig.value['attacker_list'],
+          allConfig.value['transfer_attack_test_mode'],
+          allConfig.value['transfer_attack_test_on_model_list'],
+          allConfig.value['attacker_config'],
+        ] = attackSelector.value.submit();
         current.value++;
       } catch (error) {
         message.error(error.message);
