@@ -108,10 +108,10 @@ export default defineComponent({
 
     const handleOk = async () => {
       visible.value = !visible.value;
-      selectedServerIndex.value = newServerIndex.value
+      selectedServerIndex.value = newServerIndex.value;
 
-      console.log(newServerIndex.value)
-      
+      console.log(newServerIndex.value);
+
       await serverSelected(data.value[selectedServerIndex.value].host, data.value[selectedServerIndex.value].port);
     };
 
@@ -120,7 +120,7 @@ export default defineComponent({
        * 每次渲染前对默认节点做请求声明
        */
       const newData = await getNodeInfo(1, 10);
-      newData.list.forEach((element, index) => {
+      newData.forEach((element, index) => {
         data.value[index] = {
           nodeID: element.nodeID,
           index: index + 1,
@@ -133,7 +133,6 @@ export default defineComponent({
         };
       });
       await serverSelected(data.value[0].host, data.value[0].port);
-      
     });
 
     return {

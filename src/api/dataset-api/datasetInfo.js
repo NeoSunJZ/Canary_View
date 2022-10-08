@@ -1,4 +1,5 @@
 import axiosPlugin from '@/axiosPlugin.js'
+import Qs from 'qs'
 
 export async function getDatasetInfo(pageNum, pageSize = 10) {
   let data = null;
@@ -31,5 +32,60 @@ export async function getDatasetProvider(datasetID, nodeID = null) {
       data = response.data.msg;
     }
   });
+  return data;
+}
+
+export async function addDatasetInfo(datasetName, datasetDesc, datasetWebsite, datasetClassName) {
+  let data = null;
+  await axiosPlugin({
+    method: 'post',
+    url: "v2/resource/datasetInfo/addDatasetInfo",
+    data: Qs.stringify({
+      datasetName: datasetName,
+      datasetDesc: datasetDesc,
+      datasetWebsite: datasetWebsite,
+      datasetClassName: datasetClassName
+    }),
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = response.data.msg;
+    }
+  })
+  return data;
+}
+
+export async function updateDatasetInfo(datasetID, datasetName, datasetDesc, datasetWebsite, datasetClassName) {
+  let data = null;
+  await axiosPlugin({
+    method: 'post',
+    url: "v2/resource/datasetInfo/updateDatasetInfo",
+    data: Qs.stringify({
+      datasetID: datasetID,
+      datasetName: datasetName,
+      datasetDesc: datasetDesc,
+      datasetWebsite: datasetWebsite,
+      datasetClassName: datasetClassName
+    }),
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = response.data.msg;
+    }
+  })
+  return data;
+}
+
+export async function deleteDatasetInfo(datasetID) {
+  let data = null;
+  await axiosPlugin({
+    method: 'post',
+    url: "v2/resource/datasetInfo/deleteDatasetInfo",
+    data: Qs.stringify({
+      datasetID: datasetID,
+    }),
+  }).then((response) => {
+    if (response.data.state === "SUCCESS") {
+      data = response.data.msg;
+    }
+  })
   return data;
 }

@@ -1,3 +1,8 @@
+<!--
+ * @FileDescription: MyNode界面中的表格中的状态栏组件，同时可以刷新状态
+ * @Todo: 
+ -->
+
 <style lang="less" scoped>
 @import '~ant-design-vue/dist/antd.less';
 .state {
@@ -32,9 +37,9 @@
 
 <script>
 import { defineComponent, onBeforeMount, ref } from 'vue';
-import { getDeclarationOnly } from '@/api/framework-api/declaration';
+import { getDeclaration } from '@/api/framework-api/declaration';
 import { SyncOutlined } from '@ant-design/icons-vue';
-// import { notification } from 'ant-design-vue';
+
 export default defineComponent({
   name: 'StatusGrid',
   components: { SyncOutlined },
@@ -52,7 +57,7 @@ export default defineComponent({
   setup(props, context) {
     const NodeStatus = ref('running');
     const refresh = async () => {
-      let data = await getDeclarationOnly(props.ip, props.port);
+      let data = await getDeclaration(props.ip, props.port, null, false);
       if (data == null) {
         NodeStatus.value = 'stopping';
       } else {

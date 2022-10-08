@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, watch } from 'vue';
 import Editor from '@tinymce/tinymce-vue';
 
 export default defineComponent({
@@ -65,7 +65,9 @@ export default defineComponent({
         // favs: { title: 'My Favorites', items: 'code visualaid | searchreplace | emoticons' },
       },
       // 菜单栏
-      menubar: 'favs file edit view insert format tools table help',
+      menubar: 'edit view insert format tools table',
+      // menubar: 'favs file edit view insert format tools table help',
+
       // 去掉商标
       branding: false,
       // 默认风格
@@ -73,6 +75,7 @@ export default defineComponent({
       height: props.height,
       width: props.width,
     });
+
     return {
       initOptions,
       contentValue: computed({
