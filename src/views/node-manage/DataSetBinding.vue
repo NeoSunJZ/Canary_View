@@ -12,6 +12,15 @@
     height: 70px;
   }
 }
+.dataset-website {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.dataset-link {
+  word-break: break-all;
+}
 </style>
 
 <template>
@@ -33,17 +42,40 @@
               <a> 删除</a>
             </a-popconfirm>
           </template>
+
+          <template v-if="column.dataIndex === 'datasetWebsite'">
+            <div class="dataset-website">
+              <a class="dataset-link" :href="record.datasetWebsite" target="_blank">{{record.datasetWebsite}}</a>
+              <Poptip placement="left-start" width="400" v-model="changeWebVisible" @on-popper-show='showWebsite(record.datasetWebsite)'>
+                <template #content>
+                  <a-form :model="formState" v-bind="layout" name="new-paper-info" :rules="rules" @finish="handleFinish(record)"
+                    @finishFailed="handleFinishFailed">
+                    <a-form-item has-feedback name="website" label="网址" style="margin-bottom:1px">
+                      <a-input size="small" v-model:value="formState.website" />
+                    </a-form-item>
+                    <a-form-item :wrapper-col="{ span: 14, offset: 3 }" style="margin-bottom:1px">
+                      <a-button type="primary" size="small" html-type="submit">确定</a-button>
+                      <a-button style="margin-left: 10px" size="small" @click="formState.website=''">清空</a-button>
+                      <a-button style="margin-left: 10px" size="small" @click="changeWebVisible=false">取消</a-button>
+                    </a-form-item>
+                  </a-form>
+                </template>
+                <a-button type="link">修改</a-button>
+              </Poptip>
+            </div>
+          </template>
+
           <template v-if="column.dataIndex === 'datasetDesc'">
             <div class="dataset-desc">
               <p class="dataset-desc__details">{{record.datasetDesc}}</p>
-              <UpdateDesc :oldDesc="record.datasetDesc" @newDesc="newDesc" @changeDesc="changeDesc(record)"></UpdateDesc>
+              <UpdateDesc :oldDesc="record.datasetDesc" @newDesc="(...args)=>changeDesc(args,record)"></UpdateDesc>
             </div>
-
           </template>
+
         </template>
         <!-- 附加子表 -->
         <template #expandedRowRender="{record}">
-          <DatasetBindSubMenu :attackMethodID="record.datasetID"></DatasetBindSubMenu>
+          <DatasetBindSubMenu :datasetID="record.datasetID"></DatasetBindSubMenu>
         </template>
       </a-table>
 
@@ -54,19 +86,18 @@
 <script>
 import { getDatasetInfo, updateDatasetInfo, deleteDatasetInfo } from '@/api/dataset-api/datasetInfo';
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
-import { defineComponent, ref, onMounted, computed } from 'vue';
+import { defineComponent, ref, onMounted, computed, reactive } from 'vue';
 import tinyEditor from '@/components/TinyEditor.vue';
 import DatasetBindSubMenu from '@/views/node-manage/components/DatasetBindSubMenu.vue';
 import AttackDetails from '@/views/test-manage/TestTaskConstruction/components/attack/AttackDetails.vue';
 import AddDatasetForm from '@/views/node-manage/components/AddDatasetForm.vue';
-import UpdatePaperForm from '@/views/node-manage/components/UpdatePaperForm.vue';
 import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
 import UpdateDesc from '@/views/node-manage/components/UpdateDesc.vue';
 
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, DatasetBindSubMenu, AttackDetails, AddDatasetForm, UpdatePaperForm, NodeBinding, UpdateDesc },
+  components: { MainPageNavigation, tinyEditor, DatasetBindSubMenu, AttackDetails, AddDatasetForm, NodeBinding, UpdateDesc },
 
   setup() {
     // 主表格列名
@@ -172,25 +203,58 @@ export default defineComponent({
       await getDataSetInfo();
     };
 
-    const descTemp = ref('');
-
-    const newDesc = (newDesc) => {
-      descTemp.value = newDesc;
+    const changeDesc = async (args, record) => {
+      let success = await updateDatasetInfo(record.datasetID, record.datasetName, args[0], record.datasetWebsite, record.datasetClassNumber);
+      datasetInfo.value[record.key].datasetDesc = args[0];
     };
 
-    const changeDesc = async (record) => {
-      let success = await updateDatasetInfo(record.datasetID, record.datasetName, descTemp.value, record.datasetWebsite, record.datasetClassNumber);
-      datasetInfo.value[record.key].datasetDesc = descTemp.value;
-      descTemp.value = '';
+    const changeWebVisible = ref(false);
+
+    const formState = reactive({
+      website: '',
+    });
+
+    const showWebsite = (website) => {
+      formState.website = website;
+    };
+
+    const rules = {
+      //
+    };
+    // 提交表单且数据验证成功
+    const handleFinish = async (record) => {
+      console.log(record);
+      await updateDatasetInfo(record.datasetID, record.datasetName, record.datasetDesc, formState.website, record.datasetClassNumber);
+      datasetInfo.value[record.key].datasetWebsite = formState.website;
+      changeWebVisible.value = false;
+    };
+
+    // 提交表单且数据验证失败
+    const handleFinishFailed = (errors) => {
+      console.log(errors);
+    };
+
+    const layout = {
+      labelCol: {
+        span: 3,
+      },
+      wrapperCol: {
+        span: 21,
+      },
     };
 
     return {
+      layout,
+      rules,
+      formState,
+      handleFinish,
+      handleFinishFailed,
+      showWebsite,
+      changeWebVisible,
       columns,
       editable,
       initAtkDetails,
       editAtkInfo,
-      descTemp,
-      newDesc,
       changeDesc,
       methodDetailsVisible,
       methodSelected,

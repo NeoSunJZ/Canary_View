@@ -18,6 +18,9 @@
     height: 70px;
   }
 }
+.atk-method-link {
+  word-break: break-all;
+}
 </style>
 
 <template>
@@ -36,11 +39,11 @@
           <template v-if="column.dataIndex === 'attackMethodDesc'">
             <div class="attack-method-desc">
               <p class="attack-method-desc__details">{{record.attackMethodDesc}}</p>
-              <UpdateDesc :oldDesc="record.attackMethodDesc" @newDesc="newDesc" @changeDesc="changeDesc(record)"></UpdateDesc>
+              <UpdateDesc :oldDesc="record.attackMethodDesc" @newDesc="(...args)=>changeDesc(args,record)"></UpdateDesc>
             </div>
           </template>
           <template v-if="column.dataIndex === 'operation'">
-            <NodeBinding @nodeBindingMsg="nodeBindingMsg" @nodeBinding="nodeBinding(record)"></NodeBinding>
+            <NodeBinding @nodeBindingMsg="(...args)=>nodeBinding(args,record)"></NodeBinding>
             <a @click="showDetails(record)"> 详情</a>
             <a-popconfirm title="确认删除?" okText="确定" cancelText="取消" @confirm="deleteAttackMethod(record.attackMethodID)">
               <a> 删除</a>
@@ -48,8 +51,9 @@
           </template>
           <template v-if="column.dataIndex === 'attackMethodPaper'">
             <div class="attack-method-paper">
-              <a :href="record.attackMethodPaperUrl" target="_blank">{{record.attackMethodPaper}}</a>
-              <UpdatePaperForm :methodSelected="record" @updatePaper="updatePaper"></UpdatePaperForm>
+              <a class="atk-method-link" :href="record.attackMethodPaperUrl" target="_blank">{{record.attackMethodPaper}}</a>
+              <UpdatePaperForm :paper="record.attackMethodPaper" :url="record.attackMethodPaperUrl" @newPaper="(...args)=>updatePaper(args,record)">
+              </UpdatePaperForm>
             </div>
           </template>
         </template>
@@ -195,9 +199,19 @@ export default defineComponent({
       methodSelected.value.attackMethodDetails = newDetails.value;
     };
 
-    const updatePaper = (key, newPaper) => {
-      attackInfo.value[key].attackMethodPaper = newPaper.paper;
-      attackInfo.value[key].attackMethodPaperUrl = newPaper.url;
+    const updatePaper = async (args, record) => {
+      attackInfo.value[record.key].attackMethodPaper = args[0].paper;
+      attackInfo.value[record.key].attackMethodPaperUrl = args[0].url;
+
+      await updateAtkMethod(
+        record.attackMethodID,
+        record.attackMethodName,
+        record.attackMethodDesc,
+        record.attackMethodDetails,
+        args[0].paper,
+        args[0].url,
+        record.attackMethodTypeID
+      );
     };
 
     // 拉取攻击信息
@@ -213,34 +227,22 @@ export default defineComponent({
 
     const addNodeVisiable = ref(false);
 
-    const descTemp = ref('');
-
-    const newDesc = (newDesc) => {
-      descTemp.value = newDesc;
-    };
-
-    const changeDesc = async (record) => {
-      let success = await updateAtkMethod(
+    const changeDesc = async (args, record) => {
+      await updateAtkMethod(
         record.attackMethodID,
         record.attackMethodName,
-        descTemp.value,
+        args[0],
         record.attackMethodDetails,
         record.attackMethodPaper,
         record.attackMethodPaperUrl,
         record.attackMethodTypeID
       );
-      attackInfo.value[record.key].attackMethodDesc = descTemp.value;
-      descTemp.value = '';
+      attackInfo.value[record.key].attackMethodDesc = args[0];
     };
 
-    const nodeMsgTemp = ref({});
-
-    const nodeBindingMsg = (nodeMsg) => {
-      nodeMsgTemp.value = nodeMsg;
-    };
     const refreshSubmenu = ref(0);
-    const nodeBinding = async (record) => {
-      let success = await addAtkMethodProvider(record.attackMethodID, nodeMsgTemp.value.nodeID, nodeMsgTemp.value.methodSource, nodeMsgTemp.value.bindingName);
+    const nodeBinding = async (args, record) => {
+      let success = await addAtkMethodProvider(record.attackMethodID, args[0].nodeID, args[0].methodSource, args[0].bindingName);
       refreshSubmenu.value++;
     };
 
@@ -255,14 +257,10 @@ export default defineComponent({
       initAtkDetails,
       refreshSubmenu,
       editAtkInfo,
-      nodeMsgTemp,
       nodeBinding,
-      nodeBindingMsg,
       methodDetailsVisible,
       methodSelected,
       newDetails,
-      descTemp,
-      newDesc,
       changeDesc,
       addAtkInfoSucceed,
       showDetails,

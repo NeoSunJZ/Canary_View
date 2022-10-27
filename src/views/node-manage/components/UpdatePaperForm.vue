@@ -30,9 +30,10 @@ export default defineComponent({
   name: 'UpdatePaperForm',
   components: {},
   props: {
-    methodSelected: { type: Object },
+    paper: { type: String },
+    url: { type: String },
   },
-  emits: ['updatePaper'],
+  emits: ['newPaper'],
   setup(props, context) {
     const visible = ref(false);
 
@@ -57,17 +58,7 @@ export default defineComponent({
     };
     // 提交表单且数据验证成功
     const handleFinish = async () => {
-      let success = await updateAtkMethod(
-        props.methodSelected.attackMethodID,
-        props.methodSelected.attackMethodName,
-        props.methodSelected.attackMethodDesc,
-        props.methodSelected.attackMethodDetails,
-        formState.paper,
-        formState.url,
-        props.methodSelected.attackMethodTypeID
-      );
-
-      context.emit('updatePaper', props.methodSelected.key, formState);
+      context.emit('newPaper', formState);
       visible.value = false;
     };
 
@@ -77,8 +68,8 @@ export default defineComponent({
     };
 
     const showPaper = () => {
-      formState.paper = props.methodSelected.attackMethodPaper;
-      formState.url = props.methodSelected.attackMethodPaperUrl;
+      formState.paper = props.paper;
+      formState.url = props.url;
     };
 
     // 提交表单且数据验证失败

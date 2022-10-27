@@ -47,7 +47,7 @@
           <template v-if="column.dataIndex === 'modelDesc'">
             <div class="model-desc">
               <p class="model-desc__details">{{record.modelDesc}}</p>
-              <UpdateDesc :oldDesc="record.modelDesc" @newDesc="newDesc" @changeDesc="changeDesc(record)"></UpdateDesc>
+              <UpdateDesc :oldDesc="record.modelDesc" @newDesc="(...args)=>changeDesc(args,record)"></UpdateDesc>
             </div>
           </template>
         </template>
@@ -189,14 +189,8 @@ export default defineComponent({
       // methodSelected.value.modelDetails = newDetails.value;
     };
 
-    const descTemp = ref('');
-
-    const newDesc = (newDesc) => {
-      descTemp.value = newDesc;
-    };
-
-    const changeDesc = async (record) => {
-      // let success = await updateAtkMethod(
+    const changeDesc = async (args, record) => {
+      // await updateAtkMethod(
       //   record.attackMethodID,
       //   record.attackMethodName,
       //   descTemp.value,
@@ -230,8 +224,6 @@ export default defineComponent({
     return {
       columns,
       editable,
-      descTemp,
-      newDesc,
       changeDesc,
       initAtkDetails,
       editAtkInfo,

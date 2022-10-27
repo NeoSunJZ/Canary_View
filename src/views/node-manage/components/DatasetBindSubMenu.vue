@@ -1,8 +1,13 @@
 <style lang="less" scoped>
 .editable-cell {
   position: relative;
-  .editable-cell-input-wrapper,
+  .editable-cell-input-wrapper {
+    display: flex;
+    align-items: center;
+  }
   .editable-cell-text-wrapper {
+    display: flex;
+    align-items: center;
     padding-right: 24px;
   }
 
@@ -43,39 +48,37 @@
 
 
 <template>
-  <a-table :columns="Columns" :data-source="data" :pagination="false" :scroll="{x:1000}">
+  <a-table :columns="Columns" :data-source="data" :pagination="false" :scroll="{x:1500}">
     <template #bodyCell="{ column,record,text }">
       <template v-if="column.dataIndex === 'operation'">
-        <a-popconfirm v-if="data.length" title="确认删除?" okText="确定" cancelText="取消" @confirm="onDelete(record.attackMethodProviderID)">
+        <a-popconfirm v-if="data.length" title="确认删除?" okText="确定" cancelText="取消" @confirm="onDelete(record.datasetProviderID)">
           <a>删除</a>
         </a-popconfirm>
       </template>
 
-      <template v-else-if="column.dataIndex === 'attackMethodSource'">
+      <template v-else-if="column.dataIndex === 'datasetSource'">
         <div class="editable-cell">
-          <div v-if="editableData[record.attackMethodProviderID]&&editableElement[record.attackMethodProviderID]=='attackMethodSource'"
-            class="editable-cell-input-wrapper">
-            <a-input v-model:value="editableData[record.attackMethodProviderID].attackMethodSource" @pressEnter="save(record.attackMethodProviderID)" />
-            <check-outlined class="editable-cell-icon-check" @click="save(record.attackMethodProviderID)" />
+          <div v-if="editableData[record.datasetProviderID]&&editableElement[record.datasetProviderID]=='datasetSource'" class="editable-cell-input-wrapper">
+            <a-input v-model:value="editableData[record.datasetProviderID].datasetSource" @pressEnter="save(record.datasetProviderID)" />
+            <check-outlined class="editable-cell-icon-check" @click="save(record.datasetProviderID)" />
           </div>
           <div v-else class="editable-cell-text-wrapper">
             {{ text || ' ' }}
-            <edit-outlined class="editable-cell-icon" @click="edit(record.attackMethodProviderID,'attackMethodSource')" />
+            <edit-outlined class="editable-cell-icon" @click="edit(record.datasetProviderID,'datasetSource')" />
           </div>
         </div>
       </template>
 
-      <template v-else-if="column.dataIndex === 'bindAttackMethodName'">
+      <template v-else-if="column.dataIndex === 'bindDatasetName'">
 
         <div class="editable-cell">
-          <div v-if="editableData[record.attackMethodProviderID]&&editableElement[record.attackMethodProviderID]=='bindAttackMethodName'"
-            class="editable-cell-input-wrapper">
-            <a-input v-model:value="editableData[record.attackMethodProviderID].bindAttackMethodName" @pressEnter="save(record.attackMethodProviderID)" />
-            <check-outlined class="editable-cell-icon-check" @click="save(record.attackMethodProviderID)" />
+          <div v-if="editableData[record.datasetProviderID]&&editableElement[record.datasetProviderID]=='bindDatasetName'" class="editable-cell-input-wrapper">
+            <a-input v-model:value="editableData[record.datasetProviderID].bindDatasetName" @pressEnter="save(record.datasetProviderID)" />
+            <check-outlined class="editable-cell-icon-check" @click="save(record.datasetProviderID)" />
           </div>
           <div v-else class="editable-cell-text-wrapper">
             {{ text || ' ' }}
-            <edit-outlined class="editable-cell-icon" @click="edit(record.attackMethodProviderID,'bindAttackMethodName')" />
+            <edit-outlined class="editable-cell-icon" @click="edit(record.datasetProviderID,'bindDatasetName')" />
           </div>
         </div>
 
@@ -87,7 +90,7 @@
 
 <script>
 import { defineComponent, onBeforeMount, ref, reactive, computed } from 'vue';
-import { getAtkProvider, updateAtkMethodProvider, deleteAtkMethodProvider } from '@/api/atk-api/atkInfo';
+import { getDatasetProvider, deleteDatasetProvider, updateDatasetProvider } from '@/api/dataset-api/datasetInfo';
 import { DeploymentUnitOutlined, ClusterOutlined, CheckOutlined, EditOutlined, SyncOutlined } from '@ant-design/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
@@ -101,7 +104,7 @@ export default defineComponent({
     SyncOutlined,
   },
   props: {
-    attackMethodID: {
+    datasetID: {
       type: Number,
       default: -1,
     },
@@ -121,22 +124,32 @@ export default defineComponent({
       {
         title: '节点路径',
         dataIndex: 'nodePath',
-        width: '20%',
+        width: '15%',
       },
       {
-        title: '方法源',
-        dataIndex: 'attackMethodSource',
-        width: '15%',
+        title: '数据源',
+        dataIndex: 'datasetSource',
+        width: '18%',
       },
       {
         title: '绑定名',
-        dataIndex: 'bindAttackMethodName',
-        width: '15%',
+        dataIndex: 'bindDatasetName',
+        width: '10%',
+      },
+      {
+        title: '类型',
+        dataIndex: 'datasetTypeDesc',
+        with: '13%',
+      },
+      {
+        title: '提供标签',
+        dataIndex: 'isProvideTags',
+        with: '8%',
       },
       {
         title: '创建时间',
         dataIndex: 'createTime',
-        width: '20%',
+        width: '15%',
       },
       {
         title: '操作',
@@ -156,33 +169,33 @@ export default defineComponent({
 
     // 编辑
     const edit = (key, element) => {
-      editableData[key] = cloneDeep(data.value.filter((item) => key === item.attackMethodProviderID)[0]);
+      editableData[key] = cloneDeep(data.value.filter((item) => key === item.datasetProviderID)[0]);
       console.log(editableData[key]);
       editableElement.value[key] = element;
     };
 
     // 保存编辑，更为准确和详细的逻辑是先等待success再根据结果修改前端或是报错
     const save = async (key) => {
-      Object.assign(data.value.filter((item) => key === item.attackMethodProviderID)[0], editableData[key]);
-      let success = await updateAtkMethodProvider(
-        editableData[key].attackMethodProviderID,
-        editableData[key].attackMethodID,
-        editableData[key].nodeID,
-        editableData[key].attackMethodSource,
-        editableData[key].bindAttackMethodName
-      );
+      Object.assign(data.value.filter((item) => key === item.datasetProviderID)[0], editableData[key]);
+      // let success = await updateAtkMethodProvider(
+      //   editableData[key].datasetProviderID,
+      //   editableData[key].datasetID,
+      //   editableData[key].nodeID,
+      //   editableData[key].datasetSource,
+      //   editableData[key].bindDatasetName
+      // );
       delete editableData[key];
       editableElement.value[key] = '';
     };
 
     // 删除，同上可优化逻辑
     const onDelete = async (key) => {
-      data.value = data.value.filter((item) => item.attackMethodProviderID !== key);
-      let success = await deleteAtkMethodProvider(key);
+      data.value = data.value.filter((item) => item.datasetProviderID !== key);
+      // let success = await deleteAtkMethodProvider(key);
     };
 
     onBeforeMount(async () => {
-      data.value = await getAtkProvider(props.attackMethodID);
+      data.value = await getDatasetProvider(props.datasetID);
       data.value.forEach((element) => {
         element.nodeName = element.nodeInfo.nodeName + element.nodeInfo.nodeID;
         element.nodePath = element.nodeInfo.host + ':' + element.nodeInfo.port;

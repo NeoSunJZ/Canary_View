@@ -47,7 +47,7 @@ export default defineComponent({
   name: 'NodeBinding',
   components: {},
   props: {},
-  emits: ['nodeBindingMsg', 'nodeBinding'],
+  emits: ['nodeBindingMsg'],
   setup(props, context) {
     const formRef = ref();
     const formState = reactive({
@@ -117,9 +117,7 @@ export default defineComponent({
     const dataSource = ref([]);
 
     const handleFinish = (value) => {
-      // console.log(value);
       context.emit('nodeBindingMsg', value);
-      context.emit('nodeBinding');
       addNodeVisiable.value = false;
       resetForm();
     };

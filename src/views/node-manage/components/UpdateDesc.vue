@@ -28,7 +28,7 @@ export default defineComponent({
   props: {
     oldDesc: { type: String },
   },
-  emits: ['newDesc', 'changeDesc'],
+  emits: ['newDesc'],
   setup(props, context) {
     const visible = ref(false);
 
@@ -53,7 +53,6 @@ export default defineComponent({
     // 提交表单且数据验证成功
     const handleFinish = async () => {
       context.emit('newDesc', formState.desc);
-      context.emit('changeDesc');
       visible.value = false;
     };
 
