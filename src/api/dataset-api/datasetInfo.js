@@ -67,7 +67,7 @@ export async function deleteDatasetInfo(datasetID) {
     }),
   }).then((response) => {
     if (response.data.state === "SUCCESS") {
-      data = response.data.msg;
+      data = true;
     }
   })
   return data;

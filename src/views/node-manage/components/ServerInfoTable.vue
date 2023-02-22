@@ -282,7 +282,8 @@ export default defineComponent({
     const onDelete = async (key) => {
       dataSource.value = dataSource.value.filter((item) => item.key !== key);
       let success = await deleteNodeInfo(key);
-      console.log(success);
+      if (success) totalNodeInfo.value--;
+      if (totalNodeInfo.value % pageSize.value == 0 && currentPage.value > 1) currentPage.value--;
     };
 
     onBeforeMount(async () => {

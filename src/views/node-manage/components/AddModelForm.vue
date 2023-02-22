@@ -117,7 +117,7 @@ export default defineComponent({
     const handleFinish = async (value) => {
       //   let success = await addAtkMethod(value.name, value.introduction, value.details, value.paper, value.paperUrl, value.type);
       addModelFormVisiable.value = false;
-      context.emit('addAtkInfoSucceed', value);
+      context.emit('addModelInfoSucceed', value);
     };
 
     const resetForm = () => {

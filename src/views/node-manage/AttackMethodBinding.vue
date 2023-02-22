@@ -248,7 +248,9 @@ export default defineComponent({
 
     const deleteAttackMethod = async (nodeID) => {
       let success = await deleteAtkMethod(nodeID);
-      getAttackInfo();
+      if (success) totalAtkInfo.value--;
+      if (totalAtkInfo.value % pageSize.value == 0 && currentPage.value > 1) currentPage.value--;
+      await getAttackInfo();
     };
 
     return {

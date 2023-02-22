@@ -29,7 +29,7 @@
 
     <template v-slot:content>
       <h2 class="title">模型绑定</h2>
-      <AddModelForm @addAtkInfoSucceed="addAtkInfoSucceed"></AddModelForm>
+      <AddModelForm @addModelInfoSucceed="addModelInfoSucceed"></AddModelForm>
 
       <a-table tableLayout="fixed" :columns="columns" :data-source="modelInfo" :pagination="pagination" @change="(...args) => handleTableChange(...args)">
         <template #bodyCell="{column,record}">
@@ -119,13 +119,13 @@ export default defineComponent({
 
     // 获取的全部攻击方法信息，用作表格数据源
     const modelInfo = ref([]);
-    const totalAtkInfo = ref(0);
+    const totalModelInfo = ref(0);
     const currentPage = ref(1);
     const pageSize = ref(5);
     // 用于表格分页
     const pagination = computed(() => {
       return {
-        total: totalAtkInfo.value,
+        total: totalModelInfo.value,
         current: currentPage.value,
         pageSize: pageSize.value,
       };
@@ -139,10 +139,10 @@ export default defineComponent({
       modelInfo.value.forEach((element, index) => {
         element.key = index;
       });
-      totalAtkInfo.value = atkInfo.total;
+      totalModelInfo.value = atkInfo.total;
     };
 
-    const addAtkInfoSucceed = (value) => {
+    const addModelInfoSucceed = (value) => {
       getAttackInfo();
     };
 
@@ -230,12 +230,12 @@ export default defineComponent({
       modelDetailsVisible,
       methodSelected,
       newDetails,
-      addAtkInfoSucceed,
+      addModelInfoSucceed,
       showDetails,
       updatePaper,
       modelInfo,
       pageSize,
-      totalAtkInfo,
+      totalModelInfo,
       currentPage,
       pagination,
       handleTableChange,

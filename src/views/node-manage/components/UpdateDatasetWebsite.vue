@@ -2,19 +2,16 @@
 </style>
 
 <template>
-  <Poptip placement="left-start" width="400" v-model="visible" @on-popper-show='showPaper'>
+  <Poptip placement="left-start" width="400" v-model="changeWebVisible" @on-popper-show='showUrl'>
     <template #content>
       <a-form :model="formState" v-bind="layout" name="new-paper-info" :rules="rules" @finish="handleFinish" @finishFailed="handleFinishFailed">
-        <a-form-item has-feedback name="paper" label="论文" style="margin-bottom:1px">
-          <a-input size="small" v-model:value="formState.paper" />
-        </a-form-item>
-        <a-form-item has-feedback name="url" label="链接" style="margin-bottom:1px">
+        <a-form-item has-feedback name="website" label="网址" style="margin-bottom:1px">
           <a-input size="small" v-model:value="formState.url" />
         </a-form-item>
         <a-form-item :wrapper-col="{ span: 14, offset: 3 }" style="margin-bottom:1px">
           <a-button type="primary" size="small" html-type="submit">确定</a-button>
-          <a-button style="margin-left: 10px" size="small" @click="resetForm">清空</a-button>
-          <a-button style="margin-left: 10px" size="small" @click="visible=false">取消</a-button>
+          <a-button style="margin-left: 10px" size="small" @click="formState.url=''">清空</a-button>
+          <a-button style="margin-left: 10px" size="small" @click="changeWebVisible=false">取消</a-button>
         </a-form-item>
       </a-form>
     </template>
@@ -26,19 +23,17 @@
 import { defineComponent, ref, reactive } from 'vue';
 
 export default defineComponent({
-  name: 'UpdatePaperForm',
+  name: 'UpdateDatasetWebsite',
   components: {},
   props: {
-    paper: { type: String },
     url: { type: String },
   },
-  emits: ['newPaper'],
+  emits: ['newUrl'],
   setup(props, context) {
-    const visible = ref(false);
+    const changeWebVisible = ref(false);
 
     // 绑定的表单信息
     const formState = reactive({
-      paper: '',
       url: '',
     });
 
@@ -56,18 +51,16 @@ export default defineComponent({
       //
     };
     // 提交表单且数据验证成功
-    const handleFinish = async () => {
-      context.emit('newPaper', formState);
-      visible.value = false;
+    const handleFinish = () => {
+      context.emit('newUrl', formState.url);
+      changeWebVisible.value = false;
     };
 
     const resetForm = () => {
-      formState.paper = '';
       formState.url = '';
     };
 
-    const showPaper = () => {
-      formState.paper = props.paper;
+    const showUrl = () => {
       formState.url = props.url;
     };
 
@@ -77,11 +70,11 @@ export default defineComponent({
     };
 
     return {
-      visible,
+      changeWebVisible,
       formState,
       layout,
       rules,
-      showPaper,
+      showUrl,
       handleFinish,
       resetForm,
       handleFinishFailed,

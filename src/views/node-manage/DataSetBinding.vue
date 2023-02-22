@@ -46,22 +46,8 @@
           <template v-if="column.dataIndex === 'datasetWebsite'">
             <div class="dataset-website">
               <a class="dataset-link" :href="record.datasetWebsite" target="_blank">{{record.datasetWebsite}}</a>
-              <Poptip placement="left-start" width="400" v-model="changeWebVisible" @on-popper-show='showWebsite(record.datasetWebsite)'>
-                <template #content>
-                  <a-form :model="formState" v-bind="layout" name="new-paper-info" :rules="rules" @finish="handleFinish(record)"
-                    @finishFailed="handleFinishFailed">
-                    <a-form-item has-feedback name="website" label="网址" style="margin-bottom:1px">
-                      <a-input size="small" v-model:value="formState.website" />
-                    </a-form-item>
-                    <a-form-item :wrapper-col="{ span: 14, offset: 3 }" style="margin-bottom:1px">
-                      <a-button type="primary" size="small" html-type="submit">确定</a-button>
-                      <a-button style="margin-left: 10px" size="small" @click="formState.website=''">清空</a-button>
-                      <a-button style="margin-left: 10px" size="small" @click="changeWebVisible=false">取消</a-button>
-                    </a-form-item>
-                  </a-form>
-                </template>
-                <a-button type="link">修改</a-button>
-              </Poptip>
+              <UpdateDatasetWebsite :url="record.datasetWebsite" @newUrl="(...args)=>updateUrl(args,record)">
+              </UpdateDatasetWebsite>
             </div>
           </template>
 
@@ -93,11 +79,12 @@ import AttackDetails from '@/views/test-manage/TestTaskConstruction/components/a
 import AddDatasetForm from '@/views/node-manage/components/AddDatasetForm.vue';
 import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
 import UpdateDesc from '@/views/node-manage/components/UpdateDesc.vue';
+import UpdateDatasetWebsite from '@/views/node-manage/components/UpdateDatasetWebsite.vue';
 
 export default defineComponent({
   name: 'AttackMethodBinding',
 
-  components: { MainPageNavigation, tinyEditor, DatasetBindSubMenu, AttackDetails, AddDatasetForm, NodeBinding, UpdateDesc },
+  components: { MainPageNavigation, tinyEditor, DatasetBindSubMenu, AttackDetails, AddDatasetForm, NodeBinding, UpdateDesc, UpdateDatasetWebsite },
 
   setup() {
     // 主表格列名
@@ -130,13 +117,13 @@ export default defineComponent({
 
     // 获取的全部攻击方法信息，用作表格数据源
     const datasetInfo = ref([]);
-    const totalAtkInfo = ref(0);
+    const totalDatasetInfo = ref(0);
     const currentPage = ref(1);
     const pageSize = ref(5);
     // 用于表格分页
     const pagination = computed(() => {
       return {
-        total: totalAtkInfo.value,
+        total: totalDatasetInfo.value,
         current: currentPage.value,
         pageSize: pageSize.value,
       };
@@ -150,7 +137,7 @@ export default defineComponent({
       datasetInfo.value.forEach((element, index) => {
         element.key = index;
       });
-      totalAtkInfo.value = dataInfo.total;
+      totalDatasetInfo.value = dataInfo.total;
     };
 
     const addDatasetSucceed = async (value) => {
@@ -175,31 +162,17 @@ export default defineComponent({
       methodDetailsVisible.value = true;
     };
 
-    // 是否编辑详情的弹出框可见
-    const editable = ref(false);
-    const initAtkDetails = ref('');
-    const editAtkInfo = (attackMethodDetails) => {
-      initAtkDetails.value = attackMethodDetails;
-      editable.value = true;
-    };
-
-    const newDetails = ref();
-
     // 拉取攻击信息
     onMounted(async () => {
       await getDataSetInfo();
     });
 
-    // 富文本编辑器实时更新后的内容
-    const updateValue = (value) => {
-      newDetails.value = value;
-      console.log(value);
-    };
-
     const addNodeVisiable = ref(false);
 
     const deleteDataset = async (datasetID) => {
       let success = await deleteDatasetInfo(datasetID);
+      if (success) totalDatasetInfo.value--;
+      if (totalDatasetInfo.value % pageSize.value == 0 && currentPage.value > 1) currentPage.value--;
       await getDataSetInfo();
     };
 
@@ -214,24 +187,14 @@ export default defineComponent({
       website: '',
     });
 
-    const showWebsite = (website) => {
-      formState.website = website;
+    const updateUrl = async (args, record) => {
+      console.log(args);
+      await updateDatasetInfo(record.datasetID, record.datasetName, record.datasetDesc, args[0], record.datasetClassNumber);
+      datasetInfo.value[record.key].datasetWebsite = args[0];
     };
 
     const rules = {
       //
-    };
-    // 提交表单且数据验证成功
-    const handleFinish = async (record) => {
-      console.log(record);
-      await updateDatasetInfo(record.datasetID, record.datasetName, record.datasetDesc, formState.website, record.datasetClassNumber);
-      datasetInfo.value[record.key].datasetWebsite = formState.website;
-      changeWebVisible.value = false;
-    };
-
-    // 提交表单且数据验证失败
-    const handleFinishFailed = (errors) => {
-      console.log(errors);
     };
 
     const layout = {
@@ -247,27 +210,22 @@ export default defineComponent({
       layout,
       rules,
       formState,
-      handleFinish,
-      handleFinishFailed,
-      showWebsite,
+
+      updateUrl,
       changeWebVisible,
       columns,
-      editable,
-      initAtkDetails,
-      editAtkInfo,
       changeDesc,
       methodDetailsVisible,
       methodSelected,
-      newDetails,
+
       addDatasetSucceed,
       showDetails,
       datasetInfo,
       pageSize,
-      totalAtkInfo,
+      totalDatasetInfo,
       currentPage,
       pagination,
       handleTableChange,
-      updateValue,
       addNodeVisiable,
       deleteDataset,
     };
