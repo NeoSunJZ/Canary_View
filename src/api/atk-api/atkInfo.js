@@ -64,7 +64,7 @@ export async function getAtkConfig(attackMethodProviderID) {
 }
 
 /**
- * @description: 用于请求对应服务器更新攻击方法提供者信息
+ * @description: 用于请求对应服务器增加攻击方法提供者信息
  * @param {Number} attackMethodID       攻击方法ID
  * @param {String} nodeID               节点ID
  * @param {String} attackMethodSource   攻击方法源

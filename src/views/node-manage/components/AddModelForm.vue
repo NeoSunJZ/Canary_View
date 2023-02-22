@@ -9,8 +9,7 @@
   <a-modal v-model:visible="addModelFormVisiable" :footer="false" :closable='false' :width="800" :bodyStyle="{height:'550px' ,overflow:'scroll'}">
     <h2>新增模型</h2>
     <a-divider />
-    <a-form :model="formState" v-bind="layout" ref="formRef" name="new-atk-method-info" :rules="rules" @finish="handleFinish"
-      @finishFailed="handleFinishFailed">
+    <a-form :model="formState" v-bind="layout" ref="formRef" name="new-model-info" :rules="rules" @finish="handleFinish" @finishFailed="handleFinishFailed">
       <a-form-item has-feedback name="name" label="模型名">
         <a-input v-model:value="formState.name" />
       </a-form-item>
@@ -45,6 +44,7 @@
 <script>
 import { defineComponent, reactive, ref } from 'vue';
 import TinyEditor from '@/components/TinyEditor.vue';
+import { addModelInfo } from '@/api/model-api/modelInfo';
 
 export default defineComponent({
   name: 'AddModelForm',
@@ -115,7 +115,7 @@ export default defineComponent({
       ],
     };
     const handleFinish = async (value) => {
-      //   let success = await addAtkMethod(value.name, value.introduction, value.details, value.paper, value.paperUrl, value.type);
+      let success = await addModelInfo(value.name, value.introduction, value.details, value.paper, value.paperUrl, value.type);
       addModelFormVisiable.value = false;
       context.emit('addModelInfoSucceed', value);
     };

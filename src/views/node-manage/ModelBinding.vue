@@ -2,7 +2,7 @@
 .title {
   margin-bottom: 15px;
 }
-.attack-method-paper {
+.model-paper {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -17,6 +17,9 @@
     overflow: auto;
     height: 70px;
   }
+}
+.model-link {
+  word-break: break-all;
 }
 </style>
 
@@ -36,12 +39,15 @@
           <template v-if="column.dataIndex === 'operation'">
             <NodeBinding></NodeBinding>
             <a @click="showDetails(record)"> 详情</a>
-            <a> 删除</a>
+            <a-popconfirm title="确认删除?" okText="确定" cancelText="取消" @confirm="deleteModel(record.modelID)">
+              <a> 删除</a>
+            </a-popconfirm>
           </template>
           <template v-if="column.dataIndex === 'modelPaper'">
-            <div class="attack-method-paper">
-              <a :href="record.modelPaperUrl" target="_blank">{{record.modelPaper}}</a>
-              <UpdatePaperForm :methodSelected="record" @updatePaper="updatePaper"></UpdatePaperForm>
+            <div class="model-paper">
+              <a class="model-link" :href="record.modelPaperUrl" target="_blank">{{record.modelPaper}}</a>
+              <UpdatePaperForm :paper="record.modelPaper" :url="record.modelPaperUrl" @newPaper="(...args)=>updatePaper(args,record)">
+              </UpdatePaperForm>
             </div>
           </template>
           <template v-if="column.dataIndex === 'modelDesc'">
@@ -53,15 +59,15 @@
         </template>
         <!-- 附加子表 -->
         <template #expandedRowRender="{record}">
-          <ModelBindSubMenu :attackMethodID="record.attackMethodID"></ModelBindSubMenu>
+          <ModelBindSubMenu :modelID="record.modelID"></ModelBindSubMenu>
         </template>
       </a-table>
 
       <!-- 右侧详情栏 -->
       <a-drawer title="方法详情" placement="right" :visible="modelDetailsVisible" :get-container="false" width="30%" :style="{ position: 'fixed'}"
         @close="modelDetailsVisible = false">
-        <a @click="editAtkInfo(methodSelected.modelDetails)"> 编辑</a>
-        <p v-html="methodSelected.modelDetails"></p>
+        <a @click="editAtkInfo(modelSelected.modelDetails)"> 编辑</a>
+        <p v-html="modelSelected.modelDetails"></p>
       </a-drawer>
 
       <!-- 修改详情 -->
@@ -73,7 +79,7 @@
 </template>
 
 <script>
-import { getModelInfo, getModelProvider } from '@/api/model-api/modelInfo';
+import { deleteModelInfo, getModelInfo, updateModelInfo, getModelProvider } from '@/api/model-api/modelInfo';
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import tinyEditor from '@/components/TinyEditor.vue';
@@ -84,7 +90,7 @@ import NodeBinding from '@/views/node-manage/components/NodeBinding.vue';
 import UpdateDesc from '@/views/node-manage/components/UpdateDesc.vue';
 
 export default defineComponent({
-  name: 'AttackMethodBinding',
+  name: 'ModelBinding',
 
   components: { MainPageNavigation, tinyEditor, ModelBindSubMenu, AddModelForm, UpdatePaperForm, NodeBinding, UpdateDesc },
 
@@ -132,35 +138,35 @@ export default defineComponent({
     });
 
     // 获取攻击方法信息
-    const getAttackInfo = async () => {
-      const atkInfo = await getModelInfo(currentPage.value, pageSize.value);
+    const getModel = async () => {
+      const newModelInfo = await getModelInfo(currentPage.value, pageSize.value);
       modelInfo.value = [];
-      modelInfo.value = modelInfo.value.concat(atkInfo.list);
+      modelInfo.value = modelInfo.value.concat(newModelInfo.list);
       modelInfo.value.forEach((element, index) => {
         element.key = index;
       });
-      totalModelInfo.value = atkInfo.total;
+      totalModelInfo.value = newModelInfo.total;
     };
 
-    const addModelInfoSucceed = (value) => {
-      getAttackInfo();
+    const addModelInfoSucceed = async (value) => {
+      await getModel();
     };
 
-    const loadMoreAttackMethodInfo = async () => {
-      await getAttackInfo();
+    const loadMoreModelInfo = async () => {
+      await getModel();
     };
 
     // 换页面
     const handleTableChange = (newPagination, filters, sorter) => {
       currentPage.value = newPagination.current;
-      loadMoreAttackMethodInfo();
+      loadMoreModelInfo();
     };
 
-    const methodSelected = ref('');
+    const modelSelected = ref('');
     const modelDetailsVisible = ref(false);
     // 显示某方法详情
-    const showDetails = (attackMethod) => {
-      methodSelected.value = attackMethod;
+    const showDetails = (model) => {
+      modelSelected.value = model;
       modelDetailsVisible.value = true;
     };
 
@@ -176,41 +182,34 @@ export default defineComponent({
 
     // 保存某一方法详情的修改
     const saveAtkDetails = async () => {
-      // let success = await updateAtkMethod(
-      //   methodSelected.value.attackMethodID,
-      //   methodSelected.value.attackMethodName,
-      //   methodSelected.value.attackMethodDesc,
-      //   newDetails.value,
-      //   methodSelected.value.modelPaper,
-      //   methodSelected.value.modelPaperUrl,
-      //   methodSelected.value.attackMethodTypeID
-      // );
-      // editable.value = false;
-      // methodSelected.value.modelDetails = newDetails.value;
+      let success = await updateModelInfo(
+        modelSelected.value.modelID,
+        modelSelected.value.modelName,
+        modelSelected.value.modelDesc,
+        newDetails.value,
+        modelSelected.value.modelPaper,
+        modelSelected.value.modelPaperUrl,
+        modelSelected.value.modelTypeID
+      );
+      editable.value = false;
+      modelSelected.value.modelDetails = newDetails.value;
     };
 
     const changeDesc = async (args, record) => {
-      // await updateAtkMethod(
-      //   record.attackMethodID,
-      //   record.attackMethodName,
-      //   descTemp.value,
-      //   record.attackMethodDetails,
-      //   record.attackMethodPaper,
-      //   record.attackMethodPaperUrl,
-      //   record.attackMethodTypeID
-      // );
-      // attackInfo.value[record.key].attackMethodDesc = descTemp.value;
-      // descTemp.value = '';
+      await updateModelInfo(record.modelID, record.modelName, args[0], record.modelDetails, record.modelPaper, record.modelPaperUrl, record.modelTypeID);
+      modelInfo.value[record.key].modelDesc = args[0];
     };
 
-    const updatePaper = (key, newPaper) => {
-      modelInfo.value[key].modelPaper = newPaper.paper;
-      modelInfo.value[key].modelPaperUrl = newPaper.url;
+    const updatePaper = async (args, record) => {
+      modelInfo.value[record.key].modelPaper = args[0].paper;
+      modelInfo.value[record.key].modelPaperUrl = args[0].url;
+
+      await updateModelInfo(record.modelID, record.modelName, record.modelDesc, record.modelDetails, args[0].paper, args[0].url, record.modelTypeID);
     };
 
     // 拉取攻击信息
     onMounted(async () => {
-      await getAttackInfo();
+      await getModel();
     });
 
     // 富文本编辑器实时更新后的内容
@@ -221,6 +220,13 @@ export default defineComponent({
 
     const addNodeVisiable = ref(false);
 
+    const deleteModel = async (modelID) => {
+      let success = await deleteModelInfo(modelID);
+      if (success) totalModelInfo.value--;
+      if (totalModelInfo.value % pageSize.value == 0 && currentPage.value > 1) currentPage.value--;
+      await getModel();
+    };
+
     return {
       columns,
       editable,
@@ -228,7 +234,7 @@ export default defineComponent({
       initAtkDetails,
       editAtkInfo,
       modelDetailsVisible,
-      methodSelected,
+      modelSelected,
       newDetails,
       addModelInfoSucceed,
       showDetails,
@@ -242,6 +248,7 @@ export default defineComponent({
       updateValue,
       saveAtkDetails,
       addNodeVisiable,
+      deleteModel,
     };
   },
 });
