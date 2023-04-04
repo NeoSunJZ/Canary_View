@@ -41,6 +41,7 @@ import { addNodeInfo } from '@/api/node-api/nodeinfo';
 import { notification } from 'ant-design-vue';
 export default defineComponent({
   props: {},
+  emits: ['onSubmit'],
   setup(props, context) {
     const visible = ref(false);
 
@@ -122,7 +123,7 @@ export default defineComponent({
       ],
     };
     // 提交表单且数据验证成功
-    const handleFinish = async (values) => {
+    const handleFinish = async () => {
       let success = await addNodeInfo(formState.ip, formState.port, formState.name, formState.introduction);
       visible.value = false;
       if (success == false) {
@@ -138,7 +139,7 @@ export default defineComponent({
           duration: 2,
         });
       }
-      context.emit('nodeInfo', formState);
+      context.emit('onSubmit', formState);
     };
 
     const resetForm = () => {

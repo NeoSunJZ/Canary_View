@@ -26,7 +26,7 @@ export async function getDeclaration(ip, port, notificationKey = null, showNotif
             timeout: 1000
             // cancelToken: this.connectSource.token,
         }).then((response) => {
-            if (response.data.version.indexOf("v2.") != -1) {
+            if (response.data.version.indexOf("2.") != -1) {
                 data = response.data;
             } else if (showNotification == true) {
                 notification["error"]({
@@ -37,6 +37,7 @@ export async function getDeclaration(ip, port, notificationKey = null, showNotif
             }
         })
         .catch((error) => {
+            console.log(error)
             if (axios.isCancel(error)) {
                 //
             } else if (showNotification == true) {

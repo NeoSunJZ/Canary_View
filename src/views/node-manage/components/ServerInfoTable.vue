@@ -79,7 +79,7 @@
   <h2 class="title">服务资源列表</h2>
 
   <!-- 新增节点，还在构建中 -->
-  <AddNodeForm @nodeInfo="getInfo"></AddNodeForm>
+  <AddNodeForm @onSubmit="getInfo"></AddNodeForm>
 
   <!-- 节点表 -->
   <a-table bordered :data-source="dataSource" :columns="columns" :pagination="pagination" @change="(...args) => handleTableChange(...args)" size="small">
@@ -163,7 +163,7 @@ import { cloneDeep } from 'lodash-es';
 import { getNodeInfo, deleteNodeInfo, updateNodeInfo } from '@/api/node-api/nodeinfo';
 
 export default defineComponent({
-  name: 'ServerInfoCard',
+  name: 'ServerInfoTable',
   components: {
     DeploymentUnitOutlined,
     ClusterOutlined,
@@ -177,7 +177,7 @@ export default defineComponent({
     //
   },
   setup() {
-    const getInfo = async (nodeInfo) => {
+    const getInfo = async () => {
       // 新增节点了直接刷新
       const data = await getNodeInfo();
       data.forEach((element, index) => {
@@ -186,7 +186,7 @@ export default defineComponent({
           index: index + 1,
           name: element.nodeName,
           ip: element.host,
-          port: element.port,
+          port: parseInt(element.port),
           description: element.nodeDesc,
           createTime: element.createTime,
           status: 'unknown',
@@ -267,13 +267,7 @@ export default defineComponent({
     const save = async (key) => {
       // 将编辑的数据覆盖数据源中对应的对象
       Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData[key]);
-      let success = await updateNodeInfo(
-        editableData[key].key,
-        editableData[key].ip,
-        editableData[key].port,
-        editableData[key].name,
-        editableData[key].description
-      );
+      let success = await updateNodeInfo(editableData[key].key, editableData[key].ip, editableData[key].port, editableData[key].name, editableData[key].description);
       console.log(success);
       delete editableData[key];
       editableElement.value[key] = '';
@@ -287,20 +281,7 @@ export default defineComponent({
     };
 
     onBeforeMount(async () => {
-      const data = await getNodeInfo();
-      data.forEach((element, index) => {
-        dataSource.value[index] = {
-          key: element.nodeID,
-          index: index + 1,
-          name: element.nodeName,
-          ip: element.host,
-          port: element.port,
-          description: element.nodeDesc,
-          createTime: element.createTime,
-          status: 'unknown',
-        };
-      });
-      totalNodeInfo.value = data.length;
+      await getInfo();
     });
     return {
       getInfo,
