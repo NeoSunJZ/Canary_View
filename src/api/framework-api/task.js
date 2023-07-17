@@ -57,6 +57,26 @@ export async function getTaskStepLog(nodeServerAddr, batchToken) {
   return data;
 }
 
+export async function revokeTaskStepLog(nodeServerAddr, batchToken, systemLogID) {
+  let data = null;
+  await axios({
+      method: "get",
+      url: "http://" + nodeServerAddr + "/helper/task/revokeTaskStepLog",
+      params: {
+        batchToken: batchToken,
+        systemLogID: systemLogID,
+      },
+    }).then((response) => {
+      if (response.data.status === "SUCCESS") {
+        data = response.data.msg;
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+  return data;
+}
+
 export async function getTaskConsoleLog(nodeServerAddr, batchToken, pageLoadTime) {
   let data = null;
   await axios({

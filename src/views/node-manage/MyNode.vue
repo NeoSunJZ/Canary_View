@@ -19,16 +19,11 @@
 <script>
 import MainPageNavigation from '@/components/MainPageNavigation.vue';
 import ServerInfoTable from '@/views/node-manage/components/ServerInfoTable.vue';
-import { ref } from 'vue';
 export default {
   name: 'MyNode',
   components: { MainPageNavigation, ServerInfoTable },
   setup() {
-    const server1 = ref({ name: 'Server1', ip: '10.0.0.55', port: '8888' });
-    //
-    return {
-      server1,
-    };
+    return {};
   },
 };
 </script>

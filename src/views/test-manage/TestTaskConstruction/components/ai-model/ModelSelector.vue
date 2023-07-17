@@ -12,26 +12,26 @@
   <a-row>
     <a-col :span="16" class="model-selector">
       <CommonTransfer ref="commonTransfer" :leftTableColumns="leftTableColumns" :rightTableColumns="rightTableColumns" :fields="{id:'modelID'}" :getDataResource="getModelInfo"
-        @moveItemChange="handleMoveItemChange">
+        @move-item-change="handleMoveItemChange">
 
         <template #tableCell="{ column, record }">
 
           <template v-if="column.key === 'modelConfigStatus'">
             <CommonConfigProcessor :id="record.modelID" :field="{providerID: 'modelProviderID',configID: 'modelConfigID',
-              paramsDesc: 'ModelArgsHandlerParamsDesc', providerBindName: 'bindModelName', declarationBindName:'modelName' }"
+              paramsDesc: 'model_config_params', providerBindName: 'bindModelName', declarationBindName:'model_name' }"
               :configModelTitle="'模型 '+ record.modelName +' [ ModelID: '+record.modelID+' ] - 高级配置'" providerType="ModelConfig"
-              :providerID="selectedProvider[record.modelID]" :currentServerInfo="currentServerInfo"
-              :currentServerDeclaration="currentServerDeclaration['model']['modelList']" :getConfig="getModelConfig" :getAllBindInfos="getAllModelBindInfos"
+              :providerID="selectedProvider[record.modelID]==null?null:selectedProvider[record.modelID]['modelProviderID']" :currentServerInfo="currentServerInfo"
+              :currentServerDeclaration="currentServerDeclaration['registered_component']['model_list']" :getConfig="getModelConfig" :getAllBindInfos="getAllModelBindInfos"
               @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}" @confirm="handleModelConfigConfirm">
             </CommonConfigProcessor>
           </template>
 
           <template v-if="column.key === 'imgProcConfigStatus'">
             <CommonConfigProcessor :id="record.modelID" :field="{providerID: 'modelProviderID',configID: 'modelConfigID',
-              paramsDesc: 'imgProcessingParamsDesc', providerBindName: 'bindModelName', declarationBindName:'modelName' }"
+              paramsDesc: 'img_process_config_params', providerBindName: 'bindModelName', declarationBindName:'model_name' }"
               :configModelTitle="'模型 '+ record.modelName +' [ ModelID: '+record.modelID+' ] - 图片处理配置'" providerType="ImgProcConfig"
-              :providerID="selectedProvider[record.modelID]" :currentServerInfo="currentServerInfo"
-              :currentServerDeclaration="currentServerDeclaration['model']['modelList']" :getConfig="getModelConfig" :getAllBindInfos="getAllModelBindInfos"
+              :providerID="selectedProvider[record.modelID]==null?null:selectedProvider[record.modelID]['modelProviderID']" :currentServerInfo="currentServerInfo"
+              :currentServerDeclaration="currentServerDeclaration['registered_component']['model_list']" :getConfig="getModelConfig" :getAllBindInfos="getAllModelBindInfos"
               @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}" @confirm="handleImgProcConfigConfirm">
             </CommonConfigProcessor>
           </template>
@@ -50,15 +50,15 @@
     <a-col :span="8" class="model-selector">
       <ModelDetails ref="modelDetails">
         <template #extra="{ record }">
-          <CommonProviderSelector :field="{providerID:'modelProviderID',source:'modelSource',bindName:'bindModelName'}" :id="record.modelID"
-            :currentServerInfo="currentServerInfo" @selected-provider="handleSelectProvider" :getProviderList="getAllModelBindInfos">
+          <CommonProviderSelector :field="{providerID:'modelProviderID',source:'modelSource',bindName:'bindModelName'}" :id="record.modelID" :currentServerInfo="currentServerInfo"
+            @selected-provider="handleSelectProvider" :getProviderList="getAllModelBindInfos">
             <template #extra="{ record }">
               <div style="margin-top:5px">
                 <a-tag color="#cd201f">
                   <template #icon>
                     <DatabaseOutlined />
                   </template>
-                  {{record.trainDataset}} 数据集
+                  {{record.datasetInfo.datasetName}} 数据集
                 </a-tag>
 
                 <a-tag color="#3b5999">
@@ -152,8 +152,8 @@ export default defineComponent({
 
     // 处理Provider选中
     const selectedProvider = ref({});
-    const handleSelectProvider = (modelID, providerID) => {
-      selectedProvider.value[modelID] = providerID;
+    const handleSelectProvider = (modelID, providerData) => {
+      selectedProvider.value[modelID] = providerData;
     };
 
     // 处理模型配置

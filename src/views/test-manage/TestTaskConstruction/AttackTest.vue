@@ -196,7 +196,7 @@ export default defineComponent({
 
     const submitDataset = () => {
       try {
-        allConfig.value['dataset'] = datasetSelector.value.submit();
+        [allConfig.value['dataset'], allConfig.value['dataset_seed']] = datasetSelector.value.submit();
         current.value++;
       } catch (error) {
         message.error(error.message);

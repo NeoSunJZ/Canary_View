@@ -47,10 +47,10 @@
 
 <template>
   <div>
-    <h3>
+    <h3 v-if="showTitle">
       <CodeOutlined /> 实时日志
     </h3>
-    <div class="console">
+    <div class="console" :style="{'max-height': maxHeight}">
       <div class="console__log-info">
         <a-tag color="success" v-if="connect == 'success'">
           <template #icon>
@@ -93,7 +93,8 @@
             <CloseCircleOutlined class="console__type-icon--error" v-if="data.type=='ERROR'" />
             <CheckCircleOutlined class="console__type-icon--success" v-if="data.type=='SUCCESS'" />
             <CaretRightOutlined />
-            <a-typography-text :type="data.type=='DEBUG'?'secondary':data.type=='WARNING'?'warning':data.type=='ERROR'?'danger':data.type=='SUCCESS'?'success':'default'">
+            <a-typography-text :type="data.type=='DEBUG'?'secondary':data.type=='WARNING'?'warning':data.type=='ERROR'?'danger':data.type=='SUCCESS'?'success':'default'"
+              class="console__log">
               [ {{data.time}} ]
               <span v-html="data.text" v-if="data.type!='ERROR' || data.text['traceback'] == null"></span>
               <span v-else>
@@ -153,6 +154,14 @@ export default {
     CheckCircleOutlined,
   },
   props: {
+    maxHeight: {
+      default: '400px',
+      type: String,
+    },
+    showTitle: {
+      default: true,
+      type: Boolean,
+    },
     nodeServerAddr: String,
     debugMode: {
       default: true,

@@ -86,6 +86,7 @@ export default defineComponent({
     UpOutlined,
     DownOutlined,
   },
+  emits: ['submit', 'error'],
   props: {
     paramsDesc: Object,
     showConfirm: {
@@ -159,10 +160,7 @@ export default defineComponent({
           });
           Modal.error({
             title: '失败',
-            content: h('div', {}, [
-              h('p', '配置保存失败，请检查字段是否填写正确'),
-              h('p', '问题字段(' + errorFieldNames.length + ') : ' + errorFieldNames.join(' / ')),
-            ]),
+            content: h('div', {}, [h('p', '配置保存失败，请检查字段是否填写正确'), h('p', '问题字段(' + errorFieldNames.length + ') : ' + errorFieldNames.join(' / '))]),
           });
         });
     };

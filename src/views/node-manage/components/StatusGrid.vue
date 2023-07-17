@@ -43,6 +43,7 @@ import { SyncOutlined } from '@ant-design/icons-vue';
 export default defineComponent({
   name: 'StatusGrid',
   components: { SyncOutlined },
+  emits: ['success'],
   props: {
     ip: {
       type: String,
@@ -62,6 +63,7 @@ export default defineComponent({
         NodeStatus.value = 'stopping';
       } else {
         NodeStatus.value = 'running';
+        context.emit('success', data);
       }
     };
     onBeforeMount(async () => {

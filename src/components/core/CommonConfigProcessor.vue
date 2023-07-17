@@ -28,8 +28,9 @@
       <SyncOutlined @click.stop="task(true)" class="processor__refresh" />
     </div>
 
-    <CommonConfigModel ref="configModel" v-if="declaration!=null" :title="configModelTitle" :field="{configID: field['configID']}" :paramsDesc="declaration[field['paramsDesc']]"
-      :providerID="providerID!=null?providerID:defaultProviderID" :providerType="providerType" :getPresetConfig="getConfig" @submit="handleSubmit" @cancel="handleCancel">
+    <CommonConfigModel ref="configModel" v-if="declaration!=null" :title="configModelTitle" :field="{configID: field['configID']}"
+      :paramsDesc="declaration['info'][field['paramsDesc']]" :providerID="providerID!=null?providerID:defaultProviderID" :providerType="providerType" :getPresetConfig="getConfig"
+      @submit="handleSubmit" @cancel="handleCancel">
     </CommonConfigModel>
 
   </div>
@@ -49,6 +50,7 @@ export default defineComponent({
     ExclamationCircleOutlined,
     CommonConfigModel,
   },
+  emits: ['add-async-task', 'confirm'],
   props: {
     id: Number,
     field: Object,
@@ -164,7 +166,10 @@ export default defineComponent({
           setNotice('当前服务节点有多个绑定', 'warning');
           return [null, null];
         } else {
+          console.log(bindInfos);
+          console.log(providerID);
           bindInfo = getBindInfoByProviderID(bindInfos, providerID);
+          console.log(bindInfo);
         }
       } else {
         bindInfo = bindInfos[0];
@@ -173,6 +178,7 @@ export default defineComponent({
       setNotice('正在获取配置列表', 'processing');
       let declaration = null;
       currentServerDeclaration.forEach((element) => {
+        console.log(bindInfo);
         if (element[props.field['declarationBindName']] == bindInfo[props.field['providerBindName']]) {
           declaration = element;
         }

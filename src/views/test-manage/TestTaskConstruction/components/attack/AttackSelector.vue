@@ -42,16 +42,16 @@
     <a-row>
       <a-col :span="16" class="attack-selector">
         <CommonTransfer ref="commonTransfer" :leftTableColumns="leftTableColumns" :rightTableColumns="rightTableColumns" :fields="{id:'attackMethodID'}"
-          :getDataResource="getAtkInfo" @moveItemChange="handleMoveItemChange">
+          :getDataResource="getAtkInfo" @move-item-change="handleMoveItemChange">
 
           <template #tableCell="{ column, record }">
 
             <template v-if="column.key === 'status'">
               <CommonConfigProcessor :id="record.attackMethodID" :field="{providerID: 'attackMethodProviderID',configID: 'attackMethodConfigID',
-              paramsDesc: 'attackMethodArgsHandlerParamsDesc', providerBindName: 'bindAttackMethodName', declarationBindName:'attackMethodName' }"
+              paramsDesc: 'attack_config_params', providerBindName: 'bindAttackMethodName', declarationBindName:'attacker_name' }"
                 :configModelTitle="'攻击方法 '+ record.attackMethodName +' [ AtkID: '+record.attackMethodID+' ] - 高级配置'" :providerType="null"
                 :providerID="selectedProvider[record.attackMethodID]==null?null:selectedProvider[record.attackMethodID]['attackMethodProviderID']"
-                :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration['attack']['attackList']" :getConfig="getAtkConfig"
+                :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration['registered_component']['attacker_list']" :getConfig="getAtkConfig"
                 :getAllBindInfos="getAllAtkBindInfos" @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}" @confirm="handleConfigConfirm">
               </CommonConfigProcessor>
             </template>

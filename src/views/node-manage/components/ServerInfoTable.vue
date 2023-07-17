@@ -139,7 +139,7 @@
       </template>
 
       <template v-else-if="column.dataIndex === 'status'">
-        <StatusGrid :ip="record.ip" :port="record.port"></StatusGrid>
+        <StatusGrid :ip="record.ip" :port="record.port" @success="(data)=>{record.declaration=data}"></StatusGrid>
       </template>
 
       <template v-else-if="column.dataIndex === 'operation'">
@@ -147,7 +147,97 @@
           <a>删除</a>
         </a-popconfirm>
       </template>
-
+    </template>
+    <template #expandedRowRender="{record}">
+      <div style="margin-bottom: 5px">
+        <a-alert v-if="record.declaration != null" :message="'节点已连接，组件声明已获取(报告时间：'+record.declaration['datatime']+')'" type="success" show-icon />
+        <a-alert v-else message="节点连接已丢失，未能获取组件声明" type="error" show-icon />
+      </div>
+      <a-collapse v-if="record.declaration != null">
+        <a-collapse-panel key="1" header="数据集">
+          <a-collapse>
+            <a-collapse-panel :key="index" :header="'数据集:'+data['dataset_name']" v-for="data,index in record.declaration['registered_component']['dataset_list']">
+              <a-descriptions :title="data['dataset_name'] + '信息'" style="margin-bottom:10px;">
+              </a-descriptions>
+              <a-descriptions :title="data['dataset_name'] + '子组件状态'" :column="4" bordered>
+                <a-descriptions-item v-for="status, name in data['sub_component']" :key="name">
+                  <template #label>
+                    <p>{{name}}</p>
+                    <p>({{sub_component[name]}})</p>
+                  </template>
+                  <div v-if="status">
+                    <a-badge status="success" />就绪
+                  </div>
+                  <div v-else>
+                    <a-badge status="error" />未找到
+                  </div>
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-collapse-panel>
+          </a-collapse>
+        </a-collapse-panel>
+        <a-collapse-panel key="2" header="深度学习模型">
+          <a-collapse>
+            <a-collapse-panel :key="index" :header="'模型:'+data['model_name']" v-for="data,index in record.declaration['registered_component']['model_list']">
+              <a-descriptions :title="data['model_name'] + '信息'" style="margin-bottom:10px;">
+              </a-descriptions>
+              <a-descriptions :title="data['model_name'] + '配置参数'" layout="vertical" :column="1" style="margin-bottom:10px;">
+                <a-descriptions-item label="模型配置参数表">
+                  <a-table :dataSource="declaration_config_params_data_conversion(data['info']['model_config_params'])" :columns="declaration_config_params_columns" size="small"
+                    :pagination="false" style="width:80%" />
+                </a-descriptions-item>
+                <a-descriptions-item label="图片处理器配置参数表">
+                  <a-table :dataSource="declaration_config_params_data_conversion(data['info']['img_process_config_params'])" :columns="declaration_config_params_columns"
+                    size="small" :pagination="false" style="width:80%" />
+                </a-descriptions-item>
+              </a-descriptions>
+              <a-descriptions :title="data['model_name'] + '子组件状态'" :column="4" bordered>
+                <a-descriptions-item v-for="status, name in data['sub_component']" :key="name">
+                  <template #label>
+                    <p>{{name}}</p>
+                    <p>({{sub_component[name]}})</p>
+                  </template>
+                  <div v-if="status">
+                    <a-badge status="success" />就绪
+                  </div>
+                  <div v-else>
+                    <a-badge status="error" />未找到
+                  </div>
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-collapse-panel>
+          </a-collapse>
+        </a-collapse-panel>
+        <a-collapse-panel key="3" header="对抗攻击">
+          <a-collapse>
+            <a-collapse-panel :key="index" :header="'算法:'+data['attacker_name']" v-for="data,index in record.declaration['registered_component']['attacker_list']">
+              <a-descriptions :title="data['attacker_name'] + '信息'" style="margin-bottom:10px;">
+                <a-descriptions-item label="攻击类型">{{data['info']['attack_type']}}</a-descriptions-item>
+              </a-descriptions>
+              <a-descriptions :title="data['attacker_name'] + '配置参数'" layout="vertical" :column="1" style="margin-bottom:10px;">
+                <a-descriptions-item label="对抗攻击配置参数表">
+                  <a-table :dataSource="declaration_config_params_data_conversion(data['info']['attack_config_params'])" :columns="declaration_config_params_columns" size="small"
+                    :pagination="false" style="width:80%" />
+                </a-descriptions-item>
+              </a-descriptions>
+              <a-descriptions :title="data['attacker_name'] + '子组件状态'" :column="4" bordered>
+                <a-descriptions-item v-for="status, name in data['sub_component']" :key="name">
+                  <template #label>
+                    <p>{{name}}</p>
+                    <p>({{sub_component[name]}})</p>
+                  </template>
+                  <div v-if="status">
+                    <a-badge status="success" />就绪
+                  </div>
+                  <div v-else>
+                    <a-badge status="error" />未找到
+                  </div>
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-collapse-panel>
+          </a-collapse>
+        </a-collapse-panel>
+      </a-collapse>
     </template>
   </a-table>
 </template>
@@ -190,6 +280,7 @@ export default defineComponent({
           description: element.nodeDesc,
           createTime: element.createTime,
           status: 'unknown',
+          declaration: null,
         };
       });
       totalNodeInfo.value = data.length;
@@ -220,16 +311,45 @@ export default defineComponent({
       {
         title: '描述',
         dataIndex: 'description',
-        width: '30%',
+        width: '25%',
       },
       {
         title: '状态',
         dataIndex: 'status',
-        width: '10%',
+        width: '15%',
       },
       {
         title: '操作',
         dataIndex: 'operation',
+        width: '10%',
+      },
+    ];
+
+    const declaration_config_params_columns = [
+      {
+        title: '参数名',
+        dataIndex: 'name',
+        width: '20%',
+      },
+      {
+        title: '参数释义',
+        dataIndex: 'desc',
+        width: '50%',
+      },
+      {
+        title: '参数类型',
+        dataIndex: 'type',
+        width: '10%',
+      },
+      {
+        title: '是否必须',
+        dataIndex: 'required',
+        width: '10%',
+      },
+      {
+        title: '默认值',
+        dataIndex: 'def',
+        width: '10%',
       },
     ];
 
@@ -280,12 +400,38 @@ export default defineComponent({
       if (totalNodeInfo.value % pageSize.value == 0 && currentPage.value > 1) currentPage.value--;
     };
 
+    const declaration_config_params_data_conversion = (data) => {
+      let dataSource = [];
+      for (let name in data) {
+        data[name]['name'] = name;
+        dataSource.push(data[name]);
+      }
+      return dataSource;
+    };
+
+    const sub_component = {
+      model_create_func: '模型构建函数',
+      inference_detector: '预测函数',
+      target_layers_getter: '模型目标层获取函数',
+      attack_func: '攻击核心函数',
+      attacker_class: '攻击类',
+      attack_init: '攻击初始化函数',
+      model_config_params_handler: '模型配置参数转换函数',
+      attacker_config_params_handler: '攻击配置参数转换函数',
+      img_process_config_params_handler: '图像处理配置参数转换函数',
+      img_preprocessor: '图像预处理函数',
+      img_reverse_processor: '图像逆预处理函数',
+      result_postprocessor: '预测结果处理函数',
+      dataset_loader_handler: '数据集加载函数',
+    };
+
     onBeforeMount(async () => {
       await getInfo();
     });
     return {
       getInfo,
       columns,
+      declaration_config_params_columns,
       onDelete,
       dataSource,
       editableData,
@@ -297,6 +443,8 @@ export default defineComponent({
       handleTableChange,
       edit,
       save,
+      declaration_config_params_data_conversion,
+      sub_component,
     };
   },
 });

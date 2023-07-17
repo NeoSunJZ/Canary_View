@@ -31,13 +31,13 @@ export default {
       props.inferenceResult['clean'].forEach((element) => {
         inferenceResultDataset.value[element['img_id']] = {
           oriImgID: element['img_id'],
-          ORI: element['inference_img_conf_array'][element['ori_img_label']],
+          ORI: element['inference_img_conf_array'].split(',').map(Number)[element['ori_img_label']],
         };
         series.add('ORI');
       });
       props.inferenceResult['adv'].forEach((element) => {
         let atkName = element['atk_name'] + '(' + element['base_model'] + ')';
-        inferenceResultDataset.value[element['ori_img_id']][atkName] = element['inference_img_conf_array'][element['ori_img_label']];
+        inferenceResultDataset.value[element['ori_img_id']][atkName] = element['inference_img_conf_array'].split(',').map(Number)[element['ori_img_label']];
         series.add(atkName);
       });
       let seriesItem = {

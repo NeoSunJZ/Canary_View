@@ -43,21 +43,20 @@
       <template #footer>
         <a-button>使用节点默认配置</a-button>
         <a-button>刷新预设配置</a-button>
-        <a-button type="primary" :loading="loading" @click="handleSubmit">提交配置</a-button>
+        <a-button type="primary" @click="handleSubmit">提交配置</a-button>
       </template>
-      <a-alert class="config-model__notice" :message="'[自动提交] 将在'+autoSubmitCountDown+'秒后自动使用默认配置并提交(默认配置不存在时使用结点定义的缺省配置，可能需要补全)'" type="info"
-        v-if="autoSubmitFlag" show-icon>
+      <a-alert class="config-model__notice" :message="'[自动提交] 将在'+autoSubmitCountDown+'秒后自动使用默认配置并提交(默认配置不存在时使用结点定义的缺省配置，可能需要补全)'" type="info" v-if="autoSubmitFlag" show-icon>
         <template #icon>
           <SyncOutlined :spin="true" />
         </template>
       </a-alert>
 
-      <ParamsForm ref="paramsForm" :paramsDesc="paramsDesc" :showConfirm="false" @submit="onSubmit " @error="onError"></ParamsForm>
+      <ParamsForm ref="paramsForm" :paramsDesc="paramsDesc" :showConfirm="false" @submit="onSubmit"></ParamsForm>
 
       <a-divider></a-divider>
 
-      <a-alert class="config-model__notice" :message="'[自动配置] 存在预设配置，将在'+autoSelectConfigCountDown+'秒后自动选用第一项配置'" type="info"
-        v-if="autoConifgFlag && presetConfig.length!=0 " show-icon>
+      <a-alert class="config-model__notice" :message="'[自动配置] 存在预设配置，将在'+autoSelectConfigCountDown+'秒后自动选用第一项配置'" type="info" v-if="autoConifgFlag && presetConfig.length!=0 "
+        show-icon>
         <template #icon>
           <SyncOutlined :spin="true" />
         </template>
@@ -102,12 +101,13 @@ export default defineComponent({
     ParamsForm,
     SyncOutlined,
   },
+  emits: ['cancel', 'submit'],
   props: {
     field: Object,
     title: String,
     providerID: Number,
     paramsDesc: Object,
-    getPresetConfig:Function,
+    getPresetConfig: Function,
     providerType: String,
   },
   setup(props, context) {
@@ -125,10 +125,10 @@ export default defineComponent({
     const openConfigModel = () => {
       loadPresetConfig();
       visible.value = true;
-    }
+    };
 
     const autoConfig = () => {
-      openConfigModel()
+      openConfigModel();
 
       autoConifgFlag.value = true;
       autoSubmitFlag.value = true;

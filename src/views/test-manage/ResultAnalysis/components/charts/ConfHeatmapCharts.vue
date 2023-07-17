@@ -41,12 +41,12 @@ export default {
     onMounted(async () => {
       props.inferenceResult['clean'].forEach((element) => {
         inferenceResultDataset[element['img_id']] = {
-          ORI: element['inference_img_conf_array'],
+          ORI: element['inference_img_conf_array'].split(',').map(Number),
         };
       });
       props.inferenceResult['adv'].forEach((element) => {
         let atkName = element['atk_name'] + '(' + element['base_model'] + ')';
-        inferenceResultDataset[element['ori_img_id']][atkName] = element['inference_img_conf_array'];
+        inferenceResultDataset[element['ori_img_id']][atkName] = element['inference_img_conf_array'].split(',').map(Number);
       });
       init(props.imgID);
     });

@@ -5,9 +5,9 @@
 <template>
   <div style="width:100%">
     <a-alert :message="'请注意，您至多可选择(并移动至右侧) '+maxItem+' 个选项'" type="info" show-icon v-if="maxItem!=null" style="margin-bottom:5px " />
-    <a-transfer v-model:target-keys="targetKeys" v-model:selected-keys="selectedKeys" :data-source="data" :rowKey="(record) => String(record[fields.id])"
-      :showSelectAll="false" :list-style="{'min-width': '250px', 'min-height': '300px', flex: 1,}" :titles="[' 已(预)加载', ' 已选定']" :operations="['加入队列', '移除队列']"
-      @change="handleMoveItemChange" style="width: 100%">
+    <a-transfer v-model:target-keys="targetKeys" v-model:selected-keys="selectedKeys" :data-source="data" :rowKey="(record) => String(record[fields.id])" :showSelectAll="false"
+      :list-style="{'min-width': '250px', 'min-height': '300px', flex: 1,}" :titles="[' 已(预)加载', ' 已选定']" :operations="['加入队列', '移除队列']" @change="handleMoveItemChange"
+      style="width: 100%">
 
       <template #children="{direction, filteredItems, selectedKeys, disabled: listDisabled, onItemSelectAll, onItemSelect}">
         <a-spin :spinning="direction === 'left' && loading" tip="正在加载">
@@ -46,6 +46,7 @@ import ConfigStatusNotice from './ConfigStatusNotice.vue';
 
 export default defineComponent({
   name: 'CommonTransfer',
+  emits: ['move-item-change'],
   components: {
     ConfigStatusNotice,
   },
@@ -151,7 +152,7 @@ export default defineComponent({
     // 处理选中(穿梭框移动)事件
     const handleMoveItemChange = (targetKeys, direction, moveKeys) => {
       loadMoreData();
-      context.emit('moveItemChange', targetKeys, direction, moveKeys);
+      context.emit('move-item-change', targetKeys, direction, moveKeys);
     };
 
     const getRowSelection = ({ disabled, selectedKeys, onItemSelectAll, onItemSelect }) => {

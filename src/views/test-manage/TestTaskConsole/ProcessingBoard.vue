@@ -4,16 +4,30 @@
   max-height: 400px;
   overflow-y: auto;
 }
+.title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  &__text {
+    margin: 0px;
+  }
+}
 </style>
 
 <template>
   <div>
-    <h3>
-      <BarsOutlined /> 进度
-      <a-button shape="circle" type="text" @click="loadProcessingData">
-        <SyncOutlined />
-      </a-button>
-    </h3>
+    <div class="title">
+      <h3 class="title__text">
+        <BarsOutlined /> 进度
+        <a-button shape="circle" type="text" @click="loadProcessingData">
+          <SyncOutlined />
+        </a-button>
+      </h3>
+      <div>
+        允许放弃进度 <a-switch v-model:checked="allowRevokeTaskStepLog" size="small" />
+      </div>
+    </div>
     <a-card class="proc-board">
       <a-timeline :reverse="true">
         <a-timeline-item v-for="(log,index) in processingData" :key="index" :color="log.stop_time!=null ? (Boolean(parseInt(log.is_finish)) ? 'green' : 'red') : 'blue'">
@@ -24,7 +38,9 @@
           </template>
           {{log.step_name}}
           <p>
-            <a-typography-text type="secondary">{{log.participant}} (已完成 {{log.completed_num}}) <br /> {{log.stop_time}}</a-typography-text>
+            <a-typography-text type="secondary">{{log.participant}} (已完成 {{log.completed_num}}) <br /> {{log.stop_time}} <br /></a-typography-text>
+            <a-typography-text type="secondary" v-if="allowRevokeTaskStepLog">记录ID {{log.id}} <a-button type="link" danger size="small"
+                @click="revokeTaskStep(log.id)">放弃并重置该部分进度</a-button></a-typography-text>
             <a-typography-text type="danger" v-if="!Boolean(parseInt(log.is_finish)) && log.stop_time != null"><br />错误: {{log.errorType}}:{{log.errorObject}}<br />
               <a-popover title="错误堆栈" placement="left">
                 <template #content>
@@ -41,8 +57,10 @@
 </template>
 
 <script>
-import { nextTick, onMounted, reactive, ref } from 'vue';
-import { getTaskStepLog } from '@/api/framework-api/task.js';
+import { createVNode, onMounted, reactive, ref } from 'vue';
+import { Modal } from 'ant-design-vue';
+import { getTaskStepLog, revokeTaskStepLog } from '@/api/framework-api/task.js';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import {
   BarsOutlined,
   DisconnectOutlined,
@@ -95,11 +113,28 @@ export default {
       }
     };
 
+    const revokeTaskStep = async (systemLogID) => {
+      Modal.confirm({
+        title: '重置确认',
+        icon: createVNode(ExclamationCircleOutlined),
+        content: '您正在放弃并重置该部分进度，重置后该部分进度将永久丢失，请确认操作!',
+        onOk: async () => {
+          await revokeTaskStepLog(props.nodeServerAddr, props.batchToken, systemLogID);
+          await loadProcessingData();
+        },
+        onCancel() {},
+      });
+    };
+
+    const allowRevokeTaskStepLog = ref(false);
+
     onMounted(async () => {});
 
     return {
       loadProcessingData,
+      revokeTaskStep,
       processingData,
+      allowRevokeTaskStepLog,
     };
   },
 };

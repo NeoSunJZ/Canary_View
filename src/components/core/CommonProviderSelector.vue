@@ -78,6 +78,7 @@ import { ApiOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({
   components: { ApiOutlined, CloseCircleOutlined },
+  emits: ['selected-provider'],
   props: {
     field: Object,
     id: Number,

@@ -81,6 +81,11 @@ const routes = [{
     path: "/RankingList",
     name: "RankingList",
     component: () => import("@/views/test-manage/RankingList.vue")
+  },
+  {
+    path: "/Screen",
+    name: "Screen",
+    component: () => import("@/views/big-screen/ScreenCore.vue")
   }
 
 ]
