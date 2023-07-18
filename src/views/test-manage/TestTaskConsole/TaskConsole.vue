@@ -124,6 +124,7 @@ export default {
 
     onMounted(async () => {
       taskID.value = route['query']['taskID'];
+      localStorage.setItem('nowTaskID', taskID.value);
       await loadData(true);
       await loadTaskStatus();
       if (taskInfo.value.batchToken != null) {

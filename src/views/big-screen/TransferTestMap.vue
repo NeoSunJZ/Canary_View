@@ -19,20 +19,23 @@ export default defineComponent({
       let chartDom = document.getElementById('container-TransferTestMap');
       myChart = echarts.init(chartDom, 'dark');
       init({
-        MIM: {
-          Alexnet: ['Alexnet', 'VGG'],
-          VGG: ['Alexnet', 'VGG'],
-          Desnet: ['Desnet', 'VGG'],
+        MI_FGSM: {
+          'Alexnet(ImageNet)': ['Alexnet(ImageNet)', 'InceptionV3(ImageNet)'],
+          'VGG(ImageNet)': ['VGG(ImageNet)', 'GoogLeNet(ImageNet)'],
+          'GoogLeNet(ImageNet)': ['GoogLeNet(ImageNet)', 'InceptionV3(ImageNet)'],
+          'InceptionV3(ImageNet)': ['Alexnet(ImageNet)', 'GoogLeNet(ImageNet)', 'InceptionV3(ImageNet)'],
         },
-        FGSM: {
-          Alexnet: ['Alexnet', 'VGG'],
-          VGG: ['VGG'],
-          Desnet: ['Desnet', 'Alexnet'],
+        VMI_FGSM: {
+          'Alexnet(ImageNet)': ['Alexnet(ImageNet)'],
+          'VGG(ImageNet)': ['Alexnet(ImageNet)', 'VGG(ImageNet)'],
+          'GoogLeNet(ImageNet)': ['GoogLeNet(ImageNet)'],
+          'InceptionV3(ImageNet)': ['GoogLeNet(ImageNet)', 'InceptionV3(ImageNet)'],
         },
-        IFGSM: {
-          Alexnet: ['Alexnet', 'VGG'],
-          VGG: ['Alexnet', 'VGG'],
-          Desnet: ['Desnet', 'Alexnet'],
+        SIM: {
+          'Alexnet(ImageNet)': ['VGG(ImageNet)', 'GoogLeNet(ImageNet)', 'InceptionV3(ImageNet)'],
+          'VGG(ImageNet)': ['Alexnet(ImageNet)', 'GoogLeNet(ImageNet)', 'InceptionV3(ImageNet)'],
+          'GoogLeNet(ImageNet)': ['Alexnet(ImageNet)', 'VGG(ImageNet)', 'InceptionV3(ImageNet)'],
+          'InceptionV3(ImageNet)': ['Alexnet(ImageNet)', 'VGG(ImageNet)', 'GoogLeNet(ImageNet)'],
         },
       });
     });

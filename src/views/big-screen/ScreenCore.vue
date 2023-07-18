@@ -35,7 +35,7 @@
   line-height: unset;
 }
 </style>
-<style scoped  lang="less">
+<style scoped lang="less">
 .tag {
   border: unset;
   border-radius: 0.375rem !important;
@@ -120,87 +120,12 @@
               <p style="font-size:18px" class="text">北京理工大学服务器02</p>
               <p class="text-muted">IP 127.0.0.1 <a-divider type="vertical" /> 端口 8080 <a-divider type="vertical" /> 状态 <a-tag class="tag tag--green">就绪</a-tag></p>
             </a-card>
-            <a-card style="margin:10px">
-              <p style="font-size:20px" class="text">服务节点运行态势</p>
-              <p class="text-muted">设备摘要</p>
-              <a-card style="border: 1px solid #434968 !important; box-shadow:unset;">
-                <p style="font-size:16px" class="text">
-                  设备名称 BIT-1042-Sever
-                </p>
-                <p class="text-muted">
-                  操作系统
-                  <MyIcon type="icon-Ubuntu" :style="{ fontSize: '24px' }" />
-                  <span class="text"> Ubuntu 18.02
-                  </span>
-                </p>
-                <p class="text-muted">
-                  CPU <span class="text">Intel I9-12900K</span> <a-divider type="vertical" />
-                  GPU <span class="text">Nvidia RTX 4090</span> <a-divider type="vertical" />
-                  显存 <span class="text">24GB</span> <a-divider type="vertical" />
-                  内存 <span class="text">32GB</span>
-                </p>
-                <p class="text-muted">
-                  系统时间 <span class="text">2023-07-15 17:18:00</span> <a-divider type="vertical" />
-                  网络连接 <a-tag class="tag tag--green">良好</a-tag>
-                </p>
-              </a-card>
-              <br />
-              <p class="text-muted">CPU / GPU 性能实时监控</p>
-              <a-card style="border: 1px solid #434968 !important; box-shadow:unset">
-                <div style="display:flex;">
-                  <div style="flex: 1">
-                    <div style="display: flex; align-items: center;">
-                      <a-button class="tag tag--red" type="primary">
-                        <template #icon>
-                          <MyIcon type="icon-xianqia" :style="{ fontSize: '24px' }" />
-                        </template>
-                      </a-button>
-                      <p class="tag__text" style="font-size: 16px; margin-left:5px">GPU</p>
-                    </div>
-                    <p style="font-size:20px" class="text">99%</p>
-                    <a-progress strokeColor="#ea5455" trailColor="#363b54" :percent="99" size="small" :format="()=>{}" />
-                  </div>
-                  <div style="flex: 1">
-                    <div style="display: flex; align-items: center;">
-                      <a-button class="tag tag--purple" type="primary">
-                        <template #icon>
-                          <MyIcon type="icon-cpu" :style="{ fontSize: '24px' }" />
-                        </template>
-                      </a-button>
-                      <p class="tag__text" style="font-size: 16px; margin-left:5px">CPU</p>
-                    </div>
-                    <p style="font-size:20px" class="text">51%</p>
-                    <a-progress strokeColor="#7367f0" trailColor="#363b54" :percent="51" size="small" :format="()=>{}" />
-                  </div>
-                  <div style="flex: 1">
-                    <div style="display: flex; align-items: center;">
-                      <a-button class="tag tag--cyan" type="primary">
-                        <template #icon>
-                          <MyIcon type="icon-neicun" :style="{ fontSize: '24px' }" />
-                        </template>
-                      </a-button>
-                      <p class="tag__text" style="font-size: 16px; margin-left:5px">显存</p>
-                    </div>
-                    <p style="font-size:20px" class="text">23.1 GB</p>
-                    <a-progress strokeColor="#00cfe8" trailColor="#363b54" :percent="95" size="small" :format="()=>{}" />
-                  </div>
-                  <div style="flex: 1">
-                    <div style="display: flex; align-items: center;">
-                      <a-button class="tag tag--orange" type="primary">
-                        <template #icon>
-                          <MyIcon type="icon-neicun" :style="{ fontSize: '24px' }" />
-                        </template>
-                      </a-button>
-                      <p class="tag__text" style="font-size: 16px; margin-left:5px">内存</p>
-                    </div>
-                    <p style="font-size:20px" class="text">5.8 GB</p>
-                    <a-progress strokeColor="#ff9f43" trailColor="#363b54" :percent="12" size="small" :format="()=>{}" />
-                  </div>
-                </div>
-              </a-card>
-              <br />
-              <DeviceMonitor />
-            </a-card>
+            <a-empty :image="require('@/assets/icon/wait.svg')" v-if="nodeServerAddr == null">
+              <template #description>
+                <p class="text-muted">请等待节点信息加载</p>
+              </template>
+            </a-empty>
+            <ServerNodeStatus v-else :nodeServerAddr="nodeServerAddr" />
             <a-divider style="height: 1px; background-color: #7983bb; margin:5px 0" />
             <a-card style="margin:10px">
               <p style="font-size:20px" class="text">关于</p>
@@ -314,7 +239,7 @@
                 <a-card style="margin:10px">
                   <p style="font-size:20px" class="text">实时SEFI系统日志</p>
                   <p class="text-muted">节点Console</p>
-                  <WebConsole ref="webConsole" :showTitle="false" maxHeight="95px">
+                  <WebConsole ref="webConsole" :showTitle="false" maxHeight="95px" :nodeServerAddr="nodeServerAddr">
                   </WebConsole>
                 </a-card>
                 <a-card style="margin:10px">
@@ -461,39 +386,48 @@
 
 
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 import DMGraph from './DMGraph.vue';
-import DeviceMonitor from './DeviceMonitor.vue';
 import TransferTestMap from './TransferTestMap.vue';
 import WebConsole from '@/views/test-manage/TestTaskConsole/WebConsole.vue';
+import ServerNodeStatus from './components/ServerNodeStatus.vue';
 import { ClusterOutlined } from '@ant-design/icons-vue';
-
-import { createFromIconfontCN } from '@ant-design/icons-vue';
-
 import ProcessingBoard from '@/views/test-manage/TestTaskConsole/ProcessingBoard.vue';
-
+import { createFromIconfontCN } from '@ant-design/icons-vue';
 const MyIcon = createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/c/font_4168693_8vpkziypya4.js', // 在 iconfont.cn 上生成
 });
+
+import { getTaskByTaskID, setTaskStatus } from '@/api/task-api/taskInfo.js';
 
 export default defineComponent({
   name: 'ScreenCore',
   components: {
     MyIcon,
     ClusterOutlined,
+    ServerNodeStatus,
     TransferTestMap,
     ProcessingBoard,
     DMGraph,
-    DeviceMonitor,
     WebConsole,
   },
   props: {
     //
   },
-  mounted() {},
   setup(props) {
-    const nodeServerAddr = ref();
+    const nodeServerAddr = ref('10.108.16.240:5000');
+
+    const taskID = ref();
+    onMounted(() => {
+      taskID.value = localStorage.getItem('nowTaskID');
+      loadTaskData();
+    });
+
     const taskInfo = ref();
+    const loadTaskData = async () => {
+      taskInfo.value = await getTaskByTaskID(taskID.value);
+    };
+
     return {
       nodeServerAddr,
       taskInfo,
