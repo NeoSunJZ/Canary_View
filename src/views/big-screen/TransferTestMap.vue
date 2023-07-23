@@ -6,6 +6,7 @@
 <script>
 import { defineComponent, ref, onMounted } from 'vue';
 import * as echarts from 'echarts';
+import { getTaskByTaskID } from '@/api/task-api/taskInfo.js'
 import 'echarts-gl';
 
 export default defineComponent({
@@ -14,38 +15,72 @@ export default defineComponent({
     //
   },
   setup(props) {
-    let myChart;
+    let myChart; const taskID = ref();
+    const taskInfo = ref({});
+    const config = ref({});
+    const testMode = ref();
+    const modelList = ref({});
+    const tmpModeList = ref({});
+    const tmp = ref("");
+    const loadInintData = async () => {
+      taskInfo.value = await getTaskByTaskID(taskID.value);
+      config.value = JSON.parse(taskInfo.value.config);
+      testMode.value = JSON.stringify(config.value.transfer_attack_test_mode);
+      modelList.value = config.value.transfer_attack_test_on_model_list;
+      if (testMode.value == '"APPOINT"') { init(modelList.value) }
+      else {
+        tmp.value += '{';
+        Object.keys(config.value.attacker_list).forEach((attack_name) => {
+          tmp.value += '"'
+          tmp.value += attack_name
+          tmp.value += '"'
+          tmp.value += ": {"
+          Object.keys(config.value.model_config).forEach((base_model) => {
+            tmp.value += '"'
+            tmp.value += base_model
+            tmp.value += '"'
+            tmp.value += ": ["
+            if (testMode.value == '"SELF_CROSS"') {
+              Object.keys(config.value.model_config).forEach((test_model) => {
+                tmp.value += '"'
+                tmp.value += test_model
+                tmp.value += '"'
+                tmp.value += ',';
+              }
+              );
+              tmp.value = tmp.value.slice(0, -1);
+            }
+            else if (testMode.value == '"NOT"') {
+              tmp.value += '"'
+                tmp.value += base_model
+                tmp.value += '"'  
+            } 
+            tmp.value += "],";
+          }
+          )
+        })
+        tmp.value = tmp.value.slice(0, -1);
+        tmp.value += '}}';
+        tmp.value = JSON.parse(tmp.value)
+        init(tmp.value);
+
+      }
+
+      console.log(tmp.value);
+      console.log(tmpModeList.value)
+
+    };
     onMounted(() => {
       let chartDom = document.getElementById('container-TransferTestMap');
+      taskID.value = localStorage.getItem('nowTaskID');
       myChart = echarts.init(chartDom, 'dark');
-      init({
-        MI_FGSM: {
-          'Alexnet(ImageNet)': ['Alexnet(ImageNet)', 'InceptionV3(ImageNet)'],
-          'VGG(ImageNet)': ['VGG(ImageNet)', 'GoogLeNet(ImageNet)'],
-          'GoogLeNet(ImageNet)': ['GoogLeNet(ImageNet)', 'InceptionV3(ImageNet)'],
-          'InceptionV3(ImageNet)': ['Alexnet(ImageNet)', 'GoogLeNet(ImageNet)', 'InceptionV3(ImageNet)'],
-        },
-        VMI_FGSM: {
-          'Alexnet(ImageNet)': ['Alexnet(ImageNet)'],
-          'VGG(ImageNet)': ['Alexnet(ImageNet)', 'VGG(ImageNet)'],
-          'GoogLeNet(ImageNet)': ['GoogLeNet(ImageNet)'],
-          'InceptionV3(ImageNet)': ['GoogLeNet(ImageNet)', 'InceptionV3(ImageNet)'],
-        },
-        SIM: {
-          'Alexnet(ImageNet)': ['VGG(ImageNet)', 'GoogLeNet(ImageNet)', 'InceptionV3(ImageNet)'],
-          'VGG(ImageNet)': ['Alexnet(ImageNet)', 'GoogLeNet(ImageNet)', 'InceptionV3(ImageNet)'],
-          'GoogLeNet(ImageNet)': ['Alexnet(ImageNet)', 'VGG(ImageNet)', 'InceptionV3(ImageNet)'],
-          'InceptionV3(ImageNet)': ['Alexnet(ImageNet)', 'VGG(ImageNet)', 'GoogLeNet(ImageNet)'],
-        },
-      });
+      loadInintData();
     });
 
     const init = (transfer_data) => {
       let series = [];
-
       let test_model_list = [];
       let base_model_list = [];
-
       Object.keys(transfer_data).forEach((attack_name) => {
         let data = [];
 
@@ -173,5 +208,4 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="less">
-</style>
+<style lang="less"></style>

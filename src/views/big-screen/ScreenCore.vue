@@ -13,7 +13,7 @@
   background-clip: padding-box;
   background-color: unset;
 }
-/deep/ .ant-card-body {
+/deep/ .ant-card-body { 
   padding: 16px;
   border-radius: 0.375rem;
   background-color: #2f3349e5;
@@ -105,21 +105,9 @@
       <div style="padding:10px">
         <div style="display:flex;">
           <div style="flex: 1;display: flex;flex-direction: column;">
-            <a-card style="margin:10px">
-              <p class="text-muted">节点状态</p>
-              <p style="font-size:20px" class="text">1 在线 / 2 节点</p>
-              <br />
-
-              <p class="tag__text" style="font-size: 18px">
-                <a-button class="tag tag--purple" type="primary">
-                  <template #icon>
-                    <ClusterOutlined />
-                  </template>
-                </a-button> 当前服务器
-              </p>
-              <p style="font-size:18px" class="text">北京理工大学服务器02</p>
-              <p class="text-muted">IP 127.0.0.1 <a-divider type="vertical" /> 端口 8080 <a-divider type="vertical" /> 状态 <a-tag class="tag tag--green">就绪</a-tag></p>
-            </a-card>
+              <!-- NodeInfo. -->
+              <NodeInfo/> 
+            <!-- NodeInfo. -->
             <a-empty :image="require('@/assets/icon/wait.svg')" v-if="nodeServerAddr == null">
               <template #description>
                 <p class="text-muted">请等待节点信息加载</p>
@@ -135,7 +123,6 @@
                 <p style="font-size:16px" class="text">
                   金丝雀人工智能鲁棒性评估平台（定制版）
                 </p>
-
                 <p class="text-muted">
                   核心系统版本
                   <span class="text"> Canary V2.2.1.32_CUSTOM
@@ -296,62 +283,9 @@
                 </a-card>
               </div>
               <div style="flex: 1; display: flex;flex-direction: column;">
-                <a-card style="margin:10px;">
-                  <p style="font-size:20px" class="text">当前测试任务详情</p>
-                  <p class="text-muted">测试任务简介</p>
-                  <div style="display: flex; align-items: center; flex-direction: row;">
-                    <div style="flex:1">
-                      <div style="display: flex;flex-direction: row; align-items: center;">
-                        <a-button class="tag tag--red" type="primary">
-                          <template #icon>
-                            <MyIcon type="icon-shougongji" :style="{ fontSize: '24px' }" />
-                          </template>
-                        </a-button>
-                        <div style="margin-left:10px">
-                          <p style="font-size:14px" class="text">已选定攻击</p>
-                          <p class="text-muted">3</p>
-                        </div>
-                      </div>
-                      <div style="display: flex;flex-direction: row; align-items: center;">
-                        <a-button class="tag tag--cyan" type="primary">
-                          <template #icon>
-                            <MyIcon type="icon-shujumoxing" :style="{ fontSize: '24px' }" />
-                          </template>
-                        </a-button>
-                        <div style="margin-left:10px">
-                          <p style="font-size:14px" class="text">已选定模型</p>
-                          <p class="text-muted">3</p>
-                        </div>
-                      </div>
-                      <div style="display: flex;flex-direction: row; align-items: center;">
-                        <a-button class="tag tag--orange" type="primary">
-                          <template #icon>
-                            <MyIcon type="icon-shujujiguanli" :style="{ fontSize: '24px' }" />
-                          </template>
-                        </a-button>
-                        <div style="margin-left:10px">
-                          <p style="font-size:14px" class="text">已选定数据集</p>
-                          <p class="text-muted">ImageNet</p>
-                        </div>
-                      </div>
-                      <div style="display: flex;flex-direction: row; align-items: center;">
-                        <a-button class="tag tag--orange" type="primary">
-                          <template #icon>
-                            <MyIcon type="icon-shuliangbiandongtongji" :style="{ fontSize: '24px' }" />
-                          </template>
-                        </a-button>
-                        <div style="margin-left:10px">
-                          <p style="font-size:14px" class="text">测试量</p>
-                          <p class="text-muted">1000</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div style="flex:2; text-align: right">
-                      <TransferTestMap></TransferTestMap>
-                      <p class="text-muted">转移测试示意图</p>
-                    </div>
-                  </div>
-                </a-card>
+                <!-- TaskSummary. -->
+                <TaskSummary/> 
+                <!-- TaskSummary. -->
                 <a-card style="margin:10px;">
                   <p style="font-size:20px" class="text">当前测试任务详情</p>
                   <p class="text-muted">当前测试任务实时进度</p>
@@ -392,6 +326,8 @@ import TransferTestMap from './TransferTestMap.vue';
 import WebConsole from '@/views/test-manage/TestTaskConsole/WebConsole.vue';
 import ServerNodeStatus from './components/ServerNodeStatus.vue';
 import { ClusterOutlined } from '@ant-design/icons-vue';
+import NodeInfo from './components/NodeInfo.vue';
+import TaskSummary from './components/TaskSummary.vue';
 import ProcessingBoard from '@/views/test-manage/TestTaskConsole/ProcessingBoard.vue';
 import { createFromIconfontCN } from '@ant-design/icons-vue';
 const MyIcon = createFromIconfontCN({
@@ -410,22 +346,25 @@ export default defineComponent({
     ProcessingBoard,
     DMGraph,
     WebConsole,
-  },
+    NodeInfo, 
+    TaskSummary,
+    
+},
   props: {
     //
   },
   setup(props) {
-    const nodeServerAddr = ref('10.108.16.240:5000');
+    const nodeServerAddr = ref('127.0.0.1:5000');
 
-    const taskID = ref();
+    const taskID = ref( );
     onMounted(() => {
       taskID.value = localStorage.getItem('nowTaskID');
-      loadTaskData();
+      loadTaskData(); 
     });
 
     const taskInfo = ref();
     const loadTaskData = async () => {
-      taskInfo.value = await getTaskByTaskID(taskID.value);
+      taskInfo.value = await getTaskByTaskID(taskID.value); 
     };
 
     return {
