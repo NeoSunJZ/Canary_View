@@ -164,7 +164,7 @@ export default defineComponent({
       }
       else {
         NodeStatus.value = 'running';
-      } 
+      }
     };
     const currentOnlineNum = ref(0);
     const currentServerNum = ref(0);
@@ -174,19 +174,19 @@ export default defineComponent({
 
       if (node.value.length > 0) {
         currentServerNum.value = computed(() => node.value.length)
-        nodeInfo.value.currentServer = node.value[0].nodeName;
-        nodeInfo.value.currentHost = node.value[0].host;
-        nodeInfo.value.currentPort = node.value[0].port;
+        nodeInfo.value['currentServer'] = node.value[0]['nodeName'];
+        nodeInfo.value['currentHost'] = node.value[0]['host'];
+        nodeInfo.value['currentPort'] = node.value[0]['port'];
 
         node.value.forEach(async (element) => {
           if (waitFlag.value)
             await refresh(element.host, element.port);
           if (NodeStatus.value == 'running') {
             waitFlag.value = false;
-            nodeInfo.value.currentServer = element.nodeName;
-            nodeInfo.value.currentHost = element.host;
-            nodeInfo.value.currentPort = element.port;
-            nodeInfo.value.isonline = NodeStatus.value;
+            nodeInfo.value['currentServer'] = element['nodeName'];
+            nodeInfo.value['currentServer'] = element['host'];
+            nodeInfo.value['currentServer'] = element['port'];
+            nodeInfo.value['isonline'] = NodeStatus.value;
             currentOnlineNum.value++;
           }
         });

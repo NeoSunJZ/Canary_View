@@ -188,14 +188,14 @@ export default defineComponent({
   setup(props) {
     const taskID = ref();
     const taskInfo = ref({});
-    const config = ref({}); 
+    const config = ref({});
     const attackSelectedNum = ref();
     const modelSelectedNum = ref();
     const loadTaskData = async () => {
       taskInfo.value = await getTaskByTaskID(taskID.value);
-      config.value = JSON.parse(taskInfo.value.config); 
-      modelSelectedNum.value = Object.keys(config.value.model_config).length
-      attackSelectedNum.value = Object.keys(config.value.attacker_list).length
+      config.value = JSON.parse(taskInfo.value['config']);
+      modelSelectedNum.value = Object.keys(config.value['model_config']).length
+      attackSelectedNum.value = Object.keys(config.value['attacker_list']).length
     };
     onMounted(() => {
       taskID.value = localStorage.getItem('nowTaskID');

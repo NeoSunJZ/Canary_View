@@ -15,61 +15,11 @@ export default defineComponent({
     //
   },
   setup(props) {
-    let myChart; const taskID = ref();
+    let myChart;
+    const taskID = ref();
     const taskInfo = ref({});
-    const config = ref({});
-    const testMode = ref();
-    const modelList = ref({});
-    const tmpModeList = ref({});
-    const tmp = ref("");
-    const loadInintData = async () => {
-      taskInfo.value = await getTaskByTaskID(taskID.value);
-      config.value = JSON.parse(taskInfo.value.config);
-      testMode.value = JSON.stringify(config.value.transfer_attack_test_mode);
-      modelList.value = config.value.transfer_attack_test_on_model_list;
-      if (testMode.value == '"APPOINT"') { init(modelList.value) }
-      else {
-        tmp.value += '{';
-        Object.keys(config.value.attacker_list).forEach((attack_name) => {
-          tmp.value += '"'
-          tmp.value += attack_name
-          tmp.value += '"'
-          tmp.value += ": {"
-          Object.keys(config.value.model_config).forEach((base_model) => {
-            tmp.value += '"'
-            tmp.value += base_model
-            tmp.value += '"'
-            tmp.value += ": ["
-            if (testMode.value == '"SELF_CROSS"') {
-              Object.keys(config.value.model_config).forEach((test_model) => {
-                tmp.value += '"'
-                tmp.value += test_model
-                tmp.value += '"'
-                tmp.value += ',';
-              }
-              );
-              tmp.value = tmp.value.slice(0, -1);
-            }
-            else if (testMode.value == '"NOT"') {
-              tmp.value += '"'
-                tmp.value += base_model
-                tmp.value += '"'  
-            } 
-            tmp.value += "],";
-          }
-          )
-        })
-        tmp.value = tmp.value.slice(0, -1);
-        tmp.value += '}}';
-        tmp.value = JSON.parse(tmp.value)
-        init(tmp.value);
+    const taskConfig = ref({});
 
-      }
-
-      console.log(tmp.value);
-      console.log(tmpModeList.value)
-
-    };
     onMounted(() => {
       let chartDom = document.getElementById('container-TransferTestMap');
       taskID.value = localStorage.getItem('nowTaskID');
@@ -77,6 +27,33 @@ export default defineComponent({
       loadInintData();
     });
 
+    const loadInintData = async () => {
+      let transferAttackTestMode;
+      let transferAttackTest;
+      taskInfo.value = await getTaskByTaskID(taskID.value);
+      taskConfig.value = JSON.parse(taskInfo.value['config']);
+      transferAttackTestMode = JSON.stringify(taskConfig.value['transfer_attack_test_mode']);
+      transferAttackTest = taskConfig.value['transfer_attack_test_on_model_list'];
+      if (transferAttackTestMode == '"APPOINT"') { init(transferAttackTest) }
+      else {
+        let transferDataTemp = {}
+        Object.keys(taskConfig.value.attacker_list).forEach((attack_name) => {
+          transferDataTemp[attack_name] = {}
+          Object.keys(taskConfig.value.model_config).forEach((base_model) => {
+            transferDataTemp[attack_name][base_model] = []
+            if (transferAttackTestMode == '"SELF_CROSS"') {
+              Object.keys(taskConfig.value.model_config).forEach((test_model) => {
+                transferDataTemp[attack_name][base_model].push(test_model)
+              })
+            } else if (transferAttackTestMode == '"NOT"') {
+              transferDataTemp[attack_name][base_model].push(base_model)
+            }
+          })
+        })
+        init(transferDataTemp);
+      }
+    };
+    
     const init = (transfer_data) => {
       let series = [];
       let test_model_list = [];

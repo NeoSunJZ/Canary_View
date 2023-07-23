@@ -2,10 +2,12 @@
 .ant-layout {
   background: #25293c;
 }
+
 .ant-layout-header {
   background-color: rgba(47, 51, 73, 0.95);
   box-shadow: 0 1px 0 #434968;
 }
+
 /deep/ .ant-card-bordered {
   border: unset;
   box-shadow: 0 0.25rem 1.25rem rgba(15, 20, 34, 0.4);
@@ -13,12 +15,14 @@
   background-clip: padding-box;
   background-color: unset;
 }
-/deep/ .ant-card-body { 
+
+/deep/ .ant-card-body {
   padding: 16px;
   border-radius: 0.375rem;
   background-color: #2f3349e5;
   border: 0 solid #434968;
 }
+
 .ant-divider {
   border-left: 1px solid #7983bb;
 }
@@ -30,6 +34,7 @@
   color: #cfd3ec;
   line-height: unset;
 }
+
 .text-muted {
   color: #7983bb !important;
   line-height: unset;
@@ -39,25 +44,31 @@
 .tag {
   border: unset;
   border-radius: 0.375rem !important;
+
   &__text {
     color: #b6bee3;
   }
+
   &--green {
     color: #28c76f;
     background-color: #2e4b4f;
   }
+
   &--purple {
     color: #7367f0;
     background-color: #3a3b64;
   }
+
   &--cyan {
     color: #00cfe8;
     background-color: #274c62;
   }
+
   &--red {
     color: #ea5455;
     background-color: #4d384b;
   }
+
   &--orange {
     color: #ff9f43;
     background-color: #504448;
@@ -69,9 +80,11 @@
   &__log-info {
     background-color: #25293c;
   }
+
   &__log-area {
     border-color: #434968;
   }
+
   &__log {
     color: #cfd3ec;
   }
@@ -92,7 +105,7 @@
 </style>
 <template>
   <a-layout style="min-height: 100vh;">
-    <div class="logo" :style="{'background-image': 'url('+require('@/assets/image/logo/screen_logo.png')+')'}">
+    <div class="logo" :style="{ 'background-image': 'url(' + require('@/assets/image/logo/screen_logo.png') + ')' }">
     </div>
     <a-layout-header>
       <div style="display: flex; align-items: center;">
@@ -105,8 +118,8 @@
       <div style="padding:10px">
         <div style="display:flex;">
           <div style="flex: 1;display: flex;flex-direction: column;">
-              <!-- NodeInfo. -->
-              <NodeInfo/> 
+            <!-- NodeInfo. -->
+            <NodeInfo />
             <!-- NodeInfo. -->
             <a-empty :image="require('@/assets/icon/wait.svg')" v-if="nodeServerAddr == null">
               <template #description>
@@ -284,12 +297,13 @@
               </div>
               <div style="flex: 1; display: flex;flex-direction: column;">
                 <!-- TaskSummary. -->
-                <TaskSummary/> 
+                <TaskSummary />
                 <!-- TaskSummary. -->
                 <a-card style="margin:10px;">
                   <p style="font-size:20px" class="text">当前测试任务详情</p>
                   <p class="text-muted">当前测试任务实时进度</p>
-                  <ProcessingBoard ref="processingBoard" v-if="taskInfo" :nodeServerAddr="nodeServerAddr" :batchToken="taskInfo.batchToken">
+                  <ProcessingBoard ref="processingBoard" v-if="taskInfo" :nodeServerAddr="nodeServerAddr"
+                    :batchToken="taskInfo.batchToken">
                   </ProcessingBoard>
                   <a-empty :image="require('@/assets/icon/wait.svg')" v-else>
                     <template #description>
@@ -304,7 +318,8 @@
                   <div style="display: flex; align-items: center; flex-direction: column;">
                     <a-carousel dot-position="bottom" style="width: 400px; height: 225px;">
                       <div v-for="index in Array.from({ length: 20 }, (v, k) => k)" :key="index">
-                        <img style="height: 225px;width: 400px" src="https://raw.githubusercontent.com/vueComponent/ant-design-vue/main/components/carousel/demo/abstract01.jpg" />
+                        <img style="height: 225px;width: 400px"
+                          src="https://raw.githubusercontent.com/vueComponent/ant-design-vue/main/components/carousel/demo/abstract01.jpg" />
                       </div>
                     </a-carousel>
                   </div>
@@ -346,25 +361,25 @@ export default defineComponent({
     ProcessingBoard,
     DMGraph,
     WebConsole,
-    NodeInfo, 
+    NodeInfo,
     TaskSummary,
-    
-},
+
+  },
   props: {
     //
   },
   setup(props) {
     const nodeServerAddr = ref('127.0.0.1:5000');
 
-    const taskID = ref( );
+    const taskID = ref();
     onMounted(() => {
       taskID.value = localStorage.getItem('nowTaskID');
-      loadTaskData(); 
+      loadTaskData();
     });
 
     const taskInfo = ref();
     const loadTaskData = async () => {
-      taskInfo.value = await getTaskByTaskID(taskID.value); 
+      taskInfo.value = await getTaskByTaskID(taskID.value);
     };
 
     return {
