@@ -233,13 +233,14 @@
                   <p class="text-muted">各组件工作状态实时监控</p>
                   <br />
                   <div style="display: flex; align-items: center; flex-direction: column;">
-                    <DMGraph />
+                    <DMGraph ref="dmGraph" />
                   </div>
                 </a-card>
                 <a-card style="margin:10px">
                   <p style="font-size:20px" class="text">实时SEFI系统日志</p>
                   <p class="text-muted">节点Console</p>
-                  <WebConsole ref="webConsole" :showTitle="false" maxHeight="95px" :nodeServerAddr="nodeServerAddr">
+                  <WebConsole ref="webConsole" v-if="taskInfo != null" :showTitle="false" maxHeight="95px"
+                    :nodeServerAddr="nodeServerAddr" @received="onReceived">
                   </WebConsole>
                 </a-card>
                 <a-card style="margin:10px">
@@ -302,7 +303,7 @@
                 <a-card style="margin:10px;">
                   <p style="font-size:20px" class="text">当前测试任务详情</p>
                   <p class="text-muted">当前测试任务实时进度</p>
-                  <ProcessingBoard ref="processingBoard" v-if="taskInfo" :nodeServerAddr="nodeServerAddr"
+                  <ProcessingBoard ref="processingBoard" v-if="taskInfo != null" :nodeServerAddr="nodeServerAddr"
                     :batchToken="taskInfo.batchToken">
                   </ProcessingBoard>
                   <a-empty :image="require('@/assets/icon/wait.svg')" v-else>
@@ -349,7 +350,7 @@ const MyIcon = createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/c/font_4168693_8vpkziypya4.js', // 在 iconfont.cn 上生成
 });
 
-import { getTaskByTaskID, setTaskStatus } from '@/api/task-api/taskInfo.js';
+import { getTaskByTaskID } from '@/api/task-api/taskInfo.js';
 
 export default defineComponent({
   name: 'ScreenCore',
@@ -370,21 +371,35 @@ export default defineComponent({
   },
   setup(props) {
     const nodeServerAddr = ref('127.0.0.1:5000');
-
+    const processingBoard = ref();
     const taskID = ref();
-    onMounted(() => {
+    const taskInfo= ref();
+    const webConsole=ref();
+    const dmGraph =ref();
+    onMounted(async () => {
       taskID.value = localStorage.getItem('nowTaskID');
-      loadTaskData();
+      await loadTaskData(); 
+      if (taskInfo.value.batchToken != null) { 
+        await processingBoard.value.loadProcessingData();
+      }
     });
 
-    const taskInfo = ref();
+
     const loadTaskData = async () => {
       taskInfo.value = await getTaskByTaskID(taskID.value);
     };
-
+    const onReceived = async (logMsg) => { 
+      await processingBoard.value.loadProcessingData();
+      await dmGraph.value.changeNodeStatus(processingBoard.value['processingData']); 
+    };
     return {
       nodeServerAddr,
+      taskID,
       taskInfo,
+      webConsole,
+      processingBoard,
+      dmGraph,
+      onReceived,
     };
   },
 });

@@ -118,7 +118,7 @@
         </template>
       </a-button> 当前服务器
     </p>
-    <p style="font-size:18px" class="text">{{ nodeInfo.currentServer }}</p>
+    <p style="font-size:18px" class="text">{{ nodeInfo.currentServer  }}</p>
     <p class="text-muted">Ip {{ nodeInfo.currentHost }}<a-divider type="vertical" /> 端口 {{ nodeInfo.currentPort }}
       <a-divider type="vertical" /> 状态
       <a-tag class="tag tag--green" v-if="nodeInfo.isonline == 'running'">就绪</a-tag>
@@ -129,7 +129,7 @@
 
 
 <script>
-import { defineComponent, ref, onBeforeMount, computed } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import { createFromIconfontCN } from '@ant-design/icons-vue';
 import { ClusterOutlined } from '@ant-design/icons-vue';
 import io from 'socket.io-client';
@@ -169,7 +169,7 @@ export default defineComponent({
     const currentOnlineNum = ref(0);
     const currentServerNum = ref(0);
     const waitFlag = ref(true)
-    onBeforeMount(async () => {
+    onMounted(async () => {
       node.value = await getNodeInfo(1, 10);
 
       if (node.value.length > 0) {
@@ -184,15 +184,15 @@ export default defineComponent({
           if (NodeStatus.value == 'running') {
             waitFlag.value = false;
             nodeInfo.value['currentServer'] = element['nodeName'];
-            nodeInfo.value['currentServer'] = element['host'];
-            nodeInfo.value['currentServer'] = element['port'];
+            nodeInfo.value['currentHost'] = element['host'];
+            nodeInfo.value['currentPort'] = element['port'];
             nodeInfo.value['isonline'] = NodeStatus.value;
             currentOnlineNum.value++;
           }
         });
       }
     });
-    return {
+    return { 
       nodeInfo,
       currentServerNum,
       currentOnlineNum,

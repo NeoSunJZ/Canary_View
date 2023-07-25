@@ -205,7 +205,6 @@ export default defineComponent({
           y: 0,
           data: {
             label: '系统初始化与参数加载',
-            status: 'success',
           },
           ports: [
             {
@@ -221,7 +220,6 @@ export default defineComponent({
           y: 80,
           data: {
             label: '干净样本推理测试',
-            status: 'running',
           },
           ports: [
             {
@@ -568,50 +566,73 @@ export default defineComponent({
       });
     };
 
-    const changeNodeStatus = async () => {
-      let status = [
-        {
-          id: '1',
-          status: 'success',
-        },
-        {
-          id: '2',
-          status: 'success',
-        },
-        {
-          id: '3',
-          status: 'running',
-        },
-        {
-          id: '4',
-          status: 'failed',
-        },
-        {
-          id: '5',
-          status: 'failed',
-        },
-        {
-          id: '6',
-          status: 'failed',
-        },
-        {
-          id: '7',
-          status: 'failed',
-        },
-        {
-          id: '8',
-          status: 'success',
-        },
-        {
-          id: '9',
-          status: 'failed',
-        },
-        {
-          id: '10',
-          status: 'failed',
-        },
-      ];
-      await showNodeStatus(status);
+    let setpName = ['MODEL_INFERENCE_CAPABILITY_TEST',
+      'MODEL_INFERENCE_CAPABILITY_EVALUATION',
+      'ADV_EXAMPLE_GENERATE',
+      'ATTACK_DEFLECTION_CAPABILITY_TEST',
+      'ATTACK_DEFLECTION_CAPABILITY_EVALUATION',
+      'ATTACK_ADV_EXAMPLE_COMPARATIVE_TEST',
+      'ATTACK_ADV_EXAMPLE_DA_AND_COST_EVALUATION',
+      'ATTACK_SYNTHETICAL_CAPABILITY_EVALUATION',
+      'MODEL_SECURITY_SYNTHETICAL_CAPABILITY_EVALUATION']
+    const statusCheck = (processingInfo) => {
+      if (processingInfo.is_finish == "0") {
+        if (processingInfo.stop_reason != null) {
+          return 'failed';
+        }
+      }
+      return 'running';
+    }
+    let statusFlagtmp = new Array();
+    const changeNodeStatus = async (processingData) => {
+      let status = [{
+        id: "1",
+        status: 'success'
+      }];
+      let statusFlag = new Array(10);
+      for (var index = 0; index < 10; index++) {
+        statusFlag[index] = "null";
+      }
+      statusFlag[0] = 'success';
+      await processingData.forEach((processingInfo) => {
+        for (index = 0; index < setpName.length; index++) {
+          if (processingInfo.step == 'MODEL_SECURITY_SYNTHETICAL_CAPABILITY_EVALUATION' && index == setpName.length - 1) {
+            if (statusFlag[index] != 'failed') {
+              statusFlag[index] = 'success';
+            }
+            if (processingInfo.is_finish == '1')
+              statusFlag[index + 1] = 'success';
+
+            break;
+          }
+          let steps = setpName[index];
+          if (processingInfo.step == steps) {
+            if (statusFlag[index] != 'failed') {
+              statusFlag[index] = 'success';
+            }
+            statusFlag[index + 1] = statusCheck(processingInfo)
+            break;
+          }
+        }
+      }
+      )
+      for (index = 1; index < statusFlag.length; index++) {
+        if (statusFlag[index] != "null") {
+          status.push({ id: String(index + 1), status: statusFlag[index] })
+        }
+      }
+
+      if (JSON.stringify(statusFlagtmp) != JSON.stringify(statusFlag)) {
+        console.log(statusFlagtmp)
+        console.log(statusFlag)
+        await showNodeStatus(status);
+      }
+      if (statusFlag[9] == 'success' || statusFlag[9] == 'failed') {
+        statusFlagtmp.length = 0;
+      }
+      else {
+        statusFlagtmp = Array.from(statusFlag);
+      }
     };
 
     return {
@@ -632,12 +653,14 @@ export default defineComponent({
   background: rgba(115, 103, 240, 0.16);
   box-shadow: 0 0.25rem 1.25rem rgba(15, 20, 34, 0.4);
 }
+
 .node img {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
   margin-left: 8px;
 }
+
 .node .label {
   display: inline-block;
   flex-shrink: 0;
@@ -646,33 +669,41 @@ export default defineComponent({
   color: #cfd3ec;
   font-size: 12px;
 }
+
 .node .status {
   flex-shrink: 0;
 }
+
 .node.success {
   border-left: 4px solid #28c76f;
 }
+
 .node.failed {
   border-left: 4px solid #ff4d4f;
 }
+
 .node.running .status img {
   animation: spin 1s linear infinite;
 }
+
 .x6-node-selected .node {
   border-color: #1890ff;
   border-radius: 2px;
   box-shadow: 0 0 0 4px #d4e8fe;
 }
+
 .x6-node-selected .node.success {
   border-color: #28c76f;
   border-radius: 2px;
   box-shadow: 0 0 0 4px #ccecc0;
 }
+
 .x6-node-selected .node.failed {
   border-color: #ff4d4f;
   border-radius: 2px;
   box-shadow: 0 0 0 4px #fedcdc;
 }
+
 .x6-edge:hover path:nth-child(2) {
   stroke: #1890ff;
   stroke-width: 1px;
@@ -688,10 +719,12 @@ export default defineComponent({
     stroke-dashoffset: -1000;
   }
 }
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
