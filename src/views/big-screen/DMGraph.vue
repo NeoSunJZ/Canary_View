@@ -1,6 +1,5 @@
 
-<template>
-  <button @click="changeNodeStatus">测试用按钮</button>
+<template> 
   <div id="container-DMG"></div>
 </template>
 
@@ -622,9 +621,7 @@ export default defineComponent({
         }
       }
 
-      if (JSON.stringify(statusFlagtmp) != JSON.stringify(statusFlag)) {
-        console.log(statusFlagtmp)
-        console.log(statusFlag)
+      if (JSON.stringify(statusFlagtmp) != JSON.stringify(statusFlag)) { 
         await showNodeStatus(status);
       }
       if (statusFlag[9] == 'success' || statusFlag[9] == 'failed') {

@@ -183,8 +183,12 @@ export default {
     const room = ref();
     const url = ref();
     const log = reactive([]);
-
-    const addLog = (msg, type = 'INFO', recordTime = null) => {
+    
+    const addLog = (msg, type = 'INFO', recordTime = null) => { 
+      if(type == 'BASE64'){
+        context.emit('receivedBase64Img', msg);  
+        return ;
+      }
       let date = new Date();
       if (recordTime == null) {
         recordTime =
@@ -244,6 +248,7 @@ export default {
 
     var socket = null;
     const disconnect = () => {
+      socket.emit("leave_room", room.value);
       socket.close();
     };
 

@@ -240,7 +240,7 @@
                   <p style="font-size:20px" class="text">实时SEFI系统日志</p>
                   <p class="text-muted">节点Console</p>
                   <WebConsole ref="webConsole" v-if="taskInfo != null" :showTitle="false" maxHeight="95px"
-                    :nodeServerAddr="nodeServerAddr" @received="onReceived">
+                    :nodeServerAddr="nodeServerAddr" @received="onReceived" @receivedBase64Img="onBase64Received">
                   </WebConsole>
                 </a-card>
                 <a-card style="margin:10px">
@@ -318,9 +318,8 @@
                   <br />
                   <div style="display: flex; align-items: center; flex-direction: column;">
                     <a-carousel dot-position="bottom" style="width: 400px; height: 225px;">
-                      <div v-for="index in Array.from({ length: 20 }, (v, k) => k)" :key="index">
-                        <img style="height: 225px;width: 400px"
-                          src="https://raw.githubusercontent.com/vueComponent/ant-design-vue/main/components/carousel/demo/abstract01.jpg" />
+                      <div v-for="(imageSrc, index) in imageArray" :key="index">
+                        <img style="height: 225px; width: 400px" :src="imageSrc" />
                       </div>
                     </a-carousel>
                   </div>
@@ -373,13 +372,14 @@ export default defineComponent({
     const nodeServerAddr = ref('127.0.0.1:5000');
     const processingBoard = ref();
     const taskID = ref();
-    const taskInfo= ref();
-    const webConsole=ref();
-    const dmGraph =ref();
+    const taskInfo = ref();
+    const webConsole = ref();
+    const dmGraph = ref();
+    const imageArray = ref([])
     onMounted(async () => {
       taskID.value = localStorage.getItem('nowTaskID');
-      await loadTaskData(); 
-      if (taskInfo.value.batchToken != null) { 
+      await loadTaskData();
+      if (taskInfo.value.batchToken != null) {
         await processingBoard.value.loadProcessingData();
       }
     });
@@ -388,9 +388,12 @@ export default defineComponent({
     const loadTaskData = async () => {
       taskInfo.value = await getTaskByTaskID(taskID.value);
     };
-    const onReceived = async (logMsg) => { 
+    const onReceived = async (logMsg) => {
       await processingBoard.value.loadProcessingData();
-      await dmGraph.value.changeNodeStatus(processingBoard.value['processingData']); 
+      await dmGraph.value.changeNodeStatus(processingBoard.value['processingData']);
+    };
+    const onBase64Received = async (msg) => {
+      await (imageArray.value.push(msg)); 
     };
     return {
       nodeServerAddr,
@@ -399,7 +402,10 @@ export default defineComponent({
       webConsole,
       processingBoard,
       dmGraph,
+      imageArray,
+
       onReceived,
+      onBase64Received,
     };
   },
 });
