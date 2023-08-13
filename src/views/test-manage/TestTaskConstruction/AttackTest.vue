@@ -36,13 +36,6 @@
 
 <template>
   <MainPageNavigation :selectedKeys="['6']" :openKeys="['sub2']">
-    <template v-slot:submenu>
-      <a-menu :selectedKeys="['attackTest']" mode="horizontal" class="submenu">
-        <a-menu-item key="defenseTest" @click="toPage('TestTaskConstruction/DefenseTest')"> 防御测试 </a-menu-item>
-        <a-menu-item key="attackTest" @click="toPage('TestTaskConstruction/AttackTest')"> 攻击测试 </a-menu-item>
-        <a-menu-item key="modelTest" @click="toPage('TestTaskConstruction/ModelTest')"> 模型测试 </a-menu-item>
-      </a-menu>
-    </template>
     <template v-slot:breadcrumb>
       <a-breadcrumb-item>测试任务管理</a-breadcrumb-item>
       <a-breadcrumb-item>测试任务构建</a-breadcrumb-item>

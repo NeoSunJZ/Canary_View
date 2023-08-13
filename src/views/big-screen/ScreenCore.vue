@@ -126,7 +126,7 @@
                 <p class="text-muted">请等待节点信息加载</p>
               </template>
             </a-empty>
-            <ServerNodeStatus v-else :nodeServerAddr="nodeServerAddr" />
+            <ServerNodeStatus v-else :nodeServerAddr="nodeServerAddr" ref="serverNodeStatus"/>
             <a-divider style="height: 1px; background-color: #7983bb; margin:5px 0" />
             <a-card style="margin:10px">
               <p style="font-size:20px" class="text">关于</p>
@@ -143,9 +143,9 @@
                 </p>
                 <p class="text-muted">
                   SEFI版本
-                  <span class="text"> SEFI V2.0.3
+                  <span class="text"> SEFI V{{systemVersion.sefiVersion}}
                   </span><a-divider type="vertical" />
-                  SEFI Lib版本 <span class="text"> Build-in Lib V1.0.1</span>
+                  SEFI Lib版本 <span class="text"> Build-in Lib V{{systemVersion.sefiLibVersion}}</span>
                 </p>
                 <a-divider style="height: 1px; background-color: #7983bb; margin:5px 0" />
                 <p class="text-muted">
@@ -240,7 +240,8 @@
                   <p style="font-size:20px" class="text">实时SEFI系统日志</p>
                   <p class="text-muted">节点Console</p>
                   <WebConsole ref="webConsole" v-if="taskInfo != null" :showTitle="false" maxHeight="95px"
-                    :nodeServerAddr="nodeServerAddr" @received="onReceived" @receivedBase64Img="onBase64Received">
+                    :nodeServerAddr="nodeServerAddr" @received="onReceived" @receivedBase64Img="onBase64Received"
+                    @receivedSystemUsage="onSystemUsage">
                   </WebConsole>
                 </a-card>
                 <a-card style="margin:10px">
@@ -319,7 +320,7 @@
                   <div style="display: flex; align-items: center; flex-direction: column;">
                     <a-carousel dot-position="bottom" style="width: 400px; height: 225px;">
                       <div v-for="(imageSrc, index) in imageArray" :key="index">
-                        <img style="height: 225px; width: 400px" :src="imageSrc" />
+                        <img style=" width: 400px" :src="imageSrc" />
                       </div>
                     </a-carousel>
                   </div>
@@ -335,7 +336,7 @@
 
 
 <script>
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, ref, onBeforeUnmount, onUnmounted } from 'vue';
 import DMGraph from './DMGraph.vue';
 import TransferTestMap from './TransferTestMap.vue';
 import WebConsole from '@/views/test-manage/TestTaskConsole/WebConsole.vue';
@@ -350,6 +351,7 @@ const MyIcon = createFromIconfontCN({
 });
 
 import { getTaskByTaskID } from '@/api/task-api/taskInfo.js';
+import { getSystemVersion} from '@/api/framework-api/system.js';
 
 export default defineComponent({
   name: 'ScreenCore',
@@ -376,14 +378,19 @@ export default defineComponent({
     const webConsole = ref();
     const dmGraph = ref();
     const imageArray = ref([])
+    const serverNodeStatus = ref();
+    const systemVersion = ref({
+      sefiVersion: '',
+      sefiLibVersion: '',
+    });
     onMounted(async () => {
       taskID.value = localStorage.getItem('nowTaskID');
       await loadTaskData();
       if (taskInfo.value.batchToken != null) {
         await processingBoard.value.loadProcessingData();
       }
-    });
-
+      systemVersion.value = await getSystemVersion(nodeServerAddr.value)
+    }); 
 
     const loadTaskData = async () => {
       taskInfo.value = await getTaskByTaskID(taskID.value);
@@ -395,6 +402,9 @@ export default defineComponent({
     const onBase64Received = async (msg) => {
       await (imageArray.value.push(msg)); 
     };
+    const onSystemUsage = async (msg) => {
+      await serverNodeStatus.value.ChangeSystemUsage(msg)
+    };
     return {
       nodeServerAddr,
       taskID,
@@ -403,9 +413,12 @@ export default defineComponent({
       processingBoard,
       dmGraph,
       imageArray,
+      serverNodeStatus,
+      systemVersion,
 
       onReceived,
       onBase64Received,
+      onSystemUsage
     };
   },
 });

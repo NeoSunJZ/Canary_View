@@ -38,19 +38,9 @@ const routes = [{
     component: () => import("@/views/node-manage/DefenseMethodBinding.vue")
   },
   {
-    path: "/TestTaskConstruction/DefenseTest",
-    name: "DefenseTestTaskConstruction",
-    component: () => import("@/views/test-manage/TestTaskConstruction/DefenseTest.vue")
-  },
-  {
     path: "/TestTaskConstruction/AttackTest",
     name: "AttackTestTaskConstruction",
     component: () => import("@/views/test-manage/TestTaskConstruction/AttackTest.vue")
-  },
-  {
-    path: "/TestTaskConstruction/ModelTest",
-    name: "ModelTestTaskConstruction",
-    component: () => import("@/views/test-manage/TestTaskConstruction/ModelTest.vue")
   },
   {
     path: "/TaskRealtimeBoard",
