@@ -53,7 +53,7 @@ export default defineComponent({
         init(transferDataTemp);
       }
     };
-    
+
     const init = (transfer_data) => {
       let series = [];
       let test_model_list = [];
@@ -76,9 +76,6 @@ export default defineComponent({
             data.push([base_model_id, test_model_id, 1]);
           });
         });
-
-        console.log(data);
-
         series.push({
           name: attack_name,
           type: 'bar3D',
