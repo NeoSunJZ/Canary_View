@@ -247,53 +247,63 @@
                   <p style="font-size:20px" class="text">当前测试任务结论</p>
                   <p class="text-muted">测试指标结果</p>
                   <br />
+                  <a-tabs v-model:activeKey="activeModelName" @change="loadResultByModelName">
+                    <a-tab-pane v-for="modelName in modelList" :tab="modelName" :key="modelName">
+                      <div
+                        style="display: flex; align-items: center; flex-direction: row; justify-content: space-around;">
 
-                  <div style="display: flex; align-items: center; flex-direction: row; justify-content: space-around;">
-                    <div style="display: flex;flex-direction: row; align-items: center;">
-                      <a-button class="tag tag--orange" type="primary">
-                        <template #icon>
-                          <MyIcon type="icon-biaoqianlan" :style="{ fontSize: '24px' }" />
-                        </template>
-                      </a-button>
-                      <div style="margin-left:10px">
-                        <p style="font-size:14px" class="text">误分类率 / MR</p>
-                        <p class="text-muted">98%</p>
+                        <div style="display: flex;flex-direction: row; align-items: center;">
+                          <a-button class="tag tag--orange" type="primary">
+                            <template #icon>
+                              <MyIcon type="icon-biaoqianlan" :style="{ fontSize: '24px' }" />
+                            </template>
+                          </a-button>
+                          <div style="margin-left:10px">
+                            <p style="font-size:14px" class="text">误分类率 / MR</p>
+                            <p class="text-muted"> {{ parseFloat(modelCapabilityResult.MR).toFixed(3) * 100 + '%' }}
+                            </p>
+                          </div>
+                        </div>
+                        <div style="display: flex;flex-direction: row; align-items: center;">
+                          <a-button class="tag tag--orange" type="primary">
+                            <template #icon>
+                              <MyIcon type="icon-flow-suanzi-shenduxuexituili" :style="{ fontSize: '24px' }" />
+                            </template>
+                          </a-button>
+                          <div style="margin-left:10px">
+                            <p style="font-size:14px" class="text">置信偏移 / ACC</p>
+                            <p class="text-muted">AIAC {{ parseFloat(modelCapabilityResult.AIAC).toFixed(3) }} / ARTC
+                              {{ parseFloat(modelCapabilityResult.ARTC).toFixed(3) }}</p>
+                          </div>
+                        </div>
+                        <div style="display: flex;flex-direction: row; align-items: center;">
+                          <a-button class="tag tag--orange" type="primary">
+                            <template #icon>
+                              <MyIcon type="icon-juliceliang" :style="{ fontSize: '24px' }" />
+                            </template>
+                          </a-button>
+                          <div style="margin-left:10px">
+                            <p style="font-size:14px" class="text">范数距离 / AND</p>
+                            <p class="text-muted">AMD {{ parseFloat(modelCapabilityResult.AMD).toFixed(3) }} / AED {{
+                              parseFloat(modelCapabilityResult.AED).toFixed(3) }} </p>
+                          </div>
+                        </div>
+                        <div style="display: flex;flex-direction: row; align-items: center;">
+                          <a-button class="tag tag--orange" type="primary">
+                            <template #icon>
+                              <MyIcon type="icon-ic_huazhi" :style="{ fontSize: '24px' }" />
+                            </template>
+                          </a-button>
+                          <div style="margin-left:10px">
+                            <p style="font-size:14px" class="text">图像质量 / AMS</p>
+                            <p class="text-muted">ADMS {{ parseFloat(modelCapabilityResult.ADMS).toFixed(3) }} / ALMS
+                              {{ parseFloat(modelCapabilityResult.ALMS).toFixed(3) }}</p>
+                          </div>
+                        </div>
+
                       </div>
-                    </div>
-                    <div style="display: flex;flex-direction: row; align-items: center;">
-                      <a-button class="tag tag--orange" type="primary">
-                        <template #icon>
-                          <MyIcon type="icon-flow-suanzi-shenduxuexituili" :style="{ fontSize: '24px' }" />
-                        </template>
-                      </a-button>
-                      <div style="margin-left:10px">
-                        <p style="font-size:14px" class="text">置信偏移 / ACC</p>
-                        <p class="text-muted">AIAC 0.7 / ARTC 0.8</p>
-                      </div>
-                    </div>
-                    <div style="display: flex;flex-direction: row; align-items: center;">
-                      <a-button class="tag tag--orange" type="primary">
-                        <template #icon>
-                          <MyIcon type="icon-juliceliang" :style="{ fontSize: '24px' }" />
-                        </template>
-                      </a-button>
-                      <div style="margin-left:10px">
-                        <p style="font-size:14px" class="text">范数距离 / AND</p>
-                        <p class="text-muted">AMD 0.01 / AED 0.7 </p>
-                      </div>
-                    </div>
-                    <div style="display: flex;flex-direction: row; align-items: center;">
-                      <a-button class="tag tag--orange" type="primary">
-                        <template #icon>
-                          <MyIcon type="icon-ic_huazhi" :style="{ fontSize: '24px' }" />
-                        </template>
-                      </a-button>
-                      <div style="margin-left:10px">
-                        <p style="font-size:14px" class="text">图像质量 / AMS</p>
-                        <p class="text-muted">ADMS 0.01 / ALMS 0.01</p>
-                      </div>
-                    </div>
-                  </div>
+                    </a-tab-pane>
+                  </a-tabs>
                 </a-card>
               </div>
               <div style="flex: 1; display: flex;flex-direction: column;">
@@ -319,7 +329,7 @@
                   <div style="display: flex; align-items: center; flex-direction: column;">
                     <a-carousel dot-position="bottom" style="width: 400px; height: 225px;">
                       <div v-for="(imageSrc, index) in imageArray" :key="index">
-                        <img style="height: 225px; width: 400px" :src="imageSrc" />
+                        <img style="width: 400px" :src="imageSrc" />
                       </div>
                     </a-carousel>
                   </div>
@@ -335,7 +345,7 @@
 
 
 <script>
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, ref, reactive } from 'vue';
 import DMGraph from './DMGraph.vue';
 import TransferTestMap from './TransferTestMap.vue';
 import WebConsole from '@/views/test-manage/TestTaskConsole/WebConsole.vue';
@@ -350,7 +360,8 @@ const MyIcon = createFromIconfontCN({
 });
 
 import { getTaskByTaskID } from '@/api/task-api/taskInfo.js';
-
+import { getModelSecuritySyntheticalCapabilityResult } from '@/api/framework-api/analyzer.js';
+import { async } from '@antv/x6/lib/registry/marker/async';
 export default defineComponent({
   name: 'ScreenCore',
   components: {
@@ -375,25 +386,52 @@ export default defineComponent({
     const taskInfo = ref();
     const webConsole = ref();
     const dmGraph = ref();
-    const imageArray = ref([])
+    const imageArray = ref([]);
+    let imageArraytmp = [];
+    const modelList = ref();
+    const modelCapabilityResult = ref({});
     onMounted(async () => {
       taskID.value = localStorage.getItem('nowTaskID');
+      if (!sessionStorage.getItem('nowTaskID')) {
+        sessionStorage.setItem('nowTaskID', taskID.value);
+      }
       await loadTaskData();
+      await loadImageArray();
+      await loadResultByModelName(modelList.value[0]);
       if (taskInfo.value.batchToken != null) {
         await processingBoard.value.loadProcessingData();
       }
     });
-
-
+    const loadResultByModelName = async (modelName) => {
+      modelCapabilityResult.value = await getModelSecuritySyntheticalCapabilityResult(nodeServerAddr.value, modelName, taskInfo.value.batchToken);
+    }
+    const loadImageArray = async () => {
+      let imageString = sessionStorage.getItem('imageArray');
+      if (imageString) {
+        imageArray.value = JSON.parse(imageString);
+      }
+      isTaskIdChanged();
+    }
+    const isTaskIdChanged = () => {
+      if (sessionStorage.getItem('nowTaskID') != taskID.value) {
+        sessionStorage.setItem('nowTaskID', taskID.value);
+        imageArray.value = [];
+      }
+    }
     const loadTaskData = async () => {
       taskInfo.value = await getTaskByTaskID(taskID.value);
+      modelList.value = JSON.parse(taskInfo.value['config'])['model_list'];
     };
     const onReceived = async (logMsg) => {
       await processingBoard.value.loadProcessingData();
       await dmGraph.value.changeNodeStatus(processingBoard.value['processingData']);
+      isTaskIdChanged();
     };
     const onBase64Received = async (msg) => {
-      await (imageArray.value.push(msg)); 
+      imageArraytmp.push(msg);
+      let imageArrayToString = JSON.stringify(imageArraytmp);
+      sessionStorage.setItem('imageArray', imageArrayToString);
+      await loadImageArray();
     };
     return {
       nodeServerAddr,
@@ -403,9 +441,12 @@ export default defineComponent({
       processingBoard,
       dmGraph,
       imageArray,
+      modelList,
+      modelCapabilityResult,
 
       onReceived,
       onBase64Received,
+      loadResultByModelName,
     };
   },
 });
