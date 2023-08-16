@@ -44,8 +44,8 @@
             </a-button>
             <p class="tag__text" style="font-size: 16px; margin-left:5px">GPU</p>
           </div>
-          <p style="font-size:20px" class="text">99%</p>
-          <a-progress strokeColor="#ea5455" trailColor="#363b54" :percent="99" size="small" :format="() => { }" />
+          <p style="font-size:20px" class="text">{{ systemUsage.gpuUsage}}%</p>
+        <a-progress strokeColor="#ea5455" trailColor="#363b54" :percent="systemUsage.gpuUsage" size="small" :format="()=>{}" />
         </div>
         <div style="flex: 1">
           <div style="display: flex; align-items: center;">
@@ -56,8 +56,8 @@
             </a-button>
             <p class="tag__text" style="font-size: 16px; margin-left:5px">CPU</p>
           </div>
-          <p style="font-size:20px" class="text">51%</p>
-          <a-progress strokeColor="#7367f0" trailColor="#363b54" :percent="51" size="small" :format="() => { }" />
+          <p style="font-size:20px" class="text">{{ systemUsage.cpuUsage}}%</p>
+          <a-progress strokeColor="#7367f0" trailColor="#363b54" :percent="systemUsage.cpuUsage" size="small" :format="()=>{}" />
         </div>
         <div style="flex: 1">
           <div style="display: flex; align-items: center;">
@@ -68,8 +68,8 @@
             </a-button>
             <p class="tag__text" style="font-size: 16px; margin-left:5px">显存</p>
           </div>
-          <p style="font-size:20px" class="text">23.1 GB</p>
-          <a-progress strokeColor="#00cfe8" trailColor="#363b54" :percent="95" size="small" :format="() => { }" />
+          <p style="font-size:20px" class="text">{{ systemUsage.gpuUseMemorySize}} GB</p>
+          <a-progress strokeColor="#00cfe8" trailColor="#363b54" :percent="systemUsage.gpuUseMemorySize" size="small" :format="()=>{}" />
         </div>
         <div style="flex: 1">
           <div style="display: flex; align-items: center;">
@@ -80,13 +80,13 @@
             </a-button>
             <p class="tag__text" style="font-size: 16px; margin-left:5px">内存</p>
           </div>
-          <p style="font-size:20px" class="text">5.8 GB</p>
-          <a-progress strokeColor="#ff9f43" trailColor="#363b54" :percent="12" size="small" :format="() => { }" />
+          <p style="font-size:20px" class="text">{{ systemUsage.cpuUseMemorySize}} GB</p>
+          <a-progress strokeColor="#ff9f43" trailColor="#363b54" :percent="systemUsage.cpuUseMemorySize" size="small" :format="()=>{}" />
         </div>
       </div>
     </a-card>
     <br />
-    <DeviceMonitor />
+    <DeviceMonitor ref="deviceMonitor"/>
   </a-card>
 </template>
 
@@ -101,6 +101,7 @@ const MyIcon = createFromIconfontCN({
 
 import { getSystemInfo } from '@/api/framework-api/system.js';
 import { async } from '@antv/x6/lib/registry/marker/async';
+import List from 'ant-design-vue/lib/vc-virtual-list/List';
 
 export default defineComponent({
   name: 'ServerNodeStatus',
@@ -122,19 +123,31 @@ export default defineComponent({
       gpuMemorySize: null,
       memorySize: null,
     });
+    const systemUsage = ref({
+      cpuUsage : Number(0),
+      gpuUsage : Number(0),
+      cpuUseMemorySize : Number(0),
+      gpuUseMemorySize : Number(0)
+    });
     const systemClock = ref();
     const networkStatus = ref();
-    const cpuUseRate = ref();
-    const gpuUseRate = ref();
-    const gpuMemoryUsedSize = ref();
     const memoryUsedSize = ref();
+    const deviceMonitor = ref();
 
     onMounted(async () => {
       systemInfo.value = await getSystemInfo(props.nodeServerAddr);
     });
 
+    const ChangeSystemUsage = async (msg) => {
+      systemUsage.value = await msg;
+      await deviceMonitor.value.ChangeDeviceMonitor(systemUsage.value, systemInfo.value);
+    };
     return {
       systemInfo,
+      systemUsage,
+      deviceMonitor,
+
+      ChangeSystemUsage
     };
   },
 });

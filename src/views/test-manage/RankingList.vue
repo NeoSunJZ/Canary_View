@@ -6,28 +6,7 @@
 
 <template>
   <MainPageNavigation :selectedKeys="['9']" :openKeys="['sub2']">
-    <template v-slot:submenu>
-      <a-menu v-model:selectedKeys="current" mode="horizontal" class="submenu">
-        <a-menu-item key="defenseTest">
-          <template #icon>
-            <mail-outlined />
-          </template>
-          防御测试
-        </a-menu-item>
-        <a-menu-item key="attackTest">
-          <template #icon>
-            <mail-outlined />
-          </template>
-          攻击测试
-        </a-menu-item>
-        <a-menu-item key="attackTest">
-          <template #icon>
-            <mail-outlined />
-          </template>
-          模型测试
-        </a-menu-item>
-      </a-menu>
-    </template>
+    
     <template v-slot:breadcrumb>
       <a-breadcrumb-item>Home</a-breadcrumb-item>
       <a-breadcrumb-item>List</a-breadcrumb-item>

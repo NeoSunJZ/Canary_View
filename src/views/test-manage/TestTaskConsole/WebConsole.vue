@@ -123,6 +123,7 @@
 <script>
 import { nextTick, onMounted, reactive, ref } from 'vue';
 import { message } from 'ant-design-vue';
+import { startSystemMonitor , endSystemMonitor, refreshSystemMonitorWatchDog} from '@/api/framework-api/system.js';
 import {
   CodeOutlined,
   DisconnectOutlined,
@@ -137,6 +138,7 @@ import {
   CheckCircleOutlined,
 } from '@ant-design/icons-vue';
 import io from 'socket.io-client';
+import { async } from '@antv/x6/lib/registry/marker/async';
 
 export default {
   name: 'WebConsole',
@@ -188,6 +190,14 @@ export default {
       if(type == 'BASE64'){
         context.emit('receivedBase64Img', msg);  
         return ;
+      }
+      if(type == 'USAGE'){
+        context.emit('receivedSystemUsage', msg);  
+        refreshSystemMonitorWatchDog(props.nodeServerAddr)
+        return ;
+      }
+      if(type == 'VERSION'){
+        return;
       }
       let date = new Date();
       if (recordTime == null) {
@@ -248,12 +258,14 @@ export default {
 
     var socket = null;
     const disconnect = () => {
+      endSystemMonitor(props.nodeServerAddr)
       socket.emit("leave_room", room.value);
       socket.close();
     };
 
     const join = () => {
       url.value = `http://` + props.nodeServerAddr + `/realtime_msg`;
+
       socket = getSocketIO(url.value);
       socket.on('message', (data) => {
         if (data.type != 'ERROR') {
@@ -284,6 +296,7 @@ export default {
       socket.on('connect', () => {
         addLog('已与SEFI服务节点建立连接');
         socket.emit('join');
+        startSystemMonitor(props.nodeServerAddr)
       });
       socket.open();
     };

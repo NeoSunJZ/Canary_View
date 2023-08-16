@@ -24,7 +24,7 @@
                 <p class="text-muted">请等待节点信息加载</p>
               </template>
             </a-empty>
-            <ServerNodeStatus v-else :nodeServerAddr="nodeServerAddr" />
+            <ServerNodeStatus v-else :nodeServerAddr="nodeServerAddr" ref="serverNodeStatus"/>
             <a-divider style="height: 1px; background-color: #7983bb; margin:5px 0" />
             <a-card style="margin:10px">
               <p style="font-size:20px" class="text">关于</p>
@@ -41,9 +41,9 @@
                 </p>
                 <p class="text-muted">
                   SEFI版本
-                  <span class="text"> SEFI V2.0.3
+                  <span class="text"> SEFI V{{systemVersion.sefiVersion}}
                   </span><a-divider type="vertical" />
-                  SEFI Lib版本 <span class="text"> Build-in Lib V1.0.1</span>
+                  SEFI Lib版本 <span class="text"> Build-in Lib V{{systemVersion.sefiLibVersion}}</span>
                 </p>
                 <a-divider style="height: 1px; background-color: #7983bb; margin:5px 0" />
                 <p class="text-muted">
@@ -138,7 +138,8 @@
                   <p style="font-size:20px" class="text">实时SEFI系统日志</p>
                   <p class="text-muted">节点Console</p>
                   <WebConsole ref="webConsole" v-if="taskInfo != null" :showTitle="false" maxHeight="95px"
-                    :nodeServerAddr="nodeServerAddr" @received="onReceived" @receivedBase64Img="onBase64Received">
+                    :nodeServerAddr="nodeServerAddr" @received="onReceived" @receivedBase64Img="onBase64Received"
+                    @receivedSystemUsage="onSystemUsage">
                   </WebConsole>
                 </a-card>
                 <a-card style="margin:10px">
@@ -260,6 +261,8 @@ const MyIcon = createFromIconfontCN({
 import { getTaskByTaskID } from '@/api/task-api/taskInfo.js';
 import { getModelSecuritySyntheticalCapabilityResult } from '@/api/framework-api/analyzer.js';
 import { async } from '@antv/x6/lib/registry/marker/async';
+import { getSystemVersion} from '@/api/framework-api/system.js';
+
 export default defineComponent({
   name: 'ScreenCore',
   components: {
@@ -288,6 +291,11 @@ export default defineComponent({
     let imageArraytmp = [];
     const modelList = ref();
     const modelCapabilityResult = ref({});
+    const serverNodeStatus = ref();
+    const systemVersion = ref({
+      sefiVersion: '',
+      sefiLibVersion: '',
+    });
     onMounted(async () => {
       taskID.value = localStorage.getItem('nowTaskID');
       if (!sessionStorage.getItem('nowTaskID')) {
@@ -299,7 +307,8 @@ export default defineComponent({
       if (taskInfo.value.batchToken != null) {
         await processingBoard.value.loadProcessingData();
       }
-    });
+      systemVersion.value = await getSystemVersion(nodeServerAddr.value)
+    }); 
     const loadResultByModelName = async (modelName) => {
       modelCapabilityResult.value = await getModelSecuritySyntheticalCapabilityResult(nodeServerAddr.value, modelName, taskInfo.value.batchToken);
     }
@@ -326,10 +335,10 @@ export default defineComponent({
       isTaskIdChanged();
     };
     const onBase64Received = async (msg) => {
-      imageArraytmp.push(msg);
-      let imageArrayToString = JSON.stringify(imageArraytmp);
-      sessionStorage.setItem('imageArray', imageArrayToString);
-      await loadImageArray();
+      await (imageArray.value.push(msg)); 
+    };
+    const onSystemUsage = async (msg) => {
+      await serverNodeStatus.value.ChangeSystemUsage(msg)
     };
     return {
       nodeServerAddr,
@@ -341,10 +350,13 @@ export default defineComponent({
       imageArray,
       modelList,
       modelCapabilityResult,
+      serverNodeStatus,
+      systemVersion,
 
       onReceived,
       onBase64Received,
       loadResultByModelName,
+      onSystemUsage
     };
   },
 });

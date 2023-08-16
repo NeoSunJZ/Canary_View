@@ -7,13 +7,7 @@
 <template>
   <MainPageNavigation :selectedKeys="['8']" :openKeys="['sub2']">
 
-    <template v-slot:submenu>
-      <a-menu v-model:selectedKeys="taskListType" mode="horizontal" class="submenu" @select="loadData(true)">
-        <a-menu-item key="DefenseTest"> 防御测试 </a-menu-item>
-        <a-menu-item key="AttackTest"> 攻击测试 </a-menu-item>
-        <a-menu-item key="ModelTest"> 模型测试 </a-menu-item>
-      </a-menu>
-    </template>
+    
     <template v-slot:breadcrumb>
       <a-breadcrumb-item>测试任务管理</a-breadcrumb-item>
       <a-breadcrumb-item>测试任务结果分析</a-breadcrumb-item>
