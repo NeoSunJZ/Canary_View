@@ -69,7 +69,7 @@
             <p class="tag__text" style="font-size: 16px; margin-left:5px">显存</p>
           </div>
           <p style="font-size:20px" class="text">{{ systemUsage.gpuUseMemorySize}} GB</p>
-          <a-progress strokeColor="#00cfe8" trailColor="#363b54" :percent="systemUsage.gpuUseMemorySize" size="small" :format="()=>{}" />
+          <a-progress strokeColor="#00cfe8" trailColor="#363b54" :percent="systemUsage.gpuUseMemorySize / systemInfo.gpuMemorySize * 100" size="small" :format="()=>{}" />
         </div>
         <div style="flex: 1">
           <div style="display: flex; align-items: center;">
@@ -81,7 +81,7 @@
             <p class="tag__text" style="font-size: 16px; margin-left:5px">内存</p>
           </div>
           <p style="font-size:20px" class="text">{{ systemUsage.cpuUseMemorySize}} GB</p>
-          <a-progress strokeColor="#ff9f43" trailColor="#363b54" :percent="systemUsage.cpuUseMemorySize" size="small" :format="()=>{}" />
+          <a-progress strokeColor="#ff9f43" trailColor="#363b54" :percent="systemUsage.cpuUseMemorySize / systemInfo.memorySize * 100" size="small" :format="()=>{}" />
         </div>
       </div>
     </a-card>
@@ -120,8 +120,8 @@ export default defineComponent({
       osVersion: '',
       cpuName: null,
       gpuName: null,
-      gpuMemorySize: null,
-      memorySize: null,
+      gpuMemorySize: Number(1),
+      memorySize: Number(1),
     });
     const systemUsage = ref({
       cpuUsage : Number(0),
