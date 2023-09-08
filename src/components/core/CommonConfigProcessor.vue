@@ -1,5 +1,7 @@
 <style scoped lang="less">
 @import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
+
 .processor {
   &__refresh {
     color: @primary-color;
@@ -16,9 +18,9 @@
           <SyncOutlined :spin="true" v-if="notice.status == 'processing'" />
           <ExclamationCircleOutlined v-if="notice.status == 'warning'" />
         </template>
-        {{notice.info}}
+        {{ notice.info }}
       </a-tag>
-      <span v-if="declaration!=null">
+      <span v-if="declaration != null">
         <a-divider type="vertical" />
         <a class="ant-dropdown-link" @click.stop="openConfigModel(false)">
           参数配置
@@ -28,9 +30,10 @@
       <SyncOutlined @click.stop="task(true)" class="processor__refresh" />
     </div>
 
-    <CommonConfigModel ref="configModel" v-if="declaration!=null" :title="configModelTitle" :field="{configID: field['configID']}"
-      :paramsDesc="declaration['info'][field['paramsDesc']]" :providerID="providerID!=null?providerID:defaultProviderID" :providerType="providerType" :getPresetConfig="getConfig"
-      @submit="handleSubmit" @cancel="handleCancel">
+    <CommonConfigModel ref="configModel" v-if="declaration != null" :title="configModelTitle"
+      :field="{ configID: field['configID'] }" :paramsDesc="declaration['info'][field['paramsDesc']]"
+      :providerID="providerID != null ? providerID : defaultProviderID" :providerType="providerType"
+      :getPresetConfig="getConfig" @submit="handleSubmit" @cancel="handleCancel">
     </CommonConfigModel>
 
   </div>

@@ -3,26 +3,36 @@
  -->
 
 <style scoped lang="less">
+@import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
+
 .layout {
   height: 100vh;
+
   &__menu {
     background-color: white;
   }
+
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 20px;
+    background-color: @primary-color;
   }
+
   &__collapse_button {
     margin-left: 60px;
     color: white;
   }
+
   &__content {
     overflow-y: scroll;
+
     &__breadcrumb {
       margin: 16px 24px;
     }
+
     &__card {
       margin: 0px 24px;
     }
@@ -42,7 +52,7 @@
         </a-button>
       </div>
 
-      <a-menu theme="dark" mode="horizontal">
+      <a-menu mode="horizontal">
         <a-menu-item key="1">关于系统</a-menu-item>
       </a-menu>
     </a-layout-header>
@@ -98,6 +108,12 @@
                 <AppstoreAddOutlined />
               </template>
               测试任务构建
+            </a-menu-item>
+            <a-menu-item key="11" @click="toPage('QuickConstruction')">
+              <template #icon>
+                <AppstoreOutlined />
+              </template>
+              快速构建测试任务
             </a-menu-item>
             <a-menu-item key="7" @click="toPage('TaskRealtimeBoard')">
               <template #icon>
@@ -159,6 +175,7 @@ import {
   FundOutlined,
   RocketOutlined,
   QuestionCircleOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons-vue';
 import { defineComponent, ref, toRefs, reactive, onBeforeMount } from 'vue';
 
@@ -178,6 +195,7 @@ export default defineComponent({
     FundOutlined,
     RocketOutlined,
     QuestionCircleOutlined,
+    AppstoreOutlined,
   },
   props: {
     openKeys: Array, //控制侧边栏中哪些父菜单打开

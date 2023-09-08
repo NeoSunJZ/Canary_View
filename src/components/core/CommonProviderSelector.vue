@@ -1,11 +1,14 @@
 <style scoped lang="less">
 @import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
+
 .provider-list {
   width: 100%;
   display: flex;
   flex-direction: row;
   overflow-x: scroll;
 }
+
 .provider {
   flex-shrink: 0;
   width: 300px;
@@ -15,6 +18,7 @@
   flex-direction: column;
   justify-content: center;
   overflow: hidden;
+
   &__con {
     width: 30px;
     height: 30px;
@@ -24,18 +28,23 @@
     right: -15px;
     transform: rotate(45deg);
   }
+
   &__icon {
     font-size: 32px;
+
     &--current {
       color: @primary-color;
     }
+
     &--disable {
       color: @error-color;
     }
   }
+
   &__title {
     margin-left: 10px;
   }
+
   &__detail {
     margin: 10px 0;
   }
@@ -44,10 +53,12 @@
 <template>
   <div>
     <div class="provider-list">
-      <a-card size="small" class="provider" v-for="(data,index) in providerList" :key="index" @click="currentServerInfo.nodeID==data.nodeInfo.nodeID?selectProvider(data):()=>{}">
+      <a-card size="small" class="provider" v-for="(data, index) in providerList" :key="index"
+        @click="currentServerInfo.nodeID == data.nodeInfo.nodeID ? selectProvider(data) : () => { }">
         <div class="provider__con" v-if="data[field.providerID] == selectedProviderID"></div>
         <div>
-          <ApiOutlined :class="'provider__icon '+(currentServerInfo.nodeID==data.nodeInfo.nodeID ? 'provider__icon--current' : 'provider__icon--disable')" />
+          <ApiOutlined
+            :class="'provider__icon ' + (currentServerInfo.nodeID == data.nodeInfo.nodeID ? 'provider__icon--current' : 'provider__icon--disable')" />
           <span class="provider__title">
             <a-typography-text type="secondary">来源: </a-typography-text>
             {{ data[field.source] }}
@@ -55,7 +66,7 @@
         </div>
         <div class="provider__detail">
           提供者 - {{ data.nodeInfo.nodeName }} (NodeID: {{ data.nodeInfo.nodeID }})
-          <a-tag color="error" v-if="currentServerInfo.nodeID!=data.nodeInfo.nodeID" style="margin-left:5px">
+          <a-tag color="error" v-if="currentServerInfo.nodeID != data.nodeInfo.nodeID" style="margin-left:5px">
             <CloseCircleOutlined /> 非当前节点
           </a-tag>
           <br />

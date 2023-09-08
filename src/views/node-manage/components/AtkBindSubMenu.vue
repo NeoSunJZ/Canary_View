@@ -1,6 +1,7 @@
 <style lang="less" scoped>
 .editable-cell {
   position: relative;
+
   .editable-cell-input-wrapper,
   .editable-cell-text-wrapper {
     padding-right: 24px;
@@ -36,6 +37,7 @@
     margin-bottom: 8px;
   }
 }
+
 .editable-cell:hover .editable-cell-icon {
   display: inline-block;
 }
@@ -43,24 +45,39 @@
 
 
 <template>
-  <a-table :columns="Columns" :data-source="data" :pagination="false" :scroll="{x:1000}">
-    <template #bodyCell="{ column,record,text }">
+  <a-drawer title="方法详情" placement="right" :visible="methodDetailsVisible" :get-container="false" width="70%"
+    :style="{ position: 'fixed' }" @close="methodDetailsVisible = false">
+    <a-collapse v-if='methodDetailsVisible' v-model:activeKey="activeKey">
+      <a-collapse-panel v-for="(code, index) in codes[0]" :key="index" :header="code.filename">
+        <AtkBindCode :content="code.content"></AtkBindCode>
+      </a-collapse-panel>
+    </a-collapse>
+  </a-drawer>
+  <a-table :columns="Columns" :data-source="data" :pagination="false" :scroll="{ x: 1000 }">
+    <template #bodyCell="{ column, record, text }">
       <template v-if="column.dataIndex === 'operation'">
-        <a-popconfirm v-if="data.length" title="确认删除?" okText="确定" cancelText="取消" @confirm="onDelete(record.attackMethodProviderID)">
+        <a-popconfirm v-if="data.length" title="确认删除?" okText="确定" cancelText="取消"
+          @confirm="onDelete(record.attackMethodProviderID)">
           <a>删除</a>
         </a-popconfirm>
+        <br>
+        <a @click="showCode(record.nodePath, record.bindAttackMethodName)">查看代码</a>
+        <br>
       </template>
 
       <template v-else-if="column.dataIndex === 'attackMethodSource'">
         <div class="editable-cell">
-          <div v-if="editableData[record.attackMethodProviderID]&&editableElement[record.attackMethodProviderID]=='attackMethodSource'"
+          <div
+            v-if="editableData[record.attackMethodProviderID] && editableElement[record.attackMethodProviderID] == 'attackMethodSource'"
             class="editable-cell-input-wrapper">
-            <a-input v-model:value="editableData[record.attackMethodProviderID].attackMethodSource" @pressEnter="save(record.attackMethodProviderID)" />
+            <a-input v-model:value="editableData[record.attackMethodProviderID].attackMethodSource"
+              @pressEnter="save(record.attackMethodProviderID)" />
             <check-outlined class="editable-cell-icon-check" @click="save(record.attackMethodProviderID)" />
           </div>
           <div v-else class="editable-cell-text-wrapper">
             {{ text || ' ' }}
-            <edit-outlined class="editable-cell-icon" @click="edit(record.attackMethodProviderID,'attackMethodSource')" />
+            <edit-outlined class="editable-cell-icon"
+              @click="edit(record.attackMethodProviderID, 'attackMethodSource')" />
           </div>
         </div>
       </template>
@@ -68,19 +85,20 @@
       <template v-else-if="column.dataIndex === 'bindAttackMethodName'">
 
         <div class="editable-cell">
-          <div v-if="editableData[record.attackMethodProviderID]&&editableElement[record.attackMethodProviderID]=='bindAttackMethodName'"
+          <div
+            v-if="editableData[record.attackMethodProviderID] && editableElement[record.attackMethodProviderID] == 'bindAttackMethodName'"
             class="editable-cell-input-wrapper">
-            <a-input v-model:value="editableData[record.attackMethodProviderID].bindAttackMethodName" @pressEnter="save(record.attackMethodProviderID)" />
+            <a-input v-model:value="editableData[record.attackMethodProviderID].bindAttackMethodName"
+              @pressEnter="save(record.attackMethodProviderID)" />
             <check-outlined class="editable-cell-icon-check" @click="save(record.attackMethodProviderID)" />
           </div>
           <div v-else class="editable-cell-text-wrapper">
             {{ text || ' ' }}
-            <edit-outlined class="editable-cell-icon" @click="edit(record.attackMethodProviderID,'bindAttackMethodName')" />
+            <edit-outlined class="editable-cell-icon"
+              @click="edit(record.attackMethodProviderID, 'bindAttackMethodName')" />
           </div>
         </div>
-
       </template>
-
     </template>
   </a-table>
 </template>
@@ -90,7 +108,8 @@ import { defineComponent, onBeforeMount, ref, reactive, computed, watch } from '
 import { getAtkProvider, updateAtkMethodProvider, deleteAtkMethodProvider } from '@/api/atk-api/atkInfo';
 import { DeploymentUnitOutlined, ClusterOutlined, CheckOutlined, EditOutlined, SyncOutlined } from '@ant-design/icons-vue';
 import { cloneDeep } from 'lodash-es';
-
+import { getCodeByAttackName } from "@/api/code-api/code";
+import AtkBindCode from "@/views/node-manage/components/AtkBindCode.vue";
 export default defineComponent({
   name: 'AtkBindSubMenu',
   components: {
@@ -99,6 +118,7 @@ export default defineComponent({
     CheckOutlined,
     EditOutlined,
     SyncOutlined,
+    AtkBindCode,
   },
   props: {
     attackMethodID: {
@@ -191,7 +211,14 @@ export default defineComponent({
         });
       }
     );
-
+    const codes = ref();
+    const activeKey = ref([]);
+    const methodDetailsVisible = ref(false);
+    const showCode = async (nodeAddr, attackName) => {
+      codes.value = await getCodeByAttackName(nodeAddr, attackName);
+      methodDetailsVisible.value = true;
+      console.log(methodDetailsVisible.value);
+    };
     onBeforeMount(async () => {
       data.value = await getAtkProvider(props.attackMethodID);
       data.value.forEach((element) => {
@@ -199,7 +226,7 @@ export default defineComponent({
         element.nodePath = element.nodeInfo.host + ':' + element.nodeInfo.port;
       });
     });
-    return { Columns, data, edit, save, editableData, editableElement, onDelete };
+    return { Columns, data, edit, save, editableData, codes, activeKey, editableElement, methodDetailsVisible, onDelete, showCode, };
   },
 });
 </script>

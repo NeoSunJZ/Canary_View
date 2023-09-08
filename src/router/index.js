@@ -43,6 +43,11 @@ const routes = [{
     component: () => import("@/views/test-manage/TestTaskConstruction/AttackTest.vue")
   },
   {
+    path: "/QuickConstruction",
+    name: "QuickConstruction",
+    component: () => import("@/views/test-manage/QuickConstruction/QuickConstruction.vue")
+  },
+  {
     path: "/TaskRealtimeBoard",
     name: "TaskRealtimeBoard",
     component: () => import("@/views/test-manage/TestTaskConsole/TaskRealtimeBoard.vue")

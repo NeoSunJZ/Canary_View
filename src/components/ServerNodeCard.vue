@@ -3,21 +3,27 @@
  -->
 <style scoped lang="less">
 @import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
+
 .server {
   height: 100%;
   margin-left: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+
   &__icon {
     font-size: 32px;
     color: @primary-color;
   }
+
   &__title {
     margin-left: 10px;
   }
+
   &__detail {
     margin-top: 5px;
+
     &__modal {
       &__select {
         width: 100%;
@@ -25,6 +31,7 @@
     }
   }
 }
+
 .ant-ribbon-wrapper {
   height: 100%;
 }
@@ -39,7 +46,8 @@
         </div>
         <div v-else>
           <div>
-            <cluster-outlined class="server__icon" /><span class="server__title">服务节点 - {{ data[selectedServerIndex].nodeName }}</span>
+            <cluster-outlined class="server__icon" /><span class="server__title">服务节点 - {{
+              data[selectedServerIndex].nodeName }}</span>
           </div>
           <div>
             IP地址 - {{ data[selectedServerIndex].host }}
@@ -52,8 +60,8 @@
             <!-- 对话框用于更换节点 -->
             <a-modal v-model:visible="visible" @ok="handleOk" :closable='false'>
               <a-select ref="select" v-model:value="newServerIndex" class="server__detail__modal__select" @focus="focus">
-                <a-select-option v-for="(item,index) in data" :value="index" :key="index">
-                  {{item.nodeName+' '+item.host+ ' '+item.port}}
+                <a-select-option v-for="(item, index) in data" :value="index" :key="index">
+                  {{ item.nodeName + ' ' + item.host + ' ' + item.port }}
                 </a-select-option>
               </a-select>
             </a-modal>

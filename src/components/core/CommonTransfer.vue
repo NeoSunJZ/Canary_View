@@ -4,18 +4,24 @@
 
 <template>
   <div style="width:100%">
-    <a-alert :message="'请注意，您至多可选择(并移动至右侧) '+maxItem+' 个选项'" type="info" show-icon v-if="maxItem!=null" style="margin-bottom:5px " />
-    <a-transfer v-model:target-keys="targetKeys" v-model:selected-keys="selectedKeys" :data-source="data" :rowKey="(record) => String(record[fields.id])" :showSelectAll="false"
-      :list-style="{'min-width': '250px', 'min-height': '300px', flex: 1,}" :titles="[' 已(预)加载', ' 已选定']" :operations="['加入队列', '移除队列']" @change="handleMoveItemChange"
-      style="width: 100%">
+    <a-alert :message="'请注意，您至多可选择(并移动至右侧) ' + maxItem + ' 个选项'" type="info" show-icon v-if="maxItem != null"
+      style="margin-bottom:5px " />
+    <a-transfer v-model:target-keys="targetKeys" v-model:selected-keys="selectedKeys" :data-source="data"
+      :rowKey="(record) => String(record[fields.id])" :showSelectAll="false"
+      :list-style="{ 'min-width': '250px', 'min-height': '300px', flex: 1, }" :titles="[' 已(预)加载', ' 已选定']"
+      :operations="['加入队列', '移除队列']" @change="handleMoveItemChange" style="width: 100%">
 
-      <template #children="{direction, filteredItems, selectedKeys, disabled: listDisabled, onItemSelectAll, onItemSelect}">
+      <template
+        #children="{ direction, filteredItems, selectedKeys, disabled: listDisabled, onItemSelectAll, onItemSelect }">
         <a-spin :spinning="direction === 'left' && loading" tip="正在加载">
-          <a-table :row-selection="getRowSelection({disabled: listDisabled, selectedKeys, onItemSelectAll, onItemSelect,})"
-            :custom-row="({ key, disabled: itemDisabled }) => ({onClick: () => { if (itemDisabled || listDisabled) return; onItemSelect(key, !selectedKeys.includes(key));},})"
-            :columns="direction === 'left' ? leftTableColumns : rightTableColumns" :data-source="filteredItems" size="small"
-            :style="{ pointerEvents: listDisabled ? 'none' : null }" :pagination="direction === 'left' ? pagination : { pageSize: 5 }"
-            @change="(...args) => { direction === 'left' ? handleLeftTableChange(...args) : ()=>{} }" :scroll="direction === 'left' ? { x: 800 } : { x: 1000 }">
+          <a-table
+            :row-selection="getRowSelection({ disabled: listDisabled, selectedKeys, onItemSelectAll, onItemSelect, })"
+            :custom-row="({ key, disabled: itemDisabled }) => ({ onClick: () => { if (itemDisabled || listDisabled) return; onItemSelect(key, !selectedKeys.includes(key)); }, })"
+            :columns="direction === 'left' ? leftTableColumns : rightTableColumns" :data-source="filteredItems"
+            size="small" :style="{ pointerEvents: listDisabled ? 'none' : null }"
+            :pagination="direction === 'left' ? pagination : { pageSize: 5 }"
+            @change="(...args) => { direction === 'left' ? handleLeftTableChange(...args) : () => { } }"
+            :scroll="direction === 'left' ? { x: 800 } : { x: 1000 }">
 
             <template #bodyCell="{ column, record }">
               <slot name="tableCell" :column="column" :record="record"></slot>

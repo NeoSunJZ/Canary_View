@@ -1,25 +1,32 @@
 <style scoped lang="less">
 @import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
+
 /deep/ .log-color {
   &--green {
     color: rgb(100, 127, 0);
     font-weight: bold;
   }
+
   &--pick {
     color: #f27b9b;
   }
+
   &--orange {
     color: #eb7132;
   }
 }
+
 .console {
   max-height: 400px;
   display: flex;
   flex-direction: column;
+
   &__log-info {
     background-color: #eee;
     padding: 5px 10px;
   }
+
   &__log-area {
     overflow-y: scroll;
     border-style: solid;
@@ -28,16 +35,20 @@
     padding: 5px 10px;
     flex: 1;
   }
+
   &__type-icon {
     &--error {
       color: @error-color;
     }
+
     &--info {
       color: @primary-color;
     }
+
     &--warning {
       color: @warning-color;
     }
+
     &--success {
       color: @success-color;
     }
@@ -50,7 +61,7 @@
     <h3 v-if="showTitle">
       <CodeOutlined /> 实时日志
     </h3>
-    <div class="console" :style="{'max-height': maxHeight}">
+    <div class="console" :style="{ 'max-height': maxHeight }">
       <div class="console__log-info">
         <a-tag color="success" v-if="connect == 'success'">
           <template #icon>
@@ -86,20 +97,21 @@
       </div>
       <div class="console__log-area" ref="consoleArea">
         <div v-for="(data, index) in log" :key="index">
-          <div v-if="!(!debugMode && data.type =='DEBUG')">
-            <InfoCircleOutlined class="console__type-icon--info" v-if="data.type=='INFO'" />
-            <BugOutlined class="console__type-icon--warning" v-if="data.type=='DEBUG'" />
-            <WarningOutlined class="console__type-icon--warning" v-if="data.type=='WARNING'" />
-            <CloseCircleOutlined class="console__type-icon--error" v-if="data.type=='ERROR'" />
-            <CheckCircleOutlined class="console__type-icon--success" v-if="data.type=='SUCCESS'" />
+          <div v-if="!(!debugMode && data.type == 'DEBUG')">
+            <InfoCircleOutlined class="console__type-icon--info" v-if="data.type == 'INFO'" />
+            <BugOutlined class="console__type-icon--warning" v-if="data.type == 'DEBUG'" />
+            <WarningOutlined class="console__type-icon--warning" v-if="data.type == 'WARNING'" />
+            <CloseCircleOutlined class="console__type-icon--error" v-if="data.type == 'ERROR'" />
+            <CheckCircleOutlined class="console__type-icon--success" v-if="data.type == 'SUCCESS'" />
             <CaretRightOutlined />
-            <a-typography-text :type="data.type=='DEBUG'?'secondary':data.type=='WARNING'?'warning':data.type=='ERROR'?'danger':data.type=='SUCCESS'?'success':'default'"
+            <a-typography-text
+              :type="data.type == 'DEBUG' ? 'secondary' : data.type == 'WARNING' ? 'warning' : data.type == 'ERROR' ? 'danger' : data.type == 'SUCCESS' ? 'success' : 'default'"
               class="console__log">
-              [ {{data.time}} ]
-              <span v-html="data.text" v-if="data.type!='ERROR' || data.text['traceback'] == null"></span>
+              [ {{ data.time }} ]
+              <span v-html="data.text" v-if="data.type != 'ERROR' || data.text['traceback'] == null"></span>
               <span v-else>
                 致命错误:
-                {{data.text['exception_type']}}:{{data.text['exception_object']}}
+                {{ data.text['exception_type'] }}:{{ data.text['exception_object'] }}
                 <a-divider type="vertical" />
                 <a-popover title="错误堆栈" placement="top">
                   <template #content>
@@ -123,7 +135,7 @@
 <script>
 import { nextTick, onMounted, reactive, ref } from 'vue';
 import { message } from 'ant-design-vue';
-import { startSystemMonitor , endSystemMonitor, refreshSystemMonitorWatchDog} from '@/api/framework-api/system.js';
+import { startSystemMonitor, endSystemMonitor, refreshSystemMonitorWatchDog } from '@/api/framework-api/system.js';
 import {
   CodeOutlined,
   DisconnectOutlined,
@@ -185,18 +197,18 @@ export default {
     const room = ref();
     const url = ref();
     const log = reactive([]);
-    
-    const addLog = (msg, type = 'INFO', recordTime = null) => { 
-      if(type == 'BASE64'){
-        context.emit('receivedBase64Img', msg);  
-        return ;
+
+    const addLog = (msg, type = 'INFO', recordTime = null) => {
+      if (type == 'BASE64') {
+        context.emit('receivedBase64Img', msg);
+        return;
       }
-      if(type == 'USAGE'){
-        context.emit('receivedSystemUsage', msg);  
+      if (type == 'USAGE') {
+        context.emit('receivedSystemUsage', msg);
         refreshSystemMonitorWatchDog(props.nodeServerAddr)
-        return ;
+        return;
       }
-      if(type == 'VERSION'){
+      if (type == 'VERSION') {
         return;
       }
       let date = new Date();

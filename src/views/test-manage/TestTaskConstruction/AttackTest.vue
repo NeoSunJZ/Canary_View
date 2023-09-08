@@ -1,31 +1,40 @@
 <style scoped lang="less">
 @import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
+
 .submenu {
   height: 50px;
 }
 
 .attack-task {
   margin-bottom: 10px;
+
   &__title {
     margin-bottom: 20px;
   }
+
   &__type-select {
     &__title {
       margin-bottom: 5px;
     }
+
     &__notice {
       margin-bottom: 20px;
+
       &__title {
         color: @primary-color;
       }
+
       &__warning {
         color: @error-color;
       }
     }
   }
+
   &__steps {
     margin-bottom: 10px;
   }
+
   &__attack-selector {
     display: flex;
     justify-content: center;
@@ -61,7 +70,8 @@
             <span class="attack-task__type-select__notice__title">仅生成对抗样本</span> - 将根据您选定的攻击方法在数据集上生成对抗样本。
           </div>
           <div>
-            <span class="attack-task__type-select__notice__title">最佳扰动限制估算</span> - 依据您指定的步长与范围，尝试所有可能的扰动配置并加以比较，估算出最佳的扰动限制配置（所选攻击方法须支持该操作）。
+            <span class="attack-task__type-select__notice__title">最佳扰动限制估算</span> -
+            依据您指定的步长与范围，尝试所有可能的扰动配置并加以比较，估算出最佳的扰动限制配置（所选攻击方法须支持该操作）。
           </div>
           <div>
             <span class="attack-task__type-select__notice__title">攻击方法测评</span> - 将依据您指定的配置，对一种或多种方法进行测试，并就其表现进行综合排序。
@@ -84,15 +94,19 @@
           <a-step :key="4" title="启动测试" description="配置测试任务" />
         </a-steps>
         <div class="steps-content" v-if="!showSuccess">
-          <DatasetSelector ref="datasetSelector" :currentServerInfo="currentServerInfo" v-show="current == 0"></DatasetSelector>
-          <ModelSelector ref="modelSelector" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration" v-show="current == 1">
+          <DatasetSelector ref="datasetSelector" :currentServerInfo="currentServerInfo" v-show="current == 0">
+          </DatasetSelector>
+          <ModelSelector ref="modelSelector" :currentServerInfo="currentServerInfo"
+            :currentServerDeclaration="currentServerDeclaration" v-show="current == 1">
           </ModelSelector>
-          <AttackSelector ref="attackSelector" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration" :modelList="allConfig['model_list']"
-            v-show="current==2">
+          <AttackSelector ref="attackSelector" :currentServerInfo="currentServerInfo"
+            :currentServerDeclaration="currentServerDeclaration" :modelList="allConfig['model_list']"
+            v-show="current == 2">
           </AttackSelector>
           <div v-if="current == 3">
-            <TaskSubmit ref="taskSubmit" :config="allConfig" :currentServerInfo="currentServerInfo" :taskTypeID="attackType" v-show="current == 3"
-              @success="(id)=>{showSuccess = true;taskID = id}">
+            <TaskSubmit ref="taskSubmit" :config="allConfig" :currentServerInfo="currentServerInfo"
+              :taskTypeID="attackType" v-show="current == 3" @success="(id) => { showSuccess = true; taskID = id }"
+              @saveSuccess="(id) => { saveConfigSuccess = true; configID = id }">
             </TaskSubmit>
           </div>
         </div>
@@ -100,16 +114,25 @@
           <a-button type="primary" @click="submitDataset" v-if="current == 0">确认数据集选择</a-button>
           <a-button type="primary" @click="submitModel" v-if="current == 1">确认AI模型选择</a-button>
           <a-button type="primary" @click="submitAttack" v-if="current == 2">确认攻击方法选择</a-button>
-          <a-button type="primary" @click="taskSubmit.submit()" v-if="current == 3">
+          <a-button type="primary" @click="taskSubmit.submit(); saveConfigSuccess.value = false" v-if="current == 3">
             提交测试
           </a-button>
           <a-button v-if="current > 0" style="margin-left: 8px" @click="prev">返回上一步</a-button>
+          <a-button v-if="current == 3" style="margin-left: 8px" @click="taskSubmit.newQuickConfig()">保存至快速任务</a-button>
         </div>
         <div v-if="showSuccess">
           <a-result status="success" title="您的任务已完成构建" :sub-title="'TaskID : ' + taskID + ' . 请转至 [实时任务看板] 开启任务.'">
             <template #extra>
-              <a-button type="primary">实时任务看板</a-button>
-              <a-button>继续新建任务</a-button>
+              <a-button type="primary" @click="toPage('TaskRealtimeBoard')">实时任务看板</a-button>
+              <a-button @click="showSuccess = !showSuccess">继续新建任务</a-button>
+            </template>
+          </a-result>
+        </div>
+        <div v-if="saveConfigSuccess">
+          <a-result status="success" title="您的任务已保存" :sub-title="'ConfigID : ' + configID + ' . 请转至 [快速构建测试任务] 查看任务.'">
+            <template #extra>
+              <a-button type="primary" @click="toPage('QuickConstruction')">快速构建测试任务</a-button>
+              <a-button @click="saveConfigSuccess = !saveConfigSuccess">继续新建任务</a-button>
             </template>
           </a-result>
         </div>
@@ -167,6 +190,7 @@ export default defineComponent({
 
     const prev = () => {
       current.value--;
+      saveConfigSuccess.value = false
     };
 
     // 节点切换
@@ -217,7 +241,8 @@ export default defineComponent({
       }
     };
     const taskID = ref(null);
-
+    const configID = ref(null);
+    const saveConfigSuccess = ref(false);
     return {
       showSuccess,
       attackType,
@@ -243,6 +268,8 @@ export default defineComponent({
 
       allConfig,
       taskID,
+      configID,
+      saveConfigSuccess,
     };
   },
 });

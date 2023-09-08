@@ -1,11 +1,14 @@
 <style scoped lang="less">
 @import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
+
 .attack-selector {
   display: flex;
   justify-content: center;
   padding-top: 0px !important;
   padding: 10px;
 }
+
 .attack-transfer-selector {
   display: flex;
   flex-direction: row;
@@ -29,7 +32,8 @@
               </a-radio-group>
             </div>
             <a-alert message="将不启用转移测试，仅测试对抗样本在其靶向模型上的攻击效果" type="warning" show-icon v-if="transferAttackTest == 'NOT'" />
-            <a-alert message="将启用转移测试，除靶向模型自身外，还将测试对抗样本在该对抗方法已选中的其他模型上的攻击效果" type="warning" show-icon v-if="transferAttackTest == 'SELF_CROSS'" />
+            <a-alert message="将启用转移测试，除靶向模型自身外，还将测试对抗样本在该对抗方法已选中的其他模型上的攻击效果" type="warning" show-icon
+              v-if="transferAttackTest == 'SELF_CROSS'" />
             <a-alert type="warning" show-icon v-if="transferAttackTest == 'APPOINT'">
               <template #message>
                 将启用转移测试，测试对抗样本在指定的其他模型上的攻击效果，请在对应攻击方法 <a-typography-text type="warning">[详情]</a-typography-text> 中指定
@@ -41,18 +45,24 @@
     </a-row>
     <a-row>
       <a-col :span="16" class="attack-selector">
-        <CommonTransfer ref="commonTransfer" :leftTableColumns="leftTableColumns" :rightTableColumns="rightTableColumns" :fields="{id:'attackMethodID'}"
-          :getDataResource="getAtkInfo" @move-item-change="handleMoveItemChange">
+        <CommonTransfer ref="commonTransfer" :leftTableColumns="leftTableColumns" :rightTableColumns="rightTableColumns"
+          :fields="{ id: 'attackMethodID' }" :getDataResource="getAtkInfo" @move-item-change="handleMoveItemChange">
 
           <template #tableCell="{ column, record }">
 
             <template v-if="column.key === 'status'">
-              <CommonConfigProcessor :id="record.attackMethodID" :field="{providerID: 'attackMethodProviderID',configID: 'attackMethodConfigID',
-              paramsDesc: 'attack_config_params', providerBindName: 'bindAttackMethodName', declarationBindName:'attacker_name' }"
-                :configModelTitle="'攻击方法 '+ record.attackMethodName +' [ AtkID: '+record.attackMethodID+' ] - 高级配置'" :providerType="null"
-                :providerID="selectedProvider[record.attackMethodID]==null?null:selectedProvider[record.attackMethodID]['attackMethodProviderID']"
-                :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration['registered_component']['attacker_list']" :getConfig="getAtkConfig"
-                :getAllBindInfos="getAllAtkBindInfos" @add-async-task="(task)=>{autoConfigTaskQueue.push(task)}" @confirm="handleConfigConfirm">
+              <CommonConfigProcessor :id="record.attackMethodID"
+                :field="{
+                  providerID: 'attackMethodProviderID', configID: 'attackMethodConfigID',
+                  paramsDesc: 'attack_config_params', providerBindName: 'bindAttackMethodName', declarationBindName: 'attacker_name'
+                }"
+                :configModelTitle="'攻击方法 ' + record.attackMethodName + ' [ AtkID: ' + record.attackMethodID + ' ] - 高级配置'"
+                :providerType="null"
+                :providerID="selectedProvider[record.attackMethodID] == null ? null : selectedProvider[record.attackMethodID]['attackMethodProviderID']"
+                :currentServerInfo="currentServerInfo"
+                :currentServerDeclaration="currentServerDeclaration['registered_component']['attacker_list']"
+                :getConfig="getAtkConfig" :getAllBindInfos="getAllAtkBindInfos"
+                @add-async-task="(task) => { autoConfigTaskQueue.push(task) }" @confirm="handleConfigConfirm">
               </CommonConfigProcessor>
             </template>
 
@@ -70,8 +80,10 @@
       <a-col :span="8" class="attack-selector">
         <AttackDetails ref="attackDetails">
           <template #extra="{ record }">
-            <CommonProviderSelector :field="{providerID:'attackMethodProviderID',source:'attackMethodSource',bindName:'bindAttackMethodName'}" :id="record.attackMethodID"
-              :currentServerInfo="currentServerInfo" @selected-provider="handleSelectProvider" :getProviderList="getAllAtkBindInfos">
+            <CommonProviderSelector
+              :field="{ providerID: 'attackMethodProviderID', source: 'attackMethodSource', bindName: 'bindAttackMethodName' }"
+              :id="record.attackMethodID" :currentServerInfo="currentServerInfo" @selected-provider="handleSelectProvider"
+              :getProviderList="getAllAtkBindInfos">
             </CommonProviderSelector>
             <a-divider></a-divider>
             <a-card size="small">
@@ -80,11 +92,14 @@
               <a-checkbox-group v-model:value="attackAndModelComposeList[record.attackMethodID]" :options="modelList" />
               <a-divider></a-divider>
               <h3 style="margin:0">转移测试</h3>
-              <div v-for="(bindModelList,index) in attackAndModelComposeList[record.attackMethodID]" :key="index">
-                基于 {{bindModelList}} 生成的对抗样本在以下模型上进行转移测试:
-                <a-checkbox-group v-if="transferAttackTest=='NOT'" disabled :value="[bindModelList]" :options="modelList" />
-                <a-checkbox-group v-if="transferAttackTest=='SELF_CROSS'" disabled :value="modelList" :options="modelList" />
-                <a-checkbox-group v-if="transferAttackTest=='APPOINT'" :options="modelList" v-model:value="transferAttackTestOnModelList[record.attackMethodID][bindModelList]" />
+              <div v-for="(bindModelList, index) in attackAndModelComposeList[record.attackMethodID]" :key="index">
+                基于 {{ bindModelList }} 生成的对抗样本在以下模型上进行转移测试:
+                <a-checkbox-group v-if="transferAttackTest == 'NOT'" disabled :value="[bindModelList]"
+                  :options="modelList" />
+                <a-checkbox-group v-if="transferAttackTest == 'SELF_CROSS'" disabled :value="modelList"
+                  :options="modelList" />
+                <a-checkbox-group v-if="transferAttackTest == 'APPOINT'" :options="modelList"
+                  v-model:value="transferAttackTestOnModelList[record.attackMethodID][bindModelList]" />
               </div>
             </a-card>
           </template>
@@ -217,7 +232,7 @@ export default defineComponent({
     const runConfigTaskQueue = async () => {
       while (autoConfigTaskQueue.value.length > 0) {
         let task = autoConfigTaskQueue.value.shift();
-        await task().catch(() => {});
+        await task().catch(() => { });
       }
     };
 

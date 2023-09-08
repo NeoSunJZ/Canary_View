@@ -31,6 +31,7 @@
 <script>
 import { computed, defineComponent, reactive, ref, h } from 'vue';
 import { newTask } from '@/api/task-api/taskInfo.js';
+import { newQuickTaskConfig } from '@/api/config-api/quickTaskConfig.js';
 import { Modal } from 'ant-design-vue';
 
 export default defineComponent({
@@ -84,12 +85,44 @@ export default defineComponent({
         });
     };
 
+    const newQuickConfig = async () => {
+      await formRef.value
+        .validate()
+        .then(async () => {
+          let configID = await newQuickTaskConfig(params.taskName, params.taskDesc, props.taskTypeID, JSON.stringify(allConfig.value));
+          context.emit('saveSuccess', configID);
+        })
+        .catch((e) => {
+          if (e.errorFields != null) {
+            let errorFieldNames = [];
+            e.errorFields.forEach((element) => {
+              element.name.forEach((name) => {
+                errorFieldNames.push(name);
+              });
+            });
+            Modal.error({
+              title: '失败',
+              content: h('div', {}, [
+                h('p', '提交失败，请检查字段是否填写正确'),
+                h('p', '问题字段(' + errorFieldNames.length + ') : ' + errorFieldNames.join(' / ')),
+              ]),
+            });
+          } else {
+            Modal.error({
+              title: '失败',
+              content: h('div', {}, [h('p', '提交失败，服务器异常'), h('p', '问题:' + e)]),
+            });
+          }
+        });
+    };
+
     return {
       params,
       allConfig,
       formRef,
 
       submit,
+      newQuickConfig,
     };
   },
 });
