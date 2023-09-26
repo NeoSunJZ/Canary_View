@@ -3,7 +3,6 @@
  -->
 
 <style scoped lang="less">
-@import '~ant-design-vue/dist/antd.less';
 @import '@/style.less';
 
 .layout {
@@ -22,7 +21,7 @@
   }
 
   &__collapse_button {
-    margin-left: 60px;
+    margin-left: 0px;
     color: white;
   }
 
@@ -52,9 +51,10 @@
         </a-button>
       </div>
 
-      <a-menu mode="horizontal">
-        <a-menu-item key="1">关于系统</a-menu-item>
-      </a-menu>
+      <div>
+        <a-button href="/Screen/" target="_blank" ghost value="large" style="margin-right:5px">系统大屏</a-button>
+        <a-button ghost value="large">关于系统</a-button>
+      </div>
     </a-layout-header>
 
     <a-layout>
@@ -214,25 +214,25 @@ export default defineComponent({
     };
     const links = ref([
       {
-        key: '帮助',
+        key: '1',
         title: '帮助',
         href: '',
         blankTarget: true,
       },
       {
-        key: 'github',
+        key: '2',
         icon: 'logo-github',
-        href: '',
+        href: 'https://github.com/NeoSunJZ/Canary_Master',
         blankTarget: true,
       },
       {
-        key: '条款',
-        title: '条款',
-        href: '',
+        key: '3',
+        title: '引用论文',
+        href: 'https://doi.org/10.3390/electronics12173665',
         blankTarget: true,
       },
     ]);
-    const copyright = ref('Copyright © 2022 BIT All Rights Reserved');
+    const copyright = ref('Copyright © 2023 BIT All Rights Reserved');
     onBeforeMount(() => {
       // 用于管理侧边栏折叠状态
       if (sessionStorage.getItem('collapsed') == 'true') {
