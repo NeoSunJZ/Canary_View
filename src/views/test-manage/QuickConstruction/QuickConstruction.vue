@@ -1,5 +1,5 @@
 <style scoped lang="less">
-@import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
 
 .submenu {
   height: 50px;
@@ -64,14 +64,26 @@
         <ServerNodeCard @serverSelected="handleServerChange"></ServerNodeCard>
       </a-row>
 
+      <a-alert class="attack-task__type-select__notice" message="快速攻击测试构建" type="info" show-icon closable close-text="我已了解">
+        <template #description>
+          <div>
+            请选择预先配置的攻击方案，并确认或修改数据量，以进行模型鲁棒性评估。
+          </div>
+        </template>
+      </a-alert>
+
       <div class="steps-content" v-if="!showSuccess">
-        <a-collapse v-model:activeKey="activeKey" accordion>
+        <!-- <a-collapse v-model:activeKey="activeKey" accordion>
           <a-collapse-panel v-for="(config, index) in configList" :key="index" :header="config.configName">
-            <p>{{ config.configDesc }}</p>
-            <ConfigSummary :nowConfigID="nowConfigID" :nowConfig="configContent"
-              :nowDeclaration="currentServerDeclaration" />
+            <ConfigSummary :config="config" :currentServerDeclaration="currentServerDeclaration" />
           </a-collapse-panel>
-        </a-collapse>
+        </a-collapse> -->
+        <div style="overflow: scroll; overflow-y: hidden;">
+          <div style="display: flex;flex-direction: row" v-if="currentServerDeclaration!=null">
+            <ConfigSummary v-for="(config, index) in configList" :key="index" :index="index" :config="config" :currentServerDeclaration="currentServerDeclaration" style="flex-shrink:0"
+            @selected="selectedConfig"/>
+          </div>
+        </div>
         <br />
         <a-form ref="formRef" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" @submit="finish" :model="params">
           <a-row :gutter="24">
@@ -80,18 +92,15 @@
                 <a-input style="width:100%" v-model:value="params.taskName" placeholder="请输入任务名称" width="100%"></a-input>
               </a-form-item>
               <a-form-item name="taskDesc" label="任务描述" has-feedback :rules="[{ required: true, message: '必须输入任务描述' }]">
-                <a-textarea style="width:100%" v-model:value="params.taskDesc" placeholder="请输入任务描述"
-                  width="100%"></a-textarea>
+                <a-textarea style="width:100%" v-model:value="params.taskDesc" placeholder="请输入任务描述" width="100%"></a-textarea>
               </a-form-item>
-              <a-form-item name="datasetSize" label="数据量" has-feedback
-                :rules="[{ type: 'integer', message: '数据量必须是整数' }]">
-                <a-input-number style="width:100%" v-model:value="configContent['dataset_size']"
-                  placeholder="请输入测试数据数据量(需小于数据集总量)" :step="1" />
+              <a-form-item name="datasetSize" label="数据量" has-feedback :rules="[{ type: 'integer', message: '数据量必须是整数' }]">
+                <a-input-number style="width:100%" v-model:value="configContent['dataset_size']" placeholder="请输入测试数据数据量(需小于数据集总量)" :step="1" />
               </a-form-item>
               <a-form-item name="datasetSeed" label="数据集随机种子">
                 <a-form-item-rest>
-                  <a-input-search style="width:100%" v-model:value="configContent['dataset_seed']" placeholder="请输入随机数种子"
-                    enter-button="随机生成" @search="seed_create" :disabled="!datasetSeedUserAppoint" />
+                  <a-input-search style="width:100%" v-model:value="configContent['dataset_seed']" placeholder="请输入随机数种子" enter-button="随机生成"
+                    @search="seed_create" :disabled="!datasetSeedUserAppoint" />
                   <span>自行指定</span>
                   <a-switch v-model:checked="datasetSeedUserAppoint" />
                 </a-form-item-rest>
@@ -102,8 +111,7 @@
                 <template #description>
                   <p v-if="currentServerInfo != null">下列信息将被传递至服务节点 {{ currentServerInfo.nodeName }}(NodeID: {{
                     currentServerInfo.nodeID }}) : </p>
-                  <a-textarea style="width:100%" :value="JSON.stringify(configContent)" placeholder="请选择配置信息" width="100%"
-                    readonly :rows="6"></a-textarea>
+                  <a-textarea style="width:100%" :value="JSON.stringify(configContent)" placeholder="请选择配置信息" width="100%" readonly :rows="6"></a-textarea>
                 </template>
               </a-alert>
             </a-col>
@@ -134,7 +142,7 @@ import ConfigSummary from '@/views/test-manage/QuickConstruction/components/Conf
 import { DeploymentUnitOutlined } from '@ant-design/icons-vue';
 import { onMounted, ref, defineComponent, watch, reactive, computed, h } from 'vue';
 import { newTask } from '@/api/task-api/taskInfo.js';
-import { getAllQuickTaskConfig } from '@/api/config-api/quickTaskConfig.js'
+import { getAllQuickTaskConfig } from '@/api/config-api/quickTaskConfig.js';
 import { Modal } from 'ant-design-vue';
 import router from '@/router';
 
@@ -178,7 +186,12 @@ export default defineComponent({
     const attackTypes = [
       {
         value: 1,
-        label: '攻击方法测评',
+        label: '“攻击有效性-模型鲁棒性”综合评估测试',
+      },
+      {
+        value: 2,
+        label: '“防御有效性”综合评估测试',
+        disabled: true
       },
     ];
 
@@ -191,23 +204,25 @@ export default defineComponent({
       let min = 10000000000000000;
       configContent.value['dataset_seed'] = Math.floor(Math.random() * (max - min + 1)) + min;
     };
-    watch(activeKey, val => {
-      if (typeof (val) == "undefined") {
-        configContent.value = {};
-        taskTypeID.value = 1;
-        nowConfigID.value = null;
-        return
-      }
-      nowConfigID.value = JSON.parse(configList.value[val].id);
-      configContent.value = JSON.parse(configList.value[val].config);
-      taskTypeID.value = JSON.parse(configList.value[val].taskTypeID);
-    });
+
+    const selectedConfig = (id) =>{
+      console.log(id)
+      nowConfigID.value = JSON.parse(configList.value[id].id);
+      configContent.value = JSON.parse(configList.value[id].config);
+      taskTypeID.value = JSON.parse(configList.value[id].taskTypeID);
+    };
 
     const submit = async () => {
       await formRef.value
         .validate()
         .then(async () => {
-          taskID.value = await newTask(params.taskName, params.taskDesc, currentServerInfo.value['nodeID'], taskTypeID.value, JSON.stringify(configContent.value));
+          taskID.value = await newTask(
+            params.taskName,
+            params.taskDesc,
+            currentServerInfo.value['nodeID'],
+            taskTypeID.value,
+            JSON.stringify(configContent.value)
+          );
           showSuccess.value = true;
         })
         .catch((e) => {
@@ -259,8 +274,8 @@ export default defineComponent({
       submit,
       handleServerChange,
       toPage,
+      selectedConfig,
     };
-
   },
 });
 </script>
