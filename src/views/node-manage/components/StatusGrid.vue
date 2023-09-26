@@ -4,7 +4,7 @@
  -->
 
 <style lang="less" scoped>
-@import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
 .state {
   display: flex;
   flex-direction: row;

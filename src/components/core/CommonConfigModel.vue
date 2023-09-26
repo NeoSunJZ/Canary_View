@@ -1,5 +1,5 @@
 <style scoped lang="less">
-@import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
 .config-model {
   &__notice {
     margin-bottom: 10px;

@@ -1,5 +1,4 @@
 <style scoped lang="less">
-@import '~ant-design-vue/dist/antd.less';
 @import '@/style.less';
 
 .submenu {
@@ -67,21 +66,15 @@
       <a-alert class="attack-task__type-select__notice" message="构建向导指南" type="info" show-icon closable close-text="我已了解">
         <template #description>
           <div>
-            <span class="attack-task__type-select__notice__title">仅生成对抗样本</span> - 将根据您选定的攻击方法在数据集上生成对抗样本。
+            <span class="attack-task__type-select__notice__title">“攻击有效性-模型鲁棒性”综合评估测试</span> - 将根据您选定的攻击方法、模型组合，并在数据集上生成对抗样本。
+            对攻击方法与模型进行全面评估，并就其表现进行综合排序。
           </div>
           <div>
-            <span class="attack-task__type-select__notice__title">最佳扰动限制估算</span> -
-            依据您指定的步长与范围，尝试所有可能的扰动配置并加以比较，估算出最佳的扰动限制配置（所选攻击方法须支持该操作）。
-          </div>
-          <div>
-            <span class="attack-task__type-select__notice__title">攻击方法测评</span> - 将依据您指定的配置，对一种或多种方法进行测试，并就其表现进行综合排序。
+            <span class="attack-task__type-select__notice__title">“防御有效性”综合评估测试</span> - 暂不可用
           </div>
           <br />
           <div>
-            攻击测试通常需要指定待攻击的人工智能模型（目标模型），并基于此生成对抗样本。每一攻击方法可为其指定多个待攻击模型。
-          </div>
-          <div>
-            欲验证对抗样本的迁移性，则需额外指定迁移攻击测试的模型。迁移测试默认只测试基于第一个待攻击模型生成的对抗样本的迁移性，若需全量测试则需开启相关选项，耗时可能极长。
+            欲验证对抗样本的迁移性，则需额外配置迁移攻击测试设置。全量测试耗时可能极长。
           </div>
         </template>
       </a-alert>
@@ -96,17 +89,14 @@
         <div class="steps-content" v-if="!showSuccess">
           <DatasetSelector ref="datasetSelector" :currentServerInfo="currentServerInfo" v-show="current == 0">
           </DatasetSelector>
-          <ModelSelector ref="modelSelector" :currentServerInfo="currentServerInfo"
-            :currentServerDeclaration="currentServerDeclaration" v-show="current == 1">
+          <ModelSelector ref="modelSelector" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration" v-show="current == 1">
           </ModelSelector>
-          <AttackSelector ref="attackSelector" :currentServerInfo="currentServerInfo"
-            :currentServerDeclaration="currentServerDeclaration" :modelList="allConfig['model_list']"
-            v-show="current == 2">
+          <AttackSelector ref="attackSelector" :currentServerInfo="currentServerInfo" :currentServerDeclaration="currentServerDeclaration"
+            :modelList="allConfig['model_list']" v-show="current == 2">
           </AttackSelector>
           <div v-if="current == 3">
-            <TaskSubmit ref="taskSubmit" :config="allConfig" :currentServerInfo="currentServerInfo"
-              :taskTypeID="attackType" v-show="current == 3" @success="(id) => { showSuccess = true; taskID = id }"
-              @saveSuccess="(id) => { saveConfigSuccess = true; configID = id }">
+            <TaskSubmit ref="taskSubmit" :config="allConfig" :currentServerInfo="currentServerInfo" :taskTypeID="attackType" v-show="current == 3"
+              @success="(id) => { showSuccess = true; taskID = id }" @saveSuccess="(id) => { saveConfigSuccess = true; configID = id }">
             </TaskSubmit>
           </div>
         </div>
@@ -174,7 +164,12 @@ export default defineComponent({
     const attackTypes = [
       {
         value: 1,
-        label: '攻击方法测评',
+        label: '“攻击有效性-模型鲁棒性”综合评估测试',
+      },
+      {
+        value: 2,
+        label: '“防御有效性”综合评估测试',
+        disabled: true
       },
     ];
 
@@ -190,7 +185,7 @@ export default defineComponent({
 
     const prev = () => {
       current.value--;
-      saveConfigSuccess.value = false
+      saveConfigSuccess.value = false;
     };
 
     // 节点切换

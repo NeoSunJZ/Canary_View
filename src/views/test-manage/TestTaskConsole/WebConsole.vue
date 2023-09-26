@@ -1,5 +1,4 @@
 <style scoped lang="less">
-@import '~ant-design-vue/dist/antd.less';
 @import '@/style.less';
 
 /deep/ .log-color {
@@ -201,6 +200,10 @@ export default {
     const addLog = (msg, type = 'INFO', recordTime = null) => {
       if (type == 'BASE64') {
         context.emit('receivedBase64Img', msg);
+        return;
+      }
+      if (type == 'TOKEN') {
+        context.emit('receivedToken', msg);
         return;
       }
       if (type == 'USAGE') {

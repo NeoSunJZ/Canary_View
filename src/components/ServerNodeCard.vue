@@ -2,7 +2,6 @@
  * @FileDescription: 主页中的服务器状态信息卡片，用于更换服务器节点和查看节点信息
  -->
 <style scoped lang="less">
-@import '~ant-design-vue/dist/antd.less';
 @import '@/style.less';
 
 .server {
