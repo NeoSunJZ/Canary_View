@@ -624,12 +624,8 @@ export default defineComponent({
       if (JSON.stringify(statusFlagtmp) != JSON.stringify(statusFlag)) { 
         await showNodeStatus(status);
       }
-      if (statusFlag[9] == 'success' || statusFlag[9] == 'failed') {
-        statusFlagtmp.length = 0;
-      }
-      else {
-        statusFlagtmp = Array.from(statusFlag);
-      }
+
+      statusFlagtmp = Array.from(statusFlag);
     };
 
     return {

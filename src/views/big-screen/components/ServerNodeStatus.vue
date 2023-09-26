@@ -1,5 +1,5 @@
 <style scoped lang="less">
-@import "../Screen.less";
+@import '../Screen.less';
 </style>
 
 <template>
@@ -8,33 +8,35 @@
     <p class="text-muted">设备摘要</p>
     <a-card style="border: 1px solid #434968 !important; box-shadow:unset;">
       <p style="font-size:16px" class="text">
-        设备名称 {{ systemInfo.deviceName }}
+        设备详情
       </p>
       <p class="text-muted">
+        设备名称 <span class="text">{{ systemInfo.deviceName }}</span> <a-divider type="vertical" />
         操作系统
         <MyIcon type="icon-Ubuntu" :style="{ fontSize: '24px' }" v-if="systemInfo.osVersion.indexOf('Ubuntu') != -1" />
         <MyIcon type="icon-linux" :style="{ fontSize: '24px' }" v-else-if="systemInfo.osName.indexOf('Linux') != -1" />
-        <MyIcon type="icon-windows" :style="{ fontSize: '24px' }"
-          v-else-if="systemInfo.osName.indexOf('Windows') != -1" />
+        <MyIcon type="icon-windows" :style="{ fontSize: '24px' }" v-else-if="systemInfo.osName.indexOf('Windows') != -1" />
         <MyIcon type="icon-qitacaozuoxitong" :style="{ fontSize: '24px' }" v-else />
-        <span class="text"> {{ systemInfo.osName }} {{ systemInfo.osVersion }}
+        <span class="text" style="margin-left:5px"> {{ systemInfo.osName }} {{ systemInfo.osVersion }}
         </span>
       </p>
       <p class="text-muted">
         CPU <span class="text"> {{ systemInfo.cpuName }} </span> <a-divider type="vertical" />
-        GPU <span class="text"> {{ systemInfo.gpuName }} </span> <a-divider type="vertical" />
-        显存 <span class="text"> {{ systemInfo.gpuMemorySize }} GB</span> <a-divider type="vertical" />
         内存 <span class="text"> {{ systemInfo.memorySize }} GB</span>
       </p>
       <p class="text-muted">
-        系统时间 <span class="text">2023-07-15 17:18:00</span> <a-divider type="vertical" />
+        GPU <span class="text"> {{ systemInfo.gpuName }} </span> <a-divider type="vertical" />
+        显存 <span class="text"> {{ systemInfo.gpuMemorySize }} GB</span>
+      </p>
+      <p class="text-muted">
+        系统时 <span class="text">{{ systemUsage.systemDatetime}}</span> <a-divider type="vertical" />
         网络连接 <a-tag class="tag tag--green">良好</a-tag>
       </p>
     </a-card>
     <br />
     <p class="text-muted">CPU / GPU 性能实时监控</p>
     <a-card style="border: 1px solid #434968 !important; box-shadow:unset">
-      <div style="display:flex;">
+      <div style="display:flex;" v-show="!waitingOperation">
         <div style="flex: 1">
           <div style="display: flex; align-items: center;">
             <a-button class="tag tag--red" type="primary">
@@ -45,7 +47,7 @@
             <p class="tag__text" style="font-size: 16px; margin-left:5px">GPU</p>
           </div>
           <p style="font-size:20px" class="text">{{ systemUsage.gpuUsage}}%</p>
-        <a-progress strokeColor="#ea5455" trailColor="#363b54" :percent="systemUsage.gpuUsage" size="small" :format="()=>{}" />
+          <a-progress strokeColor="#ea5455" trailColor="#363b54" :percent="systemUsage.gpuUsage" size="small" :format="()=>{}" />
         </div>
         <div style="flex: 1">
           <div style="display: flex; align-items: center;">
@@ -69,7 +71,8 @@
             <p class="tag__text" style="font-size: 16px; margin-left:5px">显存</p>
           </div>
           <p style="font-size:20px" class="text">{{ systemUsage.gpuUseMemorySize}} GB</p>
-          <a-progress strokeColor="#00cfe8" trailColor="#363b54" :percent="systemUsage.gpuUseMemorySize / systemInfo.gpuMemorySize * 100" size="small" :format="()=>{}" />
+          <a-progress strokeColor="#00cfe8" trailColor="#363b54" :percent="systemUsage.gpuUseMemorySize / systemInfo.gpuMemorySize * 100" size="small"
+            :format="()=>{}" />
         </div>
         <div style="flex: 1">
           <div style="display: flex; align-items: center;">
@@ -81,12 +84,18 @@
             <p class="tag__text" style="font-size: 16px; margin-left:5px">内存</p>
           </div>
           <p style="font-size:20px" class="text">{{ systemUsage.cpuUseMemorySize}} GB</p>
-          <a-progress strokeColor="#ff9f43" trailColor="#363b54" :percent="systemUsage.cpuUseMemorySize / systemInfo.memorySize * 100" size="small" :format="()=>{}" />
+          <a-progress strokeColor="#ff9f43" trailColor="#363b54" :percent="systemUsage.cpuUseMemorySize / systemInfo.memorySize * 100" size="small"
+            :format="()=>{}" />
         </div>
       </div>
+      <a-empty :image="require('@/assets/icon/wait.svg')" v-show="waitingOperation">
+        <template #description>
+          <p class="text-muted">请等待评估启动</p>
+        </template>
+      </a-empty>
     </a-card>
     <br />
-    <DeviceMonitor ref="deviceMonitor"/>
+    <DeviceMonitor ref="deviceMonitor" v-if="!waitingOperation"/>
   </a-card>
 </template>
 
@@ -111,6 +120,7 @@ export default defineComponent({
   },
   props: {
     nodeServerAddr: String,
+    waitingOperation: Boolean,
   },
   setup(props) {
     const waitLoading = ref(true);
@@ -124,10 +134,11 @@ export default defineComponent({
       memorySize: Number(1),
     });
     const systemUsage = ref({
-      cpuUsage : Number(0),
-      gpuUsage : Number(0),
-      cpuUseMemorySize : Number(0),
-      gpuUseMemorySize : Number(0)
+      cpuUsage: Number(0),
+      gpuUsage: Number(0),
+      cpuUseMemorySize: Number(0),
+      gpuUseMemorySize: Number(0),
+      systemDatetime: '不可用',
     });
     const systemClock = ref();
     const networkStatus = ref();
@@ -147,7 +158,7 @@ export default defineComponent({
       systemUsage,
       deviceMonitor,
 
-      ChangeSystemUsage
+      ChangeSystemUsage,
     };
   },
 });

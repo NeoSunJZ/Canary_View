@@ -3,9 +3,6 @@
 </style>
 
 <template>
-  <a-card style="margin:10px;">
-    <p style="font-size:20px" class="text">当前测试任务详情</p>
-    <p class="text-muted">测试任务简介 </p>
     <div style="display: flex; align-items: center; flex-direction: row;">
       <div style="flex:1">
         <div style="display: flex;flex-direction: row; align-items: center;">
@@ -61,7 +58,6 @@
         <p class="text-muted">转移测试示意图</p>
       </div>
     </div>
-  </a-card>
 </template>
 
 <script>

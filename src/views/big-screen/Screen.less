@@ -1,3 +1,7 @@
+p {
+    margin-bottom: unset !important;
+}
+
 .ant-layout {
     background: #25293c;
 }
@@ -84,6 +88,73 @@
     &__log {
         color: #cfd3ec;
     }
+}
+
+/deep/ .proc-title {
+    &__text {
+        color: #cfd3ec !important;
+    }
+}
+
+/deep/ .proc-timeline {
+    &__title {
+        color: #cfd3ec !important;
+    }
+
+    &__text {
+        color: #7983bb !important
+    }
+}
+
+/deep/ .ant-timeline-item-head {
+    background: #2f3349e5;
+}
+
+/deep/ .proc-board {
+    max-height: 160px;
+}
+
+/deep/ .ant-tabs-tab {
+    padding: 5px;
+}
+
+:deep(.slick-arrow.custom-slick-arrow) {
+    width: 25px;
+    height: 25px;
+    font-size: 25px;
+    color: #2f3349;
+    background-color: rgba(31, 45, 61, 0.11);
+    transition: ease all 0.3s;
+    opacity: 0.9;
+    z-index: 1;
+}
+
+:deep(.slick-arrow.custom-slick-arrow:before) {
+    display: none;
+}
+
+:deep(.slick-arrow.custom-slick-arrow:hover) {
+    color: #2f3349e5;
+    opacity: 0.5;
+}
+
+/deep/ .ant-carousel .slick-dots li.slick-active button {
+    background: #2f3349;
+    opacity: 1;
+}
+
+/deep/ .ant-carousel .slick-dots li button {
+    display: block;
+    background: #2f3349;
+    opacity: 0.5;
+}
+
+/deep/ .ant-result-title{
+    color: #cfd3ec !important
+}
+
+/deep/ .ant-result-subtitle{
+    color: #cfd3ec !important
 }
 
 .logo {
