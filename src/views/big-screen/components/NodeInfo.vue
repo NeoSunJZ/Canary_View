@@ -16,7 +16,7 @@
       </a-button> 当前服务器
     </p>
     <p style="font-size:18px" class="text">{{ nodeInfo.currentServer }}</p>
-    <p class="text-muted">Ip {{ nodeInfo.currentHost }}<a-divider type="vertical" /> 端口 {{ nodeInfo.currentPort }}
+    <p class="text-muted">IP {{ nodeInfo.currentHost }}<a-divider type="vertical" /> 端口 {{ nodeInfo.currentPort }}
       <a-divider type="vertical" /> 状态
       <a-tag class="tag tag--green" v-if="nodeInfo.isonline == 'running'">就绪</a-tag>
       <a-tag class="tag tag--red" v-else>未就绪</a-tag>
@@ -58,8 +58,7 @@ export default defineComponent({
       let data = await getDeclaration(host, port, null, false);
       if (data == null) {
         NodeStatus.value = 'stopping';
-      }
-      else {
+      } else {
         NodeStatus.value = 'running';
       }
     };
