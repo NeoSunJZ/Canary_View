@@ -20,7 +20,8 @@
         <a-descriptions-item label="任务描述" :span="2">{{taskInfo.taskDesc}}</a-descriptions-item>
 
         <a-descriptions-item label="指派节点" :span="2">{{taskInfo.nodeInfo.nodeName}}({{taskInfo.nodeInfo.host}}:{{taskInfo.nodeInfo.port}})</a-descriptions-item>
-        <a-descriptions-item label="任务属类" :span="2">{{taskInfo.taskType.subTypeName}}(API {{taskInfo.taskType.targetApi}} 版本{{taskInfo.taskType.apiVersion}})</a-descriptions-item>
+        <a-descriptions-item label="任务属类" :span="2">{{taskInfo.taskType.subTypeName}}(API {{taskInfo.taskType.targetApi}}
+          版本{{taskInfo.taskType.apiVersion}})</a-descriptions-item>
 
         <a-descriptions-item label="创建时间" :span="1">{{taskInfo.createTime}}</a-descriptions-item>
         <a-descriptions-item label="上次执行时间" :span="1">{{taskInfo.lastRunTime!=null?taskInfo.lastRunTime:"任务尚未执行"}}</a-descriptions-item>
@@ -57,7 +58,8 @@
         <a-descriptions-item label="配置信息" :span="4">{{taskInfo.config}}
         </a-descriptions-item>
         <a-descriptions-item label="操作" :span="4">
-          <a-button type="primary" style="margin-right:5px" @click="startTest(false)" v-if="taskInfo.batchToken==null" :disabled="statusCode == 3">启动测试</a-button>
+          <a-button type="primary" style="margin-right:5px" @click="startTest(false)" v-if="taskInfo.batchToken==null"
+            :disabled="statusCode == 3">启动测试</a-button>
           <span v-else>
             <a-button type="primary" style="margin-right:5px" danger @click="stopTest" v-if="statusCode == 2">终止测试</a-button>
             <a-button type="primary" style="margin-right:5px" @click="startTest(false)" v-if="statusCode == 1 || statusCode == -1">放弃结果并重新测试</a-button>
@@ -68,6 +70,9 @@
           <a-divider type="vertical" />
           启用详细模式
           <a-switch v-model:checked="debugMode" checked-children="开" un-checked-children="关" :disabled="statusCode == 2 || statusCode == 3" />
+          <a-divider type="vertical" />
+          <a-button type="primary" style="margin-right:5px" @click="loadBigScreen" v-if="bigScreenStatus">载入大屏</a-button>
+          <a-button type="danger" style="margin-right:5px" @click="unloadBigScreen" v-if="bigScreenStatus">关闭大屏</a-button>
         </a-descriptions-item>
       </a-descriptions>
       <a-row style="margin-top:10px">
@@ -122,6 +127,18 @@ export default {
       else return null;
     });
 
+    const bigScreenStatus = ref(false);
+
+    window.addEventListener('storage', function (event) {
+      if (event.key == 'bigScreenStatus') {
+        if (event.newValue == 'open') {
+          bigScreenStatus.value = true;
+        } else {
+          bigScreenStatus.value = false;
+        }
+      }
+    });
+
     onMounted(async () => {
       taskID.value = route['query']['taskID'];
       localStorage.setItem('nowTaskID', taskID.value);
@@ -133,6 +150,7 @@ export default {
           loadHistoryConsoleLog();
         }
       }
+      bigScreenStatus.value = localStorage.getItem('bigScreenStatus') == 'open';
     });
 
     const loadData = async () => {
@@ -217,6 +235,13 @@ export default {
         });
     };
 
+    const loadBigScreen = () => {
+      localStorage.setItem('nowTaskID', taskID.value);
+    };
+    const unloadBigScreen = () => {
+      localStorage.removeItem('nowTaskID');
+    };
+
     return {
       taskID,
       taskInfo,
@@ -234,6 +259,9 @@ export default {
 
       startTest,
       stopTest,
+      loadBigScreen,
+      unloadBigScreen,
+      bigScreenStatus,
     };
   },
 };

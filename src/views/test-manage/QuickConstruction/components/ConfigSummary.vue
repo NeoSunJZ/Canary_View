@@ -1,13 +1,15 @@
 <style scoped lang="less">
-@import "../Screen.less";
 </style>
 
 <template>
-  <a-card style="margin:10px;">
-    <p style="font-size:20px" class="text">当前任务配置详情</p>
-    <p class="text-muted">配置任务简介 </p>
-    <div style="display: flex; align-items: center; flex-direction: row;">
-      <div style="flex:1; flex-direction: row; display: flex; justify-content: space-around">
+  <a-card style="margin:10px;width: 400px">
+    <h3> {{ config['configName'] }} </h3>
+    <p>{{ config['configDesc'] }} </p>
+    <p>配置任务简介 </p>
+
+    <div style="display: flex; align-items: center; flex-direction: column;">
+      <div style="display: flex; align-items: center; flex-direction: row; width:100%; margin-bottom: 10px">
+
         <div style="display: flex;flex-direction: row; align-items: center;flex: 1">
           <a-button class="tag tag--red" type="primary">
             <template #icon>
@@ -16,24 +18,13 @@
           </a-button>
           <div style="margin-left:10px">
             <p style="font-size:14px;margin: 0;" class="text">已选定{{ attackSelectedNum }}种攻击</p>
-            <p class="text-muted" style="margin: 0;" v-if="configID == null">待选择</p>
-            <p class="text-muted" style="margin: 0;" v-else v-for="(data, index) in attackListDeclaration" :key="index"
-              @click="showAttackModal(data)">
+            <a style="margin: 0;" v-for="(data, index) in attackListDeclaration" :key="index" @click="showAttackModal(data)">
               {{
                 data['attacker_name']
-              }}</p>
-            <a-modal v-model:visible="openAttack" title="攻击配置参数" @ok="handleOk" width="50%">
-              <a-descriptions :title="nowModalData['attacker_name'] + '配置参数'" layout="vertical" :column="1"
-                style="margin-bottom:10px;">
-                <a-descriptions-item label="对抗攻击配置参数表">
-                  <a-table v-if="openAttack"
-                    :dataSource="declaration_config_params_data_conversion_attack(nowModalData['info']['attack_config_params'], nowModalData['attacker_name'])"
-                    :columns="declaration_config_params_columns" size="small" :pagination="false" style="width:100%" />
-                </a-descriptions-item>
-              </a-descriptions>
-            </a-modal>
+              }}</a>
           </div>
         </div>
+
         <div style="display: flex;flex-direction: row; align-items: center;flex: 1">
           <a-button class="tag tag--cyan" type="primary">
             <template #icon>
@@ -42,29 +33,16 @@
           </a-button>
           <div style="margin-left:10px">
             <p style="font-size:14px;margin: 0;" class="text">已选定{{ modelSelectedNum }}种模型</p>
-            <p class="text-muted" style="margin: 0;" v-if="configID == null">待选择</p>
-            <p class="text-muted" style="margin: 0;" v-else v-for="(data, index) in modelListDeclaration" :key="index"
-              @click="showModelModal(data)"> {{
+            <a style="margin: 0;" v-for="(data, index) in modelListDeclaration" :key="index" @click="showModelModal(data)"> {{
                 data['model_name']
-              }}</p>
-            <a-modal v-model:visible="openModel" title="模型配置参数" @ok="handleOk" width="50%">
-              <a-descriptions :title="nowModalData['model_name'] + '配置参数'" layout="vertical" :column="1"
-                style="margin-bottom:10px;">
-                <a-descriptions-item label="模型配置参数表">
-                  <a-table v-if="openModel"
-                    :dataSource="declaration_config_params_data_conversion_model(nowModalData['info']['model_config_params'], nowModalData['model_name'])"
-                    :columns="declaration_config_params_columns" size="small" :pagination="false" style="width:100%" />
-                </a-descriptions-item>
-                <a-descriptions-item label="图片处理器配置参数表">
-                  <a-table v-if="openModel"
-                    :dataSource="declaration_config_params_data_conversion_model(nowModalData['info']['img_process_config_params'], nowModalData['model_name'])"
-                    :columns="declaration_config_params_columns" size="small" :pagination="false" style="width:100%" />
-                </a-descriptions-item>
-              </a-descriptions>
-            </a-modal>
+              }}</a>
           </div>
         </div>
-        <div style="display: flex;flex-direction: row; align-items: center;flex: 1">
+
+      </div>
+      <div style="display: flex; align-items: center; flex-direction: row; width:100%; margin-bottom: 10px">
+
+        <div style="display: flex;flex-direction: row; align-items: center;flex: 1;">
           <a-button class="tag tag--orange" type="primary">
             <template #icon>
               <MyIcon type="icon-shujujiguanli" :style="{ fontSize: '24px' }" />
@@ -72,13 +50,10 @@
           </a-button>
           <div style="margin-left:10px;">
             <p style="font-size:14px;margin: 0;" class="text">已选定数据集</p>
-            <p class="text-muted" style="margin: 0;" v-if="configID == null">待选择</p>
-            <p class="text-muted" style="margin: 0;" v-else-if="config.dataset == 'ILSVRC-2012'"> ImageNet </p>
-            <p class="text-muted" style="margin: 0;" v-else-if="config.dataset == 'CIFAR-100'"> CIFAR-100 </p>
-            <p class="text-muted" style="margin: 0;" v-else-if="config.dataset == 'FashionMNIST'"> F-MNIST </p>
-            <p class="text-muted" style="margin: 0;" v-else> CIFAR-10 </p>
+            <p class="text-muted" style="margin: 0;"> {{configContent['dataset']}} </p>
           </div>
         </div>
+
         <div style="display: flex;flex-direction: row; align-items: center;flex: 1">
           <a-button class="tag tag--orange" type="primary">
             <template #icon>
@@ -87,19 +62,43 @@
           </a-button>
           <div style="margin-left:10px">
             <p style="font-size:14px;margin: 0;" class="text">测试量</p>
-            <p class="text-muted" style="margin: 0;" v-if="configID == null">待选择</p>
-            <p class="text-muted" style="margin: 0;" v-else>{{ config.dataset_size }}</p>
+            <p class="text-muted" style="margin: 0;">{{ configContent['dataset_size'] }}</p>
           </div>
         </div>
-        <div style="display: flex;flex-direction: row; align-items: center;flex: 1" v-if="configID != null">
-          <a-button type="primary" @click="showMapModal()">转移测试示意图</a-button>
-          <a-modal v-model:visible="openMap" title="转移测试示意图" @ok="handleOk" width="50%">
-            <ConfigTransferTestMap :nowConfigID="configID" v-if="openMap" />
-          </a-modal>
-        </div>
-      </div>
 
+      </div>
     </div>
+
+    <a-button type="primary" @click="showMapModal()" style="margin-right:5px">转移测试示意图</a-button>
+    <a-button type="primary" @click="selectConfig()" style="margin-right:5px">选定预设配置</a-button>
+    <a-button type="danger" @click="selectConfig()">删除</a-button>
+
+    <a-modal v-model:visible="openMap" title="转移测试示意图" @ok="handleOk" width="50%" style="display: flex; justify-content: center;">
+      <ConfigTransferTestMap :nowConfigID="config['id']" v-if="openMap" />
+    </a-modal>
+    <a-modal v-model:visible="openModel" title="模型配置参数" @ok="handleOk" width="50%">
+      <a-descriptions :title="nowModalData['model_name'] + '配置参数'" layout="vertical" :column="1" style="margin-bottom:10px;">
+        <a-descriptions-item label="模型配置参数表">
+          <a-table v-if="openModel"
+            :dataSource="declaration_config_params_data_conversion_model(nowModalData['info']['model_config_params'], nowModalData['model_name'])"
+            :columns="declaration_config_params_columns" size="small" :pagination="false" style="width:100%" />
+        </a-descriptions-item>
+        <a-descriptions-item label="图片处理器配置参数表">
+          <a-table v-if="openModel"
+            :dataSource="declaration_config_params_data_conversion_model(nowModalData['info']['img_process_config_params'], nowModalData['model_name'])"
+            :columns="declaration_config_params_columns" size="small" :pagination="false" style="width:100%" />
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-modal>
+    <a-modal v-model:visible="openAttack" title="攻击配置参数" @ok="handleOk" width="50%">
+      <a-descriptions :title="nowModalData['attacker_name'] + '配置参数'" layout="vertical" :column="1" style="margin-bottom:10px;">
+        <a-descriptions-item label="对抗攻击配置参数表">
+          <a-table v-if="openAttack"
+            :dataSource="declaration_config_params_data_conversion_attack(nowModalData['info']['attack_config_params'], nowModalData['attacker_name'])"
+            :columns="declaration_config_params_columns" size="small" :pagination="false" style="width:100%" />
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-modal>
   </a-card>
 </template>
 
@@ -111,7 +110,6 @@ const MyIcon = createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/c/font_4168693_xvx31sr2sl8.js', // 在 iconfont.cn 上生成
 });
 
-
 import ConfigTransferTestMap from './ConfigTransferTestMap.vue';
 import { async } from '@antv/x6/lib/registry/marker/main';
 export default defineComponent({
@@ -121,17 +119,14 @@ export default defineComponent({
     ConfigTransferTestMap,
   },
   props: {
-    nowConfigID: Number,
-    nowConfig: Object,
-    nowDeclaration: Object,
+    index: Number,
+    config: Object,
+    currentServerDeclaration: Object,
   },
-  setup(props) {
-    const configID = ref(null);
-    const config = ref({});
+  setup(props, context) {
+    const configContent = ref({});
     const attackSelectedNum = ref();
     const modelSelectedNum = ref();
-    const activeKey1 = ref([]);
-    const activeKey2 = ref([]);
     const attackList = ref([]);
     const modelList = ref([]);
     const declaration = ref();
@@ -141,7 +136,7 @@ export default defineComponent({
       {
         title: '参数名',
         dataIndex: 'name',
-        width: '25%',
+        width: '20%',
       },
       {
         title: '参数释义',
@@ -151,12 +146,12 @@ export default defineComponent({
       {
         title: '参数类型',
         dataIndex: 'type',
-        width: '15%',
+        width: '10%',
       },
       {
         title: '参数值',
         dataIndex: 'value',
-        width: '10%',
+        width: '20%',
       },
     ];
     const openAttack = ref(false);
@@ -174,55 +169,44 @@ export default defineComponent({
     const showMapModal = () => {
       openMap.value = true;
     };
-    const handleOk = e => {
+    const handleOk = (e) => {
       console.log(e);
       openAttack.value = false;
       openModel.value = false;
       openMap.value = false;
     };
-    const loadTaskData = async () => {
-      if (configID.value != null) {
-        modelSelectedNum.value = Object.keys(config.value['model_config']).length;
-        attackSelectedNum.value = Object.keys(config.value['attacker_list']).length;
-        attackList.value = Object.keys(config.value['attacker_list']);
-        modelList.value = Object.keys(config.value['model_config']);
-        modelListDeclaration.value = []
-        modelList.value.forEach((model, index1) => {
-          declaration.value.registered_component.model_list.forEach((data,) => {
-            if (data['model_name'] == model) {
-              modelListDeclaration.value[index1] = data
-            }
-          });
-        });
-        attackListDeclaration.value = []
-        attackList.value.forEach((attack, index1) => {
-          declaration.value.registered_component.attacker_list.forEach((data,) => {
-            if (data['attacker_name'] == attack) {
-              attackListDeclaration.value[index1] = data
-            }
-          });
-        });
-      }
-    };
 
     onMounted(() => {
-      configID.value = props.nowConfigID;
-      config.value = props.nowConfig;
-      declaration.value = props.nowDeclaration;
-      loadTaskData();
+      configContent.value = JSON.parse(props.config['config']);
 
-    });
-    watch(() => props.nowConfigID, (val) => {
-      configID.value = val;
-      config.value = props.nowConfig;
-      loadTaskData();
+      modelSelectedNum.value = Object.keys(configContent.value['model_config']).length;
+      attackSelectedNum.value = Object.keys(configContent.value['attacker_list']).length;
+      attackList.value = Object.keys(configContent.value['attacker_list']);
+      modelList.value = Object.keys(configContent.value['model_config']);
+      modelListDeclaration.value = [];
+      modelList.value.forEach((model, index1) => {
+        console.log(props.currentServerDeclaration);
+        props.currentServerDeclaration['registered_component']['model_list'].forEach((data) => {
+          if (data['model_name'] == model) {
+            modelListDeclaration.value[index1] = data;
+          }
+        });
+      });
+      attackListDeclaration.value = [];
+      attackList.value.forEach((attack, index1) => {
+        props.currentServerDeclaration['registered_component']['attacker_list'].forEach((data) => {
+          if (data['attacker_name'] == attack) {
+            attackListDeclaration.value[index1] = data;
+          }
+        });
+      });
     });
 
     const declaration_config_params_data_conversion_attack = (data, attackName) => {
       let dataSource = [];
       for (let name in data) {
         data[name]['name'] = name;
-        data[name]['value'] = config.value['attacker_config'][attackName][name];
+        data[name]['value'] = configContent.value['attacker_config'][attackName][name];
         dataSource.push(data[name]);
       }
       return dataSource;
@@ -231,19 +215,20 @@ export default defineComponent({
       let dataSource = [];
       for (let name in data) {
         data[name]['name'] = name;
-        data[name]['value'] = config.value['model_config'][modelName][name];
+        data[name]['value'] = configContent.value['model_config'][modelName][name];
         dataSource.push(data[name]);
       }
       return dataSource;
     };
 
+    const selectConfig =()=>{
+      context.emit("selected", props.index)
+    }
+
     return {
-      configID,
-      config,
+      configContent,
       attackSelectedNum,
       modelSelectedNum,
-      activeKey1,
-      activeKey2,
       attackList,
       modelList,
       declaration,
@@ -261,8 +246,8 @@ export default defineComponent({
       showAttackModal,
       showMapModal,
       handleOk,
+      selectConfig
     };
   },
-},
-);
+});
 </script>

@@ -1,10 +1,10 @@
 <style scoped lang="less">
-@import '~ant-design-vue/dist/antd.less';
+@import '@/style.less';
 .proc-board {
   max-height: 400px;
   overflow-y: auto;
 }
-.title {
+.proc-title {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -17,14 +17,14 @@
 
 <template>
   <div>
-    <div class="title">
-      <h3 class="title__text">
+    <div class="proc-title">
+      <h3 class="proc-title__text">
         <BarsOutlined /> 进度
-        <a-button shape="circle" type="text" @click="loadProcessingData">
+        <a-button shape="circle" type="text" @click="loadProcessingData" class="proc-title__text">
           <SyncOutlined />
         </a-button>
       </h3>
-      <div>
+      <div class="proc-title__text">
         允许放弃进度 <a-switch v-model:checked="allowRevokeTaskStepLog" size="small" />
       </div>
     </div>
@@ -36,12 +36,12 @@
             <CloseCircleOutlined v-if="!Boolean(parseInt(log.is_finish)) && log.stop_time != null" />
             <CheckCircleOutlined v-if="Boolean(parseInt(log.is_finish))" />
           </template>
-          {{log.step_name}}
+          <span class="proc-timeline__title"> {{log.step_name}} </span>
           <p>
-            <a-typography-text type="secondary">{{log.participant}} (已完成 {{log.completed_num}}) <br /> {{log.stop_time}} <br /></a-typography-text>
-            <a-typography-text type="secondary" v-if="allowRevokeTaskStepLog">记录ID {{log.id}} <a-button type="link" danger size="small"
+            <a-typography-text type="secondary" class="proc-timeline__text">{{log.participant}} (已完成 {{log.completed_num}}) <br /> {{log.stop_time}} <br /></a-typography-text>
+            <a-typography-text type="secondary" class="proc-timeline__text" v-if="allowRevokeTaskStepLog">记录ID {{log.id}} <a-button type="link" danger size="small"
                 @click="revokeTaskStep(log.id)">放弃并重置该部分进度</a-button></a-typography-text>
-            <a-typography-text type="danger" v-if="!Boolean(parseInt(log.is_finish)) && log.stop_time != null"><br />错误: {{log.errorType}}:{{log.errorObject}}<br />
+            <a-typography-text type="danger" class="proc-timeline__text" v-if="!Boolean(parseInt(log.is_finish)) && log.stop_time != null"><br />错误: {{log.errorType}}:{{log.errorObject}}<br />
               <a-popover title="错误堆栈" placement="left">
                 <template #content>
                   <div v-html="log.errorTraceback"></div>
